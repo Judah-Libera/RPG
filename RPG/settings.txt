@@ -1,0 +1,4 @@
+FullScreen 1
+Start Difficulty 1
+Music Volume 500
+Effects Volume 600

@@ -1,0 +1,8 @@
+*DO NOT COPY PASTE - IT WILL DESTROY DATA*
+Save:
+move chardata into here
+rename
+load:
+remove chardata if there
+move your game data back
+rename to chardata
