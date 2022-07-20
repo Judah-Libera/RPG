@@ -1,4 +1,4 @@
-//     RPG V2.6.1         newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V2.6.1         newcontent.alteredcontent/balancing.backendchanges/bugs gitchange 
 
 //sfx need to be update to pvp.cpp
 //new char difficulty - HC, untested
