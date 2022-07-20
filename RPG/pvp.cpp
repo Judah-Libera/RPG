@@ -1,5 +1,7 @@
 //unaltered since last backup
 
+#pragma warning(disable: 4996)
+
 #include "includes.h"
 
 using namespace std;

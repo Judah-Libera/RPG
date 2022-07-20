@@ -17,6 +17,8 @@
 //?map/travel?
 //have someone else put in multiple character slots
 
+#pragma warning(disable: 4996)
+
 #include "includes.h"
 
 using namespace std;
