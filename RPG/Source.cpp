@@ -5,7 +5,8 @@
 
 //equipment names not read in from save file ???save inv structs seperate and put all in a character folder. inprogress - change drop vals in play() then test???
 //unequip and droped weapon crashed after failed weapon name read
-//make weapon att effect c.attlvlups instead of being added post scaling
+//merge catt and catlvlups into same variable.
+//comment the code :(
 
 //lvlupsfx
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
@@ -517,10 +518,8 @@ void play()
 		}
 		if (sucat == numcheck && atttime < 1)
 		{
-			int temp = aihp;
-			aihp = aihp - 4 * ((double)c.catt + (double)c.we.wcatt) * (1 - atttime);
-			temp = temp - aihp;
-			cout << "HIT - " << temp << "\n" << endl;
+			cout << "HIT - " << aihp << "\n" << endl;
+			aihp = aihp - 3.5 * ((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness
 
 			if (atttime <= .6)
 			{
