@@ -1,4 +1,4 @@
-//     RPG V2.6.1         newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V2.6.2         newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //sfx need to be update to pvp.cpp
 //new char difficulty - HC, untested
@@ -6,7 +6,8 @@
 //equipment names not read in from save file ???save inv structs seperate and put all in a character folder. inprogress - change drop vals in play() then test???
 //unequip and droped weapon crashed after failed weapon name read
 //merge catt and catlvlups into same variable.
-//comment the code :(
+//real ST
+//check if difsel works
 
 //lvlupsfx
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
@@ -36,10 +37,10 @@ void settings();
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 bool keepplaying = true;
 bool lvlrdy = false;
-int difsel = 1;
-int FullScreen = 1;
-int mvolume = 1000;
-int sfxvolume = 1000;
+int difsel = 1; // 1=normal, 2=hardcore, 5920000737=cheateasy
+int FullScreen = 1; // 1=fs, 0=windowed
+int mvolume = 1000; // = 0-10 * 100
+int sfxvolume = 1000; // ^^^
 
 struct weapon
 {
@@ -72,14 +73,14 @@ struct character
 	int lvl = 0;
 	int score = 0;
 	int dif = 1;
-	weapon we = { "", 0 };
-	weapon weaponsarray[5];
+	weapon we = { "", 0 }; //weapon equiped
+	weapon weaponsarray[5]; //arrays for inv
 	armor ae = { "", 0, 0 };
 	armor armorsarray[5];
 	helmet he = { "", 0, 0 };
 	helmet helmetsarray[5];
 };
-character c;
+character c; //active character
 //scalers
 //((2.8 * pow(c.lvl,2)) + (20 * c.lvl) + starting value) // wolfram alpha
 const double aiattscaler() { return (.02 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; } //pow(1.17, c.lvl);
@@ -92,13 +93,13 @@ const double regenscaler() { return ((double)(c.regen + c.ae.aregen + c.he.hrege
 
 weapon createweapon()
 {
-	string wname;
+	string wname; // total name, part1, part2
 	string wname1;
 	string wname2;
-	int wnamei = (rand() % 4);
+	int wnamei = (rand() % 4); //title selections
 	int wnamei2 = (rand() % 4);
-	int wcatt = ((rand() % 10) + 1);
-	if (wcatt > 7)
+	int wcatt = ((rand() % 10) + 1); // weapon power
+	if (wcatt > 7) // change list titles are selected from based on power. better drops get better names
 	{
 		if (wnamei == 0)
 			wname1 = "scythe of ";
@@ -161,18 +162,18 @@ weapon createweapon()
 			wname2 = "Justice";
 		wname = wname1 + wname2;
 	}
-	weapon w = { wname, wcatt };
+	weapon w = { wname, wcatt }; // create weapon
 	return w;
 }
-weapon wd = { "", 0 };
+weapon wd = { "", 0 }; // for dropped items
 
 armor createarmor()
 {
-	string aname;
+	string aname; // works same as createweapon()
 	string aname1;
 	string aname2;
 	int aname1i = (rand() % 2);
-	int atotalstat = ((rand() % 10) + 1);
+	int atotalstat = ((rand() % 10) + 1); // total power to be distributed between hp and regen
 	int bamchp = (rand() % (atotalstat + 1));
 	int baregen = (atotalstat - bamchp);
 	int amchp = bamchp * 5;
@@ -244,11 +245,11 @@ armor ad = { "", 0, 0, 0 };
 
 helmet createhelmet()
 {
-	string hname;
+	string hname; // worsk same as createweapon()
 	string hname1;
 	string hname2;
 	int hname1i = (rand() % 2);
-	int htotalstat = ((rand() % 10) + 1);
+	int htotalstat = ((rand() % 10) + 1); // total power to be distributed between hp and regen
 	int bhmchp = (rand() % (htotalstat + 1));
 	int bhregen = (htotalstat - bhmchp);
 	int hmchp = bhmchp * 5;
@@ -322,7 +323,7 @@ int titlescreen()
 {
 	bool resetmenu = true;
 
-	if (FullScreen == 1)
+	if (FullScreen == 1) // if fs is set to yes do so
 	{
 		COORD ScreenBufferSize{ 1500, 300 };
 		HANDLE ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -335,7 +336,7 @@ int titlescreen()
 	{
 		resetmenu = false;
 
-		FILE* fptr = fopen("asciiart.txt", "r");
+		FILE* fptr = fopen("asciiart.txt", "r"); // this chunk does the title art
 		char read_string[128];
 		while (fgets(read_string, sizeof(read_string), fptr) != NULL)
 			printf("%s", read_string);
@@ -345,7 +346,7 @@ int titlescreen()
 		printf("\n\n\nPress 1 for pvp or press enter to continue\n");
 		if (cin.get() == '1')
 		{
-			choice = pvp();
+			choice = pvp(); //launch pvp script. will end returning 1 if exits game from pvp()
 			if (choice == 1)
 				return 1;
 			else if (choice == 0)
@@ -353,7 +354,7 @@ int titlescreen()
 			else {}
 		}
 	}
-	cin.seekg(0, ios::end);
+	cin.seekg(0, ios::end); // no idea what this does but i'd rather not cuase permanate damage tryign to fiugre it out
 	cin.clear();
 	return 0;
 }
@@ -362,7 +363,7 @@ void viewhscores()
 {
 	string line;
 	ifstream sdata;
-	sdata.open("hscores.txt");
+	sdata.open("hscores.txt"); //just prints lines from hscores
 
 	cout << "High Scores" << endl;
 	while (getline(sdata, line))
@@ -374,9 +375,9 @@ void viewhscores()
 
 void updatehscores()
 {
-	if (c.dif == 2)
+	if (c.dif == 2) // double score for hardcore
 		c.score = c.score * 2;
-	int scorearray[11] = { 0,0,0,0,0,0,0,0,0,0,0 };
+	int scorearray[11] = { 0,0,0,0,0,0,0,0,0,0,0 }; //place holders
 	string names[11] = { "","","","","","","","","","","" };
 
 	string line;
@@ -384,19 +385,19 @@ void updatehscores()
 	sdatai.open("hscores.txt");
 
 	int counter = 0;
-	while (getline(sdatai, line))
+	while (getline(sdatai, line)) //reads lines into place holders. data is stored in descending order and thus read in likewise
 	{
 		istringstream ss(line);
 		ss >> scorearray[counter] >> names[counter];
 		counter++;
 	}
 	sdatai.close();
-	if (c.score >= scorearray[9])
+	if (c.score >= scorearray[9]) // if list is full replace lowest entry with current games score
 	{
 		scorearray[10] = c.score;
 		printf("Enter name for highscore table.\n");
 		cin >> names[10];
-		for (int j = 0; j < 10; j++)
+		for (int j = 0; j < 10; j++) //bubble sort cuase its easy
 		{
 			for (int i = 0; i < 10 - j; i++)
 			{
@@ -406,14 +407,14 @@ void updatehscores()
 					scorearray[i] = scorearray[i + 1];
 					scorearray[i + 1] = temp;
 
-					string temp2 = names[i];
+					string temp2 = names[i]; // keep naems array matching
 					names[i] = names[i + 1];
 					names[i + 1] = temp2;
 				}
 			}
 		}
 		ofstream sdatao;
-		sdatao.open("hscores.txt");
+		sdatao.open("hscores.txt"); //save sorted data
 		sdatao << scorearray[10] << " " << names[10] << "\n" << scorearray[9] << " " << names[9] << "\n" << scorearray[8] << " " << names[8] << "\n" << scorearray[7] << " " << names[7] << "\n" << scorearray[6] << " " << names[6] << "\n" << scorearray[5] << " " << names[5] << "\n" << scorearray[4] << " " << names[4] << "\n" << scorearray[3] << " " << names[3] << "\n" << scorearray[2] << " " << names[2] << "\n" << scorearray[1] << " " << names[1];
 		sdatao.close();
 	}
@@ -421,31 +422,31 @@ void updatehscores()
 
 void lvlup()
 {
-	for (int x = 0; x < 2; x++)
+	for (int x = 0; x < 2; x++) // 2 SP per level
 	{
 		bool tryagain = false;
 		do
 		{
 			int statup;
-			if (x == 0)
+			if (x == 0) //upgrade twice prompt control
 				cout << "Congratulations on reaching level " << c.lvl + 1 << ". You may upgrade twice.\n\n1 - Max HP\n2 - Regeneration\n3 - Attack" << endl;
 			else
 				cout << "And one more.\n\n1 - Max HP\n2 - Regeneration\n3 - Attack" << endl;
 
 			cin >> statup;
-			if (statup == 1)
+			if (statup == 1) // max hp
 			{
 				double temp = c.mchp;
 				c.mchp = mchpscaler();
 				c.chp = c.chp + ((c.mchp - temp) / 2);
 				tryagain = false;
 			}
-			else if (statup == 2)
+			else if (statup == 2) // regen
 			{
 				c.regen = c.regen + 1;
 				tryagain = false;
 			}
-			else if (statup == 3)
+			else if (statup == 3) // att
 			{
 				c.attlvlups++;
 				c.catt = cattscaler();
@@ -456,7 +457,7 @@ void lvlup()
 		} while (tryagain == true);
 		system("CLS");
 	}
-	c.cxp = c.cxp - (int)xpcostscaler();
+	c.cxp = c.cxp - (int)xpcostscaler(); // reset xp and up lvl
 	lvlrdy = false;
 	c.lvl++;
 }
@@ -464,14 +465,14 @@ void lvlup()
 void play()
 {
 	cout << "When you see 'ATTACK #' hit the number then enter before times up" << endl;
-	int rng = rand() % 5 + 6; //6-10
+	int rng = rand() % 5 + 6; //6-10 // ai diff
 	int aihp = rng * aihpscaler();
 	int numcheck = 10;
 	int damage = 0;
 	int dt = 4;
 
 	bool boss = false; //testign inv saves - make true
-	if (rng >= 9)
+	if (rng >= 9) // boss
 	{
 		boss = true;
 		mciSendString(L"seek elitesfx to start", NULL, 0, NULL);
@@ -481,76 +482,72 @@ void play()
 	bool keepatt = true;
 	while (keepatt == true)
 	{
-		int aiatt = (((rand() % 11) + 15) * aiattscaler());
-		int cntratt = (rand() % 3);
-		int ct = ((rand() % 4) + 1) * 1000;
-		int sucat = (rand() % 10);
+		int aiatt = (((rand() % 11) + 15) * aiattscaler()); // rng att value
+		int cntratt = (rand() % 3); // rng if cntratt. 2 in 3 chance
+		int ct = ((rand() % 4) + 1) * 1000; // rng how long to wait for attack prompt
+		int sucat = (rand() % 10); // rng number to enter
 
 		cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
 
+		numcheck = 10;
 		system("pause");
 		system("CLS");
 		cout << "ATTACK: ";
 		Sleep(ct);
 		cout << sucat << endl;
-		numcheck = 10;
-
 
 		clock_t begin = clock();
-
 		cin >> numcheck;
-
 		clock_t end = clock();
+		double atttime = double(end - begin) / CLOCKS_PER_SEC; // gets att time converted to seconds
 
-		double atttime = double(end - begin) / CLOCKS_PER_SEC;
-
-		if (c.dif == 0)
+		if (c.dif == 0) // half time for easy
 			atttime = atttime / 2;
 
 		system("CLS");
 
 		cout << "time to strike: " << atttime << endl;
 
-		if (cin.fail() == true)
+		if (cin.fail() == true) // non numerical input
 		{
 			cin.clear();
 			cin.ignore(std::numeric_limits<int>::max(), '\n');
 			cout << "You entered a character. " << numcheck << endl;
 			numcheck = 10;
 		}
-		if (sucat == numcheck && atttime < 1)
+		if (sucat == numcheck && atttime < 1) // hit
 		{
 			cout << "HIT - " << aihp << "\n" << endl;
 			aihp = aihp - 3.5 * ((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness
 
-			if (atttime <= .6)
+			if (atttime <= .6) // crit
 			{
-				cntratt = 2;
+				cntratt = 2; // don't cntr att on crit
 				mciSendString(L"seek critsfx to start", NULL, 0, NULL);
 				mciSendString(L"play critsfx", NULL, 0, NULL);
 			}
 
 			if (cntratt != 2 && aihp > 0)
 			{
-				c.chp = c.chp - aiatt / (cntratt + 2);
+				c.chp = c.chp - aiatt / (cntratt + 2); // 50/50 between half and third att damage
 				cout << "OUCH - Counter Attacked - " << (aiatt / (cntratt + 2)) << "\n" << endl;
 			}
 		}
 		else
-		{
+		{ // miss
 			c.chp = c.chp - aiatt;
 			cout << "OUCH" << endl;
-			if (sucat != numcheck)
+			if (sucat != numcheck) // display entered number if it was wrong. otherwise will still have tts up
 				cout << "You entered " << numcheck << " instead of " << sucat << ".\n" << endl;
 		}
-		if (c.chp < 1)
+		if (c.chp < 1) // character dead
 		{
 			mciSendString(L"seek dsfx to start", NULL, 0, NULL);
 			mciSendString(L"play dsfx", NULL, 0, NULL);
 
 			cout << "hp - 0\nYour garbage and don't deserve a second chance looser. Your score was " << c.score << ".\n\n" << endl;
 			cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
-			if (c.dif == 2)
+			if (c.dif == 2) // if hardcore, creates emoty char to overwrite save data
 			{
 				character q = { "", 200, 200, 10, 0, 3, 0, 1, 0, difsel};
 				FILE* ofpb = fopen("chardata.bin", "wb");
@@ -564,11 +561,11 @@ void play()
 			mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 			system("pause");
 			system("CLS");
-			if (c.dif != 0)
+			if (c.dif != 0) // don't get score saved for easy
 				updatehscores();
 			viewhscores();
 			system("pause");
-			mciSendString(L"close maintheme", NULL, 0, NULL);
+			mciSendString(L"close maintheme", NULL, 0, NULL); // close game
 			mciSendString(L"close em3", NULL, 0, NULL);
 			mciSendString(L"close fighttheme", NULL, 0, NULL);
 			mciSendString(L"close fighttheme2", NULL, 0, NULL);
@@ -579,7 +576,7 @@ void play()
 			mciSendString(L"close dsfx", NULL, 0, NULL);
 			exit(0);
 		}
-		if (aihp < 1)
+		if (aihp < 1) // enemy dead
 		{
 			mciSendString(L"seek vsfx to start", NULL, 0, NULL);
 			mciSendString(L"play vsfx", NULL, 0, NULL);
@@ -596,17 +593,17 @@ void play()
 			}
 			if (boss == true)
 			{
-				int ld = (rand() % 2); //testign inv saves - make 1
+				int ld = (rand() % 2); //testign inv saves - make 1. default 2 // item drop chance
 				if (ld == 1)
 				{
-					dt = (rand() % 3);//testign inv saves - make 0
+					dt = (rand() % 3);//testign inv saves - make 0. defualt 3 // item drop type
 					mciSendString(L"seek itemdsfx to start", NULL, 0, NULL);
 					mciSendString(L"play itemdsfx", NULL, 0, NULL);
 					if (dt == 0)
 					{
 						weapon wd = createweapon();
 						cout << "You've found " << wd.wname << "!" << endl;
-						for (int i = 0; i < 5 - 1; i++)
+						for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (c.weaponsarray[j].wcatt < c.weaponsarray[j + 1].wcatt)
 								{
@@ -614,9 +611,10 @@ void play()
 									c.weaponsarray[j] = c.weaponsarray[j + 1];
 									c.weaponsarray[j + 1] = temp;
 								}
-						c.weaponsarray[4] = wd;
+						if (wd.wcatt > c.weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
+							c.weaponsarray[4] = wd;
 					}
-					if (dt == 1)
+					if (dt == 1) // same as weapon drop
 					{
 						armor ad = createarmor();
 						cout << "You've found " << ad.aname << "!" << endl;
@@ -628,9 +626,10 @@ void play()
 									c.armorsarray[j] = c.armorsarray[j + 1];
 									c.armorsarray[j + 1] = temp;
 								}
-						c.armorsarray[4] = ad;
+						if (ad.atotalstat > c.armorsarray[4].atotalstat)
+							c.armorsarray[4] = ad;
 					}
-					if (dt == 2)
+					if (dt == 2) // same as weapon drop
 					{
 						helmet hd = createhelmet();
 						cout << "You've found " << hd.hname << "!" << endl;
@@ -642,7 +641,8 @@ void play()
 									c.helmetsarray[j] = c.helmetsarray[j + 1];
 									c.helmetsarray[j + 1] = temp;
 								}
-						c.helmetsarray[4] = hd;
+						if (hd.htotalstat > c.helmetsarray[4].htotalstat)
+							c.helmetsarray[4] = hd;
 					}
 				}
 			}
@@ -650,7 +650,7 @@ void play()
 			system("CLS");
 
 
-			int sucheal = (rand() % 10);
+			int sucheal = (rand() % 10); // same as attack but heals instead
 			cout << "Time to get some hp back, make it count.\n" << endl;
 			system("pause");
 			cout << "HEAL: ";
@@ -696,7 +696,7 @@ void play()
 
 void viewchar(int pac)
 {
-	if (c.dif == 2)
+	if (c.dif == 2) // dispaly in red for HC character
 		SetConsoleTextAttribute(hConsole, 4);
 	cout << "Class - " << c.cclass << endl;
 	cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
@@ -705,10 +705,10 @@ void viewchar(int pac)
 	cout << "Expierience - " << c.cxp << "/" << (int)xpcostscaler() << endl;
 	cout << "Level - " << (int)c.lvl << "\n\n" << endl;
 	cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << endl;
-	if (c.dif == 2)
+	if (c.dif == 2) // put back normal
 		SetConsoleTextAttribute(hConsole, 15);
 
-	if (pac == 1)
+	if (pac == 1) // inventory managment option. not sure when viewchar is called without it
 	{
 		bool skip = false;
 		bool ri = false;
@@ -922,25 +922,25 @@ void viewchar(int pac)
 
 void savegame()
 {
-	FILE* ofpb = fopen("char/chardata.bin", "wb");
+	FILE* ofpb = fopen("char/chardata.bin", "wb"); //save char
 	fwrite(&c, sizeof(character), 1, ofpb);
 	fclose(ofpb);
 
-	FILE* ofpb2 = fopen("char/weapons.bin", "wb");
+	FILE* ofpb2 = fopen("char/weapons.bin", "wb"); //save weapons inventory
 	for (int i = 0; i < 5; i++)		
 		fwrite(&c.weaponsarray[i], sizeof(weapon), 1, ofpb2);
 	fclose(ofpb2);
-	//manual save all enrties in equipments arrays as bin(still loop and save individually)
+	//manual save all enrties in equipments arrays as bin(still loop and save individually). hae to save equiped items seperat also?
 	system("CLS");
 }
 
 void loadchar()
 {
-	FILE* ifpb = fopen("char/chardata.bin", "rb");
+	FILE* ifpb = fopen("char/chardata.bin", "rb"); //load char
 	fread(&c, sizeof(character), 1, ifpb);
 	fclose(ifpb);
 
-	FILE* ifpb2 = fopen("char/weapons.bin", "rb");
+	FILE* ifpb2 = fopen("char/weapons.bin", "rb"); //stil ltrying to fix equipment saving/loading
 	for (int i = 0; i < 5; i++)
 		fread(&c.weaponsarray[i], sizeof(weapon), 1, ifpb2);
 	fclose(ifpb2);
@@ -984,7 +984,7 @@ void volumeupdate()
 
 void settings()
 {
-	mciSendString(L"open audio/elitesfx.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL);
+	mciSendString(L"open audio/elitesfx.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL); // to hear sfx whe nselecting
 	int cs = 0;
 	int mc = 0;
 	bool vi = true;
@@ -1057,7 +1057,7 @@ void settings()
 	} while (vi != true);
 	system("CLS");
 
-	FILE* ofp = fopen("settings.txt", "w");
+	FILE* ofp = fopen("settings.txt", "w"); //update settigns file
 	fprintf(ofp, "FullScreen %d\nStart Difficulty %d\nMusic Volume %d\nEffects Volume %d", FullScreen, difsel, mvolume, sfxvolume);
 	fclose(ofp);
 	mciSendString(L"close elitesfx", NULL, 0, NULL);
@@ -1066,7 +1066,7 @@ void settings()
 int main()
 {
 	//SetConsoleTextAttribute(hConsole, 15);
-	mciSendString(L"open audio/titletheme.mp3 type mpegvideo alias em3", NULL, 0, NULL);
+	mciSendString(L"open audio/titletheme.mp3 type mpegvideo alias em3", NULL, 0, NULL); //open all audio files gonna be needed. 
 	mciSendString(L"open audio/fighttheme.mp3 type mpegvideo alias fighttheme", NULL, 0, NULL);
 	mciSendString(L"open audio/fighttheme2.mp3 type mpegvideo alias fighttheme2", NULL, 0, NULL);
 	mciSendString(L"open audio/maintheme.mp3 type mpegvideo alias maintheme", NULL, 0, NULL);
@@ -1076,7 +1076,7 @@ int main()
 	mciSendString(L"open audio/elitesfx.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL);
 	mciSendString(L"open audio/vsfx.mp3 type mpegvideo alias vsfx", NULL, 0, NULL);
 	mciSendString(L"open audio/dsfx.mp3 type mpegvideo alias dsfx", NULL, 0, NULL);
-	FILE* ifp = fopen("settings.txt", "r");
+	FILE* ifp = fopen("settings.txt", "r"); //read in settigns
 	fscanf(ifp, "FullScreen %d\n", &FullScreen);
 	fscanf(ifp, "Start Difficulty %d\n", &difsel);
 	fscanf(ifp, "Music Volume %d\n", &mvolume);
@@ -1092,12 +1092,12 @@ int main()
 	volumeupdate();
 
 	mciSendString(L"play titletheme repeat", NULL, 0, NULL);
-	int pvpfullexit = titlescreen();
+	int pvpfullexit = titlescreen(); // returns 1 if pvp() wants to close app
 	mciSendString(L"pause titletheme", NULL, 0, NULL);
 	mciSendString(L"close titletheme", NULL, 0, NULL);
 	system("CLS");
 
-	if (pvpfullexit == 1)
+	if (pvpfullexit == 1) // app closed form pvp()
 	{
 		mciSendString(L"close maintheme", NULL, 0, NULL);
 		mciSendString(L"close em3", NULL, 0, NULL);
@@ -1126,7 +1126,7 @@ int main()
 				  break;
 			case 2: c = { "Human", 100, 100, 20, 0, 3, 0, 1, 0, difsel};
 				  break;
-			case 3: c = { "Elf", 50, 50, 40, 0, 3, 0, 1, 0, difsel}; //c.dif always gets garbage value here(difsel/1/na). difsel does = 1;
+			case 3: c = { "Elf", 50, 50, 40, 0, 3, 0, 1, 0, difsel}; // if difsel not working, theres an issue with it gettign the right value here, i think
 				  break;
 			default:
 				break;
@@ -1148,7 +1148,7 @@ int main()
 			mciSendString(L"pause em3", NULL, 0, NULL);
 		}
 		else if (temp2 == 4)
-		{
+		{ // basically a copy of play()
 			bool cont = true;
 			int numcheck = 11;
 			system("CLS");
@@ -1231,7 +1231,7 @@ int main()
 		else
 			continue;
 
-		while (keepplaying == true)
+		while (keepplaying == true) // starts when game is opened. main gameplay loop
 		{
 			if (lvlrdy == true)
 			{
@@ -1246,7 +1246,7 @@ int main()
 			case 0: if (lvlrdy == true)
 				lvlup();
 				break;
-			case 1: ts = rand() % 2;
+			case 1: ts = rand() % 2; // rng between two fight themes
 				if (ts == 0)
 				{
 					mciSendString(L"pause maintheme", NULL, 0, NULL);
@@ -1274,8 +1274,8 @@ int main()
 				break;
 			case 4: keepplaying = false;
 				break;
-			case 5: keepplaying = false;
-				resetmenu = false;
+			case 5: keepplaying = false; // quite just gameplay loop
+				resetmenu = false; // quite main menu loop
 				break;
 			default:
 				break;
