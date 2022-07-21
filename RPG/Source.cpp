@@ -2,14 +2,14 @@
 
 //sfx need to be update to pvp.cpp
 //new char difficulty - HC, untested
+//merge catt and catlvlups into same variable.
 
 //equipment names not read in from save file ???save inv structs seperate and put all in a character folder. inprogress - change drop vals in play() then test???
 //unequip and droped weapon crashed after failed weapon name read
-//merge catt and catlvlups into same variable.
-//real ST
 //check if difsel works
 
 //lvlupsfx
+//real soundtrack
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
 //try fibonacci for late game scaling? < x^2 till x > 12
 //renown title and name generation every 5 levels past 10
