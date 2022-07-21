@@ -1,13 +1,14 @@
 //     RPG V2.6.2         newcontent.alteredcontent/balancing.backendchanges/bugs
 
-//sfx need to be update to pvp.cpp
-//new char difficulty - HC, untested
-//merge catt and catlvlups into same variable.
-
+//BUGS
 //equipment names not read in from save file ???save inv structs seperate and put all in a character folder. inprogress - change drop vals in play() then test???
 //unequip and droped weapon crashed after failed weapon name read
-//check if difsel works
 
+//EDITS
+//merge catt and catlvlups into same variable.
+//sfx need to be update to pvp.cpp
+
+//FEATURES
 //lvlupsfx
 //real soundtrack
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
@@ -487,6 +488,9 @@ void play()
 		int ct = ((rand() % 4) + 1) * 1000; // rng how long to wait for attack prompt
 		int sucat = (rand() % 10); // rng number to enter
 
+		if (c.dif == 2)
+			aiatt = aiatt * 1.1; // +10% damage for ai in hardcore
+
 		cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
 
 		numcheck = 10;
@@ -517,8 +521,11 @@ void play()
 		}
 		if (sucat == numcheck && atttime < 1) // hit
 		{
-			cout << "HIT - " << aihp << "\n" << endl;
-			aihp = aihp - 3.5 * ((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness
+			double dmg = 3.5 * ((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness
+			if (c.dif == 2)
+				dmg = dmg * .9; // -10% damage for hardcore
+			aihp = aihp - (int)dmg;
+			cout << "HIT - " << dmg << "\n" << endl;
 
 			if (atttime <= .6) // crit
 			{
@@ -547,7 +554,7 @@ void play()
 
 			cout << "hp - 0\nYour garbage and don't deserve a second chance looser. Your score was " << c.score << ".\n\n" << endl;
 			cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
-			if (c.dif == 2) // if hardcore, creates emoty char to overwrite save data
+			if (c.dif == 2) // if hardcore, creates empty char to overwrite save data
 			{
 				character q = { "", 200, 200, 10, 0, 3, 0, 1, 0, difsel};
 				FILE* ofpb = fopen("chardata.bin", "wb");
@@ -698,6 +705,7 @@ void viewchar(int pac)
 {
 	if (c.dif == 2) // dispaly in red for HC character
 		SetConsoleTextAttribute(hConsole, 4);
+	cout << difsel << "<- difsel : c.dif->" << c.dif << endl;
 	cout << "Class - " << c.cclass << endl;
 	cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 	cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
@@ -1002,7 +1010,7 @@ void settings()
 		case 1: int diff;
 			loop = false;
 			do {
-				cout << "Select difficulty for new Characters. 1 - normal\n2 - hardcore." << endl;
+				cout << "Select difficulty for new Characters.\n1 - normal\n2 - hardcore." << endl;
 				cin >> diff;
 				if (diff == 2 || diff == 1)
 					difsel = diff;
@@ -1122,11 +1130,14 @@ int main()
 			system("CLS");
 			switch (temp)
 			{
-			case 1: c = { "Orc", 200, 200, 10, 0, 3, 0, 1, 0, difsel};
+			case 1: c = { "Orc", 200, 200, 10, 0, 3, 0, 1, 0};
+				  c.dif = difsel;
 				  break;
-			case 2: c = { "Human", 100, 100, 20, 0, 3, 0, 1, 0, difsel};
+			case 2: c = { "Human", 100, 100, 20, 0, 3, 0, 1, 0};
+				  c.dif = difsel;
 				  break;
-			case 3: c = { "Elf", 50, 50, 40, 0, 3, 0, 1, 0, difsel}; // if difsel not working, theres an issue with it gettign the right value here, i think
+			case 3: c = { "Elf", 50, 50, 40, 0, 3, 0, 1, 0};
+				  c.dif = difsel;
 				  break;
 			default:
 				break;
