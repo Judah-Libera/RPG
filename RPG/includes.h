@@ -1,4 +1,5 @@
-//unaltered since last backup
+#ifndef inlcudes_H
+#define inlcudes_H
 
 #pragma once
 
@@ -15,6 +16,41 @@
 #include <stdio.h>
 #include <filesystem>
 
+//#include "Source.cpp"
+
 int pvp();
 
+struct weapon
+{
+	std::string wname = "";
+	int wcatt = 0;
+};
+struct armor
+{
+	std::string aname = "";
+	int amchp = 0;
+	int aregen = 0;
+	int atotalstat = 0;
+};
+struct helmet
+{
+	std::string hname = "";
+	int hmchp = 0;
+	int hregen = 0;
+	int htotalstat = 0;
+};
+
+namespace deadlibrary
+{
+	class func
+	{
+	public:
+		static void swapweapon(weapon &i, weapon &j);
+		static void swaparmor(armor &i, armor &j);
+		static void swaphelmet(helmet &i, helmet &j);
+	};
+}
+
 #pragma comment(lib, "Winmm.lib")
+
+#endif

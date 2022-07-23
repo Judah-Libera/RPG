@@ -6,25 +6,6 @@
 
 using namespace std;
 
-struct weapon
-{
-	string wname = "";
-	int wcatt = 0;
-};
-struct armor
-{
-	string aname = "";
-	int amchp = 0;
-	int aregen = 0;
-	int atotalstat = 0;
-};
-struct helmet
-{
-	string hname = "";
-	int hmchp = 0;
-	int hregen = 0;
-	int htotalstat = 0;
-};
 struct character
 {
 	string cclass = "";

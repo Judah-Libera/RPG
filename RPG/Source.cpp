@@ -1,12 +1,10 @@
-//     RPG V2.6.2         newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V2.6.5	        newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//equipment names not read in from save file ???save inv structs seperate and put all in a character folder. inprogress - change drop vals in play() then test???
-//unequip and droped weapon crashed after failed weapon name read
 
 //EDITS
 //merge catt and catlvlups into same variable.
-//sfx need to be update to pvp.cpp
+//update pvp.cpp - sfx
 
 //FEATURES
 //lvlupsfx
@@ -43,25 +41,7 @@ int FullScreen = 1; // 1=fs, 0=windowed
 int mvolume = 1000; // = 0-10 * 100
 int sfxvolume = 1000; // ^^^
 
-struct weapon
-{
-	string wname = "";
-	int wcatt = 0;
-};
-struct armor
-{
-	string aname = "";
-	int amchp = 0;
-	int aregen = 0;
-	int atotalstat = 0;
-};
-struct helmet
-{
-	string hname = "";
-	int hmchp = 0;
-	int hregen = 0;
-	int htotalstat = 0;
-};
+
 struct character
 {
 	string cclass = "";
@@ -75,13 +55,16 @@ struct character
 	int score = 0;
 	int dif = 1;
 	weapon we = { "", 0 }; //weapon equiped
-	weapon weaponsarray[5]; //arrays for inv
+	weapon weaponsarray[5]; // doesn't work if these arrays are not here. idk why, they arn't used as far as i know. doesn't seem to matter what they're called
 	armor ae = { "", 0, 0 };
 	armor armorsarray[5];
 	helmet he = { "", 0, 0 };
 	helmet helmetsarray[5];
 };
 character c; //active character
+weapon weaponsarray[5]; //arrays for inv
+armor armorsarray[5];
+helmet helmetsarray[5];
 //scalers
 //((2.8 * pow(c.lvl,2)) + (20 * c.lvl) + starting value) // wolfram alpha
 const double aiattscaler() { return (.02 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; } //pow(1.17, c.lvl);
@@ -472,7 +455,7 @@ void play()
 	int damage = 0;
 	int dt = 4;
 
-	bool boss = false; //testign inv saves - make true
+	bool boss = false;
 	if (rng >= 9) // boss
 	{
 		boss = true;
@@ -600,10 +583,10 @@ void play()
 			}
 			if (boss == true)
 			{
-				int ld = (rand() % 2); //testign inv saves - make 1. default 2 // item drop chance
+				int ld = (rand() % 2); // item drop chance
 				if (ld == 1)
 				{
-					dt = (rand() % 3);//testign inv saves - make 0. defualt 3 // item drop type
+					dt = (rand() % 3); // item drop type
 					mciSendString(L"seek itemdsfx to start", NULL, 0, NULL);
 					mciSendString(L"play itemdsfx", NULL, 0, NULL);
 					if (dt == 0)
@@ -612,14 +595,22 @@ void play()
 						cout << "You've found " << wd.wname << "!" << endl;
 						for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
 							for (int j = 0; j < 5 - i - 1; j++)
-								if (c.weaponsarray[j].wcatt < c.weaponsarray[j + 1].wcatt)
+								if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
 								{
-									weapon temp = c.weaponsarray[j];
-									c.weaponsarray[j] = c.weaponsarray[j + 1];
-									c.weaponsarray[j + 1] = temp;
+									weapon temp = weaponsarray[j];
+									weaponsarray[j] = weaponsarray[j + 1];
+									weaponsarray[j + 1] = temp;
 								}
-						if (wd.wcatt > c.weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
-							c.weaponsarray[4] = wd;
+						if (wd.wcatt > weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
+							weaponsarray[4] = wd;
+						for (int i = 0; i < 5 - 1; i++) // sort inv by descending power again with new item
+							for (int j = 0; j < 5 - i - 1; j++)
+								if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
+								{
+									weapon temp = weaponsarray[j];
+									weaponsarray[j] = weaponsarray[j + 1];
+									weaponsarray[j + 1] = temp;
+								}
 					}
 					if (dt == 1) // same as weapon drop
 					{
@@ -627,14 +618,22 @@ void play()
 						cout << "You've found " << ad.aname << "!" << endl;
 						for (int i = 0; i < 5 - 1; i++)
 							for (int j = 0; j < 5 - i - 1; j++)
-								if (c.armorsarray[j].atotalstat < c.armorsarray[j + 1].atotalstat)
+								if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
 								{
-									armor temp = c.armorsarray[j];
-									c.armorsarray[j] = c.armorsarray[j + 1];
-									c.armorsarray[j + 1] = temp;
+									armor temp = armorsarray[j];
+									armorsarray[j] = armorsarray[j + 1];
+									armorsarray[j + 1] = temp;
 								}
-						if (ad.atotalstat > c.armorsarray[4].atotalstat)
-							c.armorsarray[4] = ad;
+						if (ad.atotalstat > armorsarray[4].atotalstat)
+							armorsarray[4] = ad;
+						for (int i = 0; i < 5 - 1; i++)
+							for (int j = 0; j < 5 - i - 1; j++)
+								if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
+								{
+									armor temp = armorsarray[j];
+									armorsarray[j] = armorsarray[j + 1];
+									armorsarray[j + 1] = temp;
+								}
 					}
 					if (dt == 2) // same as weapon drop
 					{
@@ -642,14 +641,22 @@ void play()
 						cout << "You've found " << hd.hname << "!" << endl;
 						for (int i = 0; i < 5 - 1; i++)
 							for (int j = 0; j < 5 - i - 1; j++)
-								if (c.helmetsarray[j].htotalstat < c.helmetsarray[j + 1].htotalstat)
+								if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
 								{
-									helmet temp = c.helmetsarray[j];
-									c.helmetsarray[j] = c.helmetsarray[j + 1];
-									c.helmetsarray[j + 1] = temp;
+									helmet temp = helmetsarray[j];
+									helmetsarray[j] = helmetsarray[j + 1];
+									helmetsarray[j + 1] = temp;
 								}
-						if (hd.htotalstat > c.helmetsarray[4].htotalstat)
-							c.helmetsarray[4] = hd;
+						if (hd.htotalstat > helmetsarray[4].htotalstat)
+							helmetsarray[4] = hd;
+						for (int i = 0; i < 5 - 1; i++)
+							for (int j = 0; j < 5 - i - 1; j++)
+								if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
+								{
+									helmet temp = helmetsarray[j];
+									helmetsarray[j] = helmetsarray[j + 1];
+									helmetsarray[j + 1] = temp;
+								}
 					}
 				}
 			}
@@ -690,7 +697,7 @@ void play()
 		}
 
 		cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n" << endl;
-		cout << "\nhp - " << c.chp << "\nattack - " << c.catt + c.we.wcatt << "\n\n" << endl;
+		cout << "\nhp - " << c.chp << "/" << c.mchp << "\nattack - " << c.catt + c.we.wcatt << "\n\n" << endl;
 		cout << "1 - continue attacking\n2 - retreat" << endl;
 		int temp3;
 		cin >> temp3;
@@ -705,7 +712,6 @@ void viewchar(int pac)
 {
 	if (c.dif == 2) // dispaly in red for HC character
 		SetConsoleTextAttribute(hConsole, 4);
-	cout << difsel << "<- difsel : c.dif->" << c.dif << endl;
 	cout << "Class - " << c.cclass << endl;
 	cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 	cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
@@ -716,7 +722,7 @@ void viewchar(int pac)
 	if (c.dif == 2) // put back normal
 		SetConsoleTextAttribute(hConsole, 15);
 
-	if (pac == 1) // inventory managment option. not sure when viewchar is called without it
+	if (pac == 1) // enables inventory managment option. not sure when viewchar is called without it
 	{
 		bool skip = false;
 		bool ri = false;
@@ -729,6 +735,9 @@ void viewchar(int pac)
 		cin >> mc3;
 		if (mc3 == 1)
 		{
+			weapon emptyweapon = { "", 0 };
+			armor emptyarmor = { "", 0, 0 };
+			helmet emptyhelmet = { "", 0, 0 };
 			do
 			{
 				ri = false;
@@ -738,26 +747,26 @@ void viewchar(int pac)
 				cout << "\nA - Weapons in inventory." << endl;
 				for (int i = 0; i < 5; i++)
 				{
-					if (c.weaponsarray[i].wname == "")
+					if (weaponsarray[i].wname == "" || weaponsarray[i].wname == " ") //empty naems should be blank but just in case its a space it checks that too
 						cout << i + 1 << " - " << "empty" << endl;
 					else
-						cout << i + 1 << " - " << c.weaponsarray[i].wname << " - " << c.weaponsarray[i].wcatt << " att" << endl;
+						cout << i + 1 << " - " << weaponsarray[i].wname << " - " << weaponsarray[i].wcatt << " att" << endl;
 				}
 				cout << "\nB - Armors in inventory." << endl;
 				for (int i = 0; i < 5; i++)
 				{
-					if (c.armorsarray[i].aname == "")
+					if (armorsarray[i].aname == "" || armorsarray[i].aname == " ")
 						cout << i + 1 << " - " << "empty" << endl;
 					else
-						cout << i + 1 << " - " << c.armorsarray[i].aname << " - " << c.armorsarray[i].amchp << " hp" << " - " << c.armorsarray[i].aregen << " regen" << endl;
+						cout << i + 1 << " - " << armorsarray[i].aname << " - " << armorsarray[i].amchp << " hp" << " - " << armorsarray[i].aregen << " regen" << endl;
 				}
 				cout << "\nC - Helmets in inventory." << endl;
 				for (int i = 0; i < 5; i++)
 				{
-					if (c.helmetsarray[i].hname == "")
+					if (helmetsarray[i].hname == "" || helmetsarray[i].hname == " ")
 						cout << i + 1 << " - " << "empty" << endl;
 					else
-						cout << i + 1 << " - " << c.helmetsarray[i].hname << " - " << c.helmetsarray[i].hmchp << " hp" << " - " << c.helmetsarray[i].hregen << " regen" << endl;
+						cout << i + 1 << " - " << helmetsarray[i].hname << " - " << helmetsarray[i].hmchp << " hp" << " - " << helmetsarray[i].hregen << " regen" << endl;
 				}
 
 				cout << "\nTo switch items enter the letter of the item type you would like to replace, or D to delete/unequip. Enter 0 at any time to exit." << endl;
@@ -767,15 +776,25 @@ void viewchar(int pac)
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						c.we = c.weaponsarray[0];
+					{
+						deadlibrary::func::swapweapon(c.we, weaponsarray[0]);
+					}
 					else if (mc2 == 2)
-						c.we = c.weaponsarray[1];
+					{
+						deadlibrary::func::swapweapon(c.we, weaponsarray[1]);
+					}
 					else if (mc2 == 3)
-						c.we = c.weaponsarray[2];
+					{
+						deadlibrary::func::swapweapon(c.we, weaponsarray[2]);
+					}
 					else if (mc2 == 4)
-						c.we = c.weaponsarray[3];
+					{
+						deadlibrary::func::swapweapon(c.we, weaponsarray[3]);
+					}
 					else if (mc2 == 5)
-						c.we = c.weaponsarray[4];
+					{
+						deadlibrary::func::swapweapon(c.we, weaponsarray[4]);
+					}
 					else
 						skip = true;
 				}
@@ -784,15 +803,25 @@ void viewchar(int pac)
 					cout << "Enter the number of the armor you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						c.ae = c.armorsarray[0];
+					{
+						deadlibrary::func::swaparmor(c.ae, armorsarray[0]); // no idea if this wil lwork
+					}
 					else if (mc2 == 2)
-						c.ae = c.armorsarray[1];
+					{
+						deadlibrary::func::swaparmor(c.ae, armorsarray[1]);
+					}
 					else if (mc2 == 3)
-						c.ae = c.armorsarray[2];
+					{
+						deadlibrary::func::swaparmor(c.ae, armorsarray[2]);
+					}
 					else if (mc2 == 4)
-						c.ae = c.armorsarray[3];
+					{
+						deadlibrary::func::swaparmor(c.ae, armorsarray[3]);
+					}
 					else if (mc2 == 5)
-						c.ae = c.armorsarray[4];
+					{
+						deadlibrary::func::swaparmor(c.ae, armorsarray[4]);
+					}
 					else
 						skip = true;
 				}
@@ -801,15 +830,15 @@ void viewchar(int pac)
 					cout << "Enter the number of the helmet you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						c.he = c.helmetsarray[0];
+						deadlibrary::func::swaphelmet(c.he, helmetsarray[0]);
 					else if (mc2 == 2)
-						c.he = c.helmetsarray[1];
+						deadlibrary::func::swaphelmet(c.he, helmetsarray[1]);
 					else if (mc2 == 3)
-						c.he = c.helmetsarray[2];
+						deadlibrary::func::swaphelmet(c.he, helmetsarray[2]);
 					else if (mc2 == 4)
-						c.he = c.helmetsarray[3];
+						deadlibrary::func::swaphelmet(c.he, helmetsarray[3]);
 					else if (mc2 == 5)
-						c.he = c.helmetsarray[4];
+						deadlibrary::func::swaphelmet(c.he, helmetsarray[4]);
 					else
 						skip = true;
 				}
@@ -823,27 +852,28 @@ void viewchar(int pac)
 						cout << "Enter the number of the weapon you would like to delete or enter 6 to unequip your current weapon." << endl;
 						cin >> mc5;
 						if (mc5 == 1)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[0] = { "",0 };
 						else if (mc5 == 2)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[1] = { "",0 };
 						else if (mc5 == 3)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[2] = { "",0 };
 						else if (mc5 == 4)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[3] = { "",0 };
 						else if (mc5 == 5)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[4] = { "",0 };
 						else if (mc5 == 6)
 						{
-							for (int i = 0; i < 5 - 1; i++)
+							weaponsarray[4] = c.we; // already sorted so worse item is in last slot
+							c.we = emptyweapon;
+							for (int i = 0; i < 5 - 1; i++) // sort again as theres a new item in inv
 								for (int j = 0; j < 5 - i - 1; j++)
-									if (c.weaponsarray[j].wcatt < c.weaponsarray[j + 1].wcatt)
+									if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
 									{
-										weapon temp = c.weaponsarray[j];
-										c.weaponsarray[j] = c.weaponsarray[j + 1];
-										c.weaponsarray[j + 1] = temp;
-									}
-							c.weaponsarray[4] = c.we;
-							c.we = { "",0 };
+										deadlibrary::func::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+										//weapon temp = weaponsarray[j];
+										//weaponsarray[j] = weaponsarray[j + 1];
+										//weaponsarray[j + 1] = temp;
+									}							
 						}
 					}
 					else if (mc4 == 'b' || mc == 'B')
@@ -851,27 +881,28 @@ void viewchar(int pac)
 						cout << "Enter the number of the armor you would like to delete or enter 6 to unequip your current armor." << endl;
 						cin >> mc5;
 						if (mc5 == 1)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[0] = { "",0 };
 						else if (mc5 == 2)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[1] = { "",0 };
 						else if (mc5 == 3)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[2] = { "",0 };
 						else if (mc5 == 4)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[3] = { "",0 };
 						else if (mc5 == 5)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[4] = { "",0 };
 						else if (mc5 == 6)
 						{
+							armorsarray[4] = c.ae;
+							c.ae = emptyarmor;
 							for (int i = 0; i < 5 - 1; i++)
 								for (int j = 0; j < 5 - i - 1; j++)
-									if (c.armorsarray[j].atotalstat < c.armorsarray[j + 1].atotalstat)
+									if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
 									{
-										armor temp = c.armorsarray[j];
-										c.armorsarray[j] = c.armorsarray[j + 1];
-										c.armorsarray[j + 1] = temp;
-									}
-							c.armorsarray[4] = c.ae;
-							c.ae = { "",0 };
+										deadlibrary::func::swaparmor(armorsarray[j], armorsarray[j + 1]);
+										//armor temp = armorsarray[j];
+										//armorsarray[j] = armorsarray[j + 1];
+										//armorsarray[j + 1] = temp;
+									}							
 						}
 					}
 					else if (mc4 == 'c' || mc == 'C')
@@ -879,27 +910,29 @@ void viewchar(int pac)
 						cout << "Enter the number of the helmet you would like to delete or enter 6 to unequip your current helmet." << endl;
 						cin >> mc5;
 						if (mc5 == 1)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[0] = { "",0 };
 						else if (mc5 == 2)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[1] = { "",0 };
 						else if (mc5 == 3)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[2] = { "",0 };
 						else if (mc5 == 4)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[3] = { "",0 };
 						else if (mc5 == 5)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[4] = { "",0 };
 						else if (mc5 == 6)
 						{
+							helmetsarray[4] = c.he;
+							c.he = emptyhelmet;
 							for (int i = 0; i < 5 - 1; i++)
 								for (int j = 0; j < 5 - i - 1; j++)
-									if (c.helmetsarray[j].htotalstat < c.helmetsarray[j + 1].htotalstat)
+									if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
 									{
-										helmet temp = c.helmetsarray[j];
-										c.helmetsarray[j] = c.helmetsarray[j + 1];
-										c.helmetsarray[j + 1] = temp;
+										deadlibrary::func::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+										//helmet temp = helmetsarray[j];
+										//helmetsarray[j] = helmetsarray[j + 1];
+										//helmetsarray[j + 1] = temp;
 									}
-							c.helmetsarray[4] = c.he;
-							c.he = { "",0 };
+							
 						}
 					}
 					else
@@ -930,15 +963,26 @@ void viewchar(int pac)
 
 void savegame()
 {
+	ofstream out1("char/weapons.txt"); // saves an inventory item type
+	for (int i = 0; i < 5; i++)
+		out1 << weaponsarray[i].wcatt << " " << weaponsarray[i].wname << "\n";
+
+	ofstream out2("char/armors.txt");
+	for (int i = 0; i < 5; i++)
+		out2 << weaponsarray[i].wcatt << " " << weaponsarray[i].wname << "\n";
+
+	ofstream out3("char/helmets.txt");
+	for (int i = 0; i < 5; i++)
+		out3 << weaponsarray[i].wcatt << " " << weaponsarray[i].wname << "\n";
+
+	out1.close();
+	out2.close();
+	out3.close();
+
 	FILE* ofpb = fopen("char/chardata.bin", "wb"); //save char
 	fwrite(&c, sizeof(character), 1, ofpb);
 	fclose(ofpb);
 
-	FILE* ofpb2 = fopen("char/weapons.bin", "wb"); //save weapons inventory
-	for (int i = 0; i < 5; i++)		
-		fwrite(&c.weaponsarray[i], sizeof(weapon), 1, ofpb2);
-	fclose(ofpb2);
-	//manual save all enrties in equipments arrays as bin(still loop and save individually). hae to save equiped items seperat also?
 	system("CLS");
 }
 
@@ -948,10 +992,48 @@ void loadchar()
 	fread(&c, sizeof(character), 1, ifpb);
 	fclose(ifpb);
 
-	FILE* ifpb2 = fopen("char/weapons.bin", "rb"); //stil ltrying to fix equipment saving/loading
-	for (int i = 0; i < 5; i++)
-		fread(&c.weaponsarray[i], sizeof(weapon), 1, ifpb2);
-	fclose(ifpb2);
+	string w1, w2, w3; //loads an inventory item type
+	string line1;
+	ifstream sdata1;
+	sdata1.open("char/weapons.txt");
+	int counter1 = 0;
+	while (getline(sdata1, line1)) 
+	{
+		istringstream ss(line1);
+		ss >> weaponsarray[counter1].wcatt >> w1 >> w2 >> w3;
+		weaponsarray[counter1].wname = w1 + " " + w2 + " " + w3;
+		counter1++;
+	}
+	sdata1.close();
+
+	string a1, a2, a3;
+	string line2;
+	ifstream sdata2;
+	sdata2.open("char/armors.txt");
+	int counter2 = 0;
+	while (getline(sdata2, line2))
+	{
+		istringstream ss(line2);
+		ss >> weaponsarray[counter2].wcatt >> a1 >> a2 >> a3;
+		weaponsarray[counter2].wname = a1 + " " + a2 + " " + a3;
+		counter2++;
+	}
+	sdata2.close();
+
+	string h1, h2, h3;
+	string line3;
+	ifstream sdata3;
+	sdata3.open("char/armors.txt");
+	int counter3 = 0;
+	while (getline(sdata3, line3))
+	{
+		istringstream ss(line3);
+		ss >> weaponsarray[counter3].wcatt >> h1 >> h2 >> h3;
+		weaponsarray[counter3].wname = h1 + " " + h2 + " " + h3;
+		counter3++;
+	}
+	sdata3.close();
+
 	system("CLS");
 }
 
@@ -1122,6 +1204,7 @@ int main()
 		cout << "1 - Start a New Game\n2 - Load Game\n3 - Gameplay Mechanics\n4 - Combat Practice\n5 - High Scores\n6 - settings\n7 - Exit Game" << endl;
 		cin >> temp2;
 		system("CLS");
+
 		if (temp2 == 1)
 		{
 			cout << "What type of character you would like to make?\n1 - Orc - high health but low damage. Makes for a forgving combat experience.\n2 - Human - medium health and medium damage. A good balance in required combat ability. \n3 - Elf - low health but high damage. Requires the ability to consistently win rounds." << endl;
@@ -1130,17 +1213,50 @@ int main()
 			system("CLS");
 			switch (temp)
 			{
-			case 1: c = { "Orc", 200, 200, 10, 0, 3, 0, 1, 0};
+			case 1: c = {};
+				  c.cclass = "Orc";
+				  c.chp = 200;
+				  c.mchp = 200;
+				  c.catt = 10;
+				  c.attlvlups = 0;
+				  c.regen = 3;
+				  c.cxp = 0;
+				  c.lvl = 1;
+				  c.score = 0;
 				  c.dif = difsel;
 				  break;
-			case 2: c = { "Human", 100, 100, 20, 0, 3, 0, 1, 0};
+			case 2: c = {};
+				  c.cclass = "Human";
+				  c.chp = 100;
+				  c.mchp = 100;
+				  c.catt = 20;
+				  c.attlvlups = 0;
+				  c.regen = 3;
+				  c.cxp = 0;
+				  c.lvl = 1;
+				  c.score = 0;
 				  c.dif = difsel;
 				  break;
-			case 3: c = { "Elf", 50, 50, 40, 0, 3, 0, 1, 0};
+			case 3: c = {};
+				  c.cclass = "Elf";
+				  c.chp = 50;
+				  c.mchp = 50;
+				  c.catt = 40;
+				  c.attlvlups = 0;
+				  c.regen = 3;
+				  c.cxp = 0;
+				  c.lvl = 1;
+				  c.score = 0;
 				  c.dif = difsel;
 				  break;
 			default:
 				break;
+			}
+			for (int i = 0; i < 5; i++)
+			{
+				weaponsarray[i] = { "", 0 };
+				armorsarray[i] = { "", 0, 0 };
+				helmetsarray[i] = { "", 0, 0 };
 			}
 		}
 		else if (temp2 == 2)
