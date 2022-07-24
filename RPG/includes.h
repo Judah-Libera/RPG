@@ -16,8 +16,6 @@
 #include <stdio.h>
 #include <filesystem>
 
-//#include "Source.cpp"
-
 int pvp();
 
 struct weapon
@@ -42,12 +40,12 @@ struct helmet
 
 namespace deadlibrary
 {
-	class func
+	class dlclass
 	{
 	public:
-		static void swapweapon(weapon &i, weapon &j);
-		static void swaparmor(armor &i, armor &j);
-		static void swaphelmet(helmet &i, helmet &j);
+		static void swapweapon(weapon& i, weapon& j);
+		static void swaparmor(armor& i, armor& j);
+		static void swaphelmet(helmet& i, helmet& j);
 	};
 }
 
