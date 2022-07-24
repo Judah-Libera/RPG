@@ -1,7 +1,7 @@
 //     RPG V2.6.5	        newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//swap functions don't work. swapweapon(weapon &i, weapon &j) has invalid read location error. swapweapon(weapon i, weapon j) doesn't change passed in values
+//swap functions don't work. swapweapon(weapon &i, weapon &j) has invalid read location error. swapweapon(weapon i, weapon j) doesn't change passed in values. ||||| ???fixed itself???
 
 //EDITS
 //merge catt and catlvlups into same variable.
@@ -749,6 +749,7 @@ void viewchar(int pac)
 		if (mc3 == 1)
 		{
 			weapon emptyweapon = { "", 0 };
+			weapon emptyweapon1 = { "", 0 };
 			armor emptyarmor = { "", 0, 0, 0, };
 			helmet emptyhelmet = { "", 0, 0, 0 };
 			do
@@ -799,6 +800,15 @@ void viewchar(int pac)
 						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[3]);
 					else if (mc2 == 5)
 						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[4]);
+					//else if (mc2 == 6) ////////// forr debugging incase it crashes again
+					//{
+						//emptyweapon = c.we;
+						//emptyweapon1 = weaponsarray[0];
+						//cout << emptyweapon.wcatt << emptyweapon1.wcatt;
+						//deadlibrary::dlclass::swapweapon(c.we, weaponsarray[0]);
+						//cout << emptyweapon.wcatt << emptyweapon1.wcatt;
+						//system("pause");
+					//}
 					else
 						skip = true;
 				}
