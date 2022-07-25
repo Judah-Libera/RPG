@@ -791,7 +791,7 @@ void viewchar(int pac)
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[0]); // would rather use deadlibrary function, but nto workign yet
+						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[0]); // would rather use deadlibrary function, but nto workign yet. now its working but armor isn't
 					else if (mc2 == 2)
 						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[1]);
 					else if (mc2 == 3)
@@ -804,9 +804,9 @@ void viewchar(int pac)
 					//{
 						//emptyweapon = c.we;
 						//emptyweapon1 = weaponsarray[0];
-						//cout << emptyweapon.wcatt << emptyweapon1.wcatt;
-						//deadlibrary::dlclass::swapweapon(c.we, weaponsarray[0]);
-						//cout << emptyweapon.wcatt << emptyweapon1.wcatt;
+						//cout << emptyweapon.wname << emptyweapon1.wname;
+						//deadlibrary::dlclass::swapweapon(emptyweapon, emptyweapon1);
+						//cout << emptyweapon.wname << emptyweapon1.wname;
 						//system("pause");
 					//}
 					else
