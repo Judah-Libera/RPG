@@ -1,5 +1,7 @@
 #include "includes.h"
 
+//remove try catch blocks once fixed
+
 namespace deadlibrary
 {
 	
@@ -10,9 +12,16 @@ namespace deadlibrary
 			std::cout << "uninitialized item.\n";
 			return;
 		}
-		weapon t = i;
-		i = j;
-		j = t;
+		try // hopefully runs even if it breaks;
+		{
+			weapon t = i;
+			i = j;
+			j = t;
+		}
+		catch (const std::exception& e)
+		{
+			std::cout << "exception";
+		}
 	}
 	void dlclass::swaparmor(armor &i, armor &j)
 	{
@@ -21,9 +30,16 @@ namespace deadlibrary
 			std::cout << "uninitialized item.\n";
 			return;
 		}
+		try 
+		{
 		armor t = i;
 		i = j;
 		j = t;
+		}
+		catch (const std::exception& e)
+		{
+			std::cout << "exception";
+		}
 	}
 	void dlclass::swaphelmet(helmet &i, helmet &j)
 	{
@@ -32,9 +48,16 @@ namespace deadlibrary
 			std::cout << "uninitialized item.\n";
 			return;
 		}
+		try
+		{
 		helmet t = i;
 		i = j;
 		j = t;
+		}
+		catch (const std::exception& e)
+		{
+			std::cout << "exception";
+		}
 	}
 	
 }
