@@ -1,6 +1,6 @@
-7 2 15 Mask of Equilibrium
-7 2 20 Viel of Equilibrium
-0 0 0  
-2 1 0 Hood of Recovery
-0 0 0  
-0 0 0  
+4 2 0 Mask of Rejuvenation
+10 4 20 Crown of Harmony
+10 3 25 Helm of Harmony
+0 0 0 
+0 0 0 
+0 0 0 Viel of Equilibrium

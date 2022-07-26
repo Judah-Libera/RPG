@@ -1,6 +1,6 @@
-4 2 5 Vestment of Rejuvenation
+0 0 0 Armor of Youth
+9 4 10 Armor of Youth
+0 0 0   
 0 0 0 
-0 0 0 
-0 0 0  
-0 0 0  
-0 0 0  
+0 0 0 Armor of Youth
+0 0 0 Armor of Youth

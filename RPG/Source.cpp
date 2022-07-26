@@ -38,14 +38,15 @@ struct character
 	int lvl = 0;
 	int score = 0;
 	int dif = 1;
-	weapon we = { " ", 0 }; //weapon equiped
+	weapon we = {"", 0 }; //weapon equiped
 	//weapon weaponsarray[5]; // doesn't work if these arrays are not here. idk why, they arn't used as far as i know. doesn't seem to matter what they're called
-	armor ae = { " ", 0, 0, 0 };
+	armor ae = {"", 0, 0, 0 };
 	//armor armorsarray[5];
-	helmet he = { " ", 0, 0, 0 };
+	helmet he = {"", 0, 0, 0 };
 	//helmet helmetsarray[5];
 };
 character c = {};
+
 
 void viewhscores();
 void updatehscores();
@@ -1007,20 +1008,68 @@ void savegame()
 	out1.close();
 	out2.close();
 	out3.close();
-
+	/*
 	FILE* ofpb = fopen("char/chardata.bin", "wb"); //save char
-	fwrite(&c, sizeof(character), 1, ofpb);
+	fwrite(&c, sizeof(character) + sizeof(weapon) + sizeof(armor) + sizeof(helmet), 1, ofpb);
 	fclose(ofpb);
+	*/
 
+	ofstream out4("char/chardata.txt"); //cclass is one word so it can be read in like the other vars
+	out4 << c.name << "\n" << c.nametitle << "\n" << c.cclass << " " << c.chp << " " << c.mchp << " " << c.catt << " " << c.attlvlups << " " << c.regen << " " << c.cxp << " " << c.lvl << " " << c.score << " " << c.dif << "\n";
+	out4.close();
 	system("CLS");
 }
 
 void loadchar()
 {
-	FILE* ifpb = fopen("char/chardata.bin", "rb"); //load char
-	fread(&c, sizeof(character), 1, ifpb);
-	fclose(ifpb);
+	
 
+	/*
+	FILE* ifpb = fopen("char/chardata.bin", "rb"); //load char
+	fread(&c, sizeof(character) + sizeof(weapon) + sizeof(armor) + sizeof(helmet), 1, ifpb);
+	fclose(ifpb);
+	*/
+
+	//string t;
+
+	ifstream infile;
+	infile.open("char/chardata.txt");
+	string textline;
+	getline(infile, textline, '\n');
+	istringstream name(textline);
+	name >> c.name;
+	getline(infile, textline, '\n');
+	istringstream nametitle(textline);
+	nametitle >> c.nametitle;
+	getline(infile, textline);
+	istringstream data(textline);
+	data >> c.cclass >> c.chp >> c.mchp >> c.catt >> c.attlvlups >> c.regen >> c.cxp >> c.lvl >> c.score >> c.dif;
+	
+	//system("pause");
+
+	c.we = {}; //idk if i need this
+	c.we.wname = "";
+	c.we.wcatt = 0;
+	c.ae = {};
+	c.ae.aname = "";
+	c.ae.amchp = 0;
+	c.ae.aregen = 0;
+	c.ae.atotalstat = 0;
+	c.he = {};
+	c.he.hname = "";
+	c.he.hmchp = 0;
+	c.he.hregen = 0;
+	c.he.htotalstat = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		weaponsarray[i] = { "", 0 };
+		armorsarray[i] = { "", 0, 0, 0 };
+		helmetsarray[i] = { "", 0, 0, 0 };
+	}
+
+
+
+	//c.we = { };
 	string w1, w2, w3; //loads an inventory item type
 	string line1;
 	ifstream sdata1;
@@ -1029,13 +1078,30 @@ void loadchar()
 	getline(sdata1, line1);
 	istringstream iss1(line1);
 	iss1 >> c.we.wcatt >> w1 >> w2 >> w3;
-	c.we.wname = w1 + " " + w2 + " " + w3;
+	//cout << c.we.wcatt << "\n";////////////////////////////////////////////////
+	//system("pause");
+	//cout << w1 << "\n";////////////////////////////////////////////////
+	//system("pause");
+	//cout << w2 << "\n";////////////////////////////////////////////////
+	//system("pause");
+	//cout << w3 << "\n";////////////////////////////////////////////////
+	//system("pause");
+	//string tempdebug = w1 + " " + w2 + " " + w3;
+	//cout << tempdebug << "\n";////////////////////////////////////////////////
+	//system("pause");
+	//cout << c.we.wname << "\n";////////////////////////////////////////////////
+	//system("pause");
+	//c.we.wname = w1 + " " + w2 + " " + w3;
+	//cout << c.we.wname << "\n";////////////////////////////////////////////////
+	//system("pause");
 	while (getline(sdata1, line1)) 
 	{
 		istringstream ssi(line1);
 		ssi >> weaponsarray[counter1].wcatt >> w1 >> w2 >> w3;
 		weaponsarray[counter1].wname = w1 + " " + w2 + " " + w3;
 		counter1++;
+		cout << weaponsarray[counter1].wname << "\n";////////////////////////////////////////////////
+		system("pause");
 	}
 	sdata1.close();
 
@@ -1316,12 +1382,26 @@ int main()
 			default:
 				break;
 			}
+			c.we = {};
+			c.we.wname = "";
+			c.we.wcatt = 0;
+			c.ae = {};
+			c.ae.aname = "";
+			c.ae.amchp = 0;
+			c.ae.aregen = 0;
+			c.ae.atotalstat = 0;
+			c.he = {};
+			c.he.hname = "";
+			c.he.hmchp = 0;
+			c.he.hregen = 0;
+			c.he.htotalstat = 0;
 			for (int i = 0; i < 5; i++)
 			{
-				weaponsarray[i] = { " ", 0 };
-				armorsarray[i] = { " ", 0, 0, 0 };
-				helmetsarray[i] = { " ", 0, 0, 0 };
+				weaponsarray[i] = { "", 0 };
+				armorsarray[i] = { "", 0, 0, 0 };
+				helmetsarray[i] = { "", 0, 0, 0 };
 			}
+			system("pause");
 		}
 		else if (temp2 == 2)
 		{

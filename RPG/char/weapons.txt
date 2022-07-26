@@ -1,6 +1,6 @@
-7 sword of Destruction
-0  
-3 Hammer of Justice
-0  
-0  
-0  
+9 scythe of Hades
+0   
+8 Longsword of Chaos
+8 Battle-Axe of Hades
+6 Flail of Destruction
+4 Flail of Brutality
