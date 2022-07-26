@@ -1,7 +1,10 @@
-//     RPG V2.7.5	        newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V3.0.0	        newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
 //swap functions don't work. swapweapon(weapon &i, weapon &j) has invalid read location error. swapweapon(weapon i, weapon j) doesn't change passed in values. ||||| ???fixed itself??? ||| just weapons working
+//test lvlup sfx
+//test titles
+//test new soundtrack
 
 //EDITS
 //merge catt and catlvlups into same variable.
@@ -9,9 +12,6 @@
 //try fibonacci for late game scaling? < x^2 till x > 12
 
 //FEATURES
-//lvlupsfx
-//real soundtrack
-//renown title and name generation every 5 levels past 10
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
 //colorize
 //?story mode?
@@ -41,11 +41,14 @@ int difsel = 1; // 1=normal, 2=hardcore, 5920000737=cheateasy
 int FullScreen = 1; // 1=fs, 0=windowed
 int mvolume = 1000; // = 0-10 * 100
 int sfxvolume = 1000; // ^^^
+int soundtracknum = 1;
+string charactername = "";
 
 
 struct character
 {
 	string cclass = "";
+	string name = "";
 	int chp = 0;
 	int mchp = 0;
 	double catt = 0;
@@ -445,6 +448,29 @@ void lvlup()
 	c.cxp = c.cxp - (int)xpcostscaler(); // reset xp and up lvl
 	lvlrdy = false;
 	c.lvl++;
+
+	if (c.lvl == 5)
+	{
+		cout << "Your journey as a warrior has begun. Who will you be remembered as?" << endl;
+		cin >> charactername;
+		c.name = charactername + " the distinguished";
+	}
+	if (c.lvl == 10)
+		c.name = charactername + " the prestigious";
+	if (c.lvl == 15)
+		c.name = charactername + " the renowned";
+	if (c.lvl == 20)
+		c.name = "the glorious " + charactername;
+	if (c.lvl == 25)
+		c.name = charactername + " the legend";
+	if (c.lvl == 30)
+		c.name = charactername + " the fabled";
+	if (c.lvl == 35)
+		c.name = charactername + " the exalted";
+	if (c.lvl == 40)
+		c.name = charactername + " the immortal";
+	if (c.lvl == 50)
+		c.name == "Immortal High King " + charactername;
 }
 
 void play()
@@ -552,7 +578,7 @@ void play()
 			cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
 			if (c.dif == 2) // if hardcore, creates empty char to overwrite save data
 			{
-				character q = { "", 200, 200, 10, 0, 3, 0, 1, 0, difsel};
+				character q = { "", "", 200, 200, 10, 0, 3, 0, 1, 0, difsel};
 				FILE* ofpb = fopen("chardata.bin", "wb");
 				fwrite(&q, sizeof(character), 1, ofpb);
 				fclose(ofpb);
@@ -591,6 +617,8 @@ void play()
 			c.score = c.score + xpgain;
 			if (c.cxp >= (int)xpcostscaler())
 			{
+				mciSendString(L"seek lvlupsfx to start", NULL, 0, NULL);
+				mciSendString(L"play lvlupsfx", NULL, 0, NULL);
 				cout << "LEVEL UP\n" << endl;
 				lvlrdy = true;
 			}
@@ -725,7 +753,10 @@ void viewchar(int pac)
 {
 	if (c.dif == 2) // dispaly in red for HC character
 		SetConsoleTextAttribute(hConsole, 4);
-	cout << "Class - " << c.cclass << endl;
+	if (c.name == "")
+		cout << "Class - " << c.cclass << endl;
+	else
+		cout << c.name << endl;
 	cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 	cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
 	cout << "attack - " << (int)((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) << " : weapon - " << (int)((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1)) << endl;
@@ -936,7 +967,10 @@ void viewchar(int pac)
 		if (skip == false)
 		{
 			system("CLS");
-			cout << "Class - " << c.cclass << endl;
+			if (c.name == "")
+				cout << "Class - " << c.cclass << endl;
+			else
+				cout << c.name << endl;
 			cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 			cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
 			cout << "attack - " << (int)((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) << " : weapon - " << (int)((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1)) << endl;
@@ -988,10 +1022,10 @@ void loadchar()
 	ifstream sdata1;
 	sdata1.open("char/weapons.txt");
 	int counter1 = 0;
-	getline(sdata1, line1);// see if i can get this to work. otherwise just do its own file again. hopefulyl this fixes inv issues. seems to only have problems after loading a saved game. and equiped item names are unreadable by compiler.
-	istringstream ss(line1);
-	ss >> c.we.wcatt >> w1 >> w2 >> w3;
-	c.we.wname = w1 + " " + w2 + " " + w3;
+	//getline(sdata1, line1);// see if i can get this to work. otherwise just do its own file again. hopefulyl this fixes inv issues. seems to only have problems after loading a saved game. and equiped item names are unreadable by compiler.
+	//istringstream ss(line1);
+	//ss >> c.we.wcatt >> w1 >> w2 >> w3;
+	//c.we.wname = w1 + " " + w2 + " " + w3;
 	while (getline(sdata1, line1)) 
 	{
 		istringstream ss(line1);
@@ -1006,10 +1040,10 @@ void loadchar()
 	ifstream sdata2;
 	sdata2.open("char/armors.txt");
 	int counter2 = 0;
-	getline(sdata2, line2);
-	istringstream ss(line2);
-	ss >> c.ae.atotalstat >> c.ae.aregen >> c.ae.amchp >> a1 >> a2 >> a3;
-	c.ae.aname = a1 + " " + a2 + " " + a3;
+	//getline(sdata2, line2);
+	//istringstream ss(line2);
+	//ss >> c.ae.atotalstat >> c.ae.aregen >> c.ae.amchp >> a1 >> a2 >> a3;
+	//c.ae.aname = a1 + " " + a2 + " " + a3;
 	while (getline(sdata2, line2))
 	{
 		istringstream ss(line2);
@@ -1024,10 +1058,10 @@ void loadchar()
 	ifstream sdata3;
 	sdata3.open("char/helmets.txt");
 	int counter3 = 0;
-	getline(sdata3, line3);
-	stringstream ss(line3);
-	ss >> c.he.htotalstat >> c.he.hregen >> c.he.hmchp >> h1 >> h2 >> h3;
-	c.ae.aname = h1 + " " + h2 + " " + h3;
+	//getline(sdata3, line3);
+	//stringstream ss(line3);
+	//ss >> c.he.htotalstat >> c.he.hregen >> c.he.hmchp >> h1 >> h2 >> h3;
+	//c.ae.aname = h1 + " " + h2 + " " + h3;
 	while (getline(sdata3, line3))
 	{
 		istringstream ss(line3);
@@ -1086,7 +1120,7 @@ void settings()
 	{
 		system("CLS");
 		cout << "Settings" << endl;
-		cout << "1 - New Character Difficulty\n2 - Toggle Full Screen launch\n3 - Music Volume\n4 - Sound Effects Volume\n5 - exit" << endl;
+		cout << "1 - New Character Difficulty\n2 - Toggle Full Screen launch\n3 - Music Volume\n4 - Sound Effects Volume\n5 - Change soundtrack (relaunch game).\n6 - exit" << endl;
 
 		vi = false;
 		cin >> cs;
@@ -1141,7 +1175,10 @@ void settings()
 			sfxvolume *= 100;
 			volumeupdate();
 			break;
-		case 5: vi = true;
+		case 5: cout << "Judah - 1\nAlina - 2" << endl;
+			cin >> soundtracknum;
+			break;
+		case 6: vi = true;
 			keepplaying = false;
 			break;
 		default: vi = false;
@@ -1151,7 +1188,7 @@ void settings()
 	system("CLS");
 
 	FILE* ofp = fopen("settings.txt", "w"); //update settigns file
-	fprintf(ofp, "FullScreen %d\nStart Difficulty %d\nMusic Volume %d\nEffects Volume %d", FullScreen, difsel, mvolume, sfxvolume);
+	fprintf(ofp, "FullScreen %d\nStart Difficulty %d\nMusic Volume %d\nEffects Volume %d\nSoundtrack %d", FullScreen, difsel, mvolume, sfxvolume, soundtracknum);
 	fclose(ofp);
 	mciSendString(L"close elitesfx", NULL, 0, NULL);
 }
@@ -1161,14 +1198,17 @@ int main()
 	int dt; ///////////////////////////////////////////////item create for 6
 	//SetConsoleTextAttribute(hConsole, 15);
 
-	string st = "st1";
-
+	string st;
 	FILE* ifp = fopen("settings.txt", "r"); //read in settigns
 	fscanf(ifp, "FullScreen %d\n", &FullScreen);
 	fscanf(ifp, "Start Difficulty %d\n", &difsel);
 	fscanf(ifp, "Music Volume %d\n", &mvolume);
-	fscanf(ifp, "Effects Volume %d", &sfxvolume);
-	//read in val for st here;
+	fscanf(ifp, "Effects Volume %d\n", &sfxvolume);
+	fscanf(ifp, "Soundtrack %d", &soundtracknum);
+	if (soundtracknum == 2)
+		st = "st2";
+	else
+		st = "st1";
 	fclose(ifp);
 
 	string em3 = "open audio/" + st + "/titletheme.mp3 mpegvideo alias em3"; //creating all needed audio players
@@ -1188,6 +1228,7 @@ int main()
 	mciSendString(L"open audio/sfx/elite.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL);
 	mciSendString(L"open audio/sfx/v.mp3 type mpegvideo alias vsfx", NULL, 0, NULL);
 	mciSendString(L"open audio/sfx/d.mp3 type mpegvideo alias dsfx", NULL, 0, NULL);
+	mciSendString(L"open audio/sfx/lvlup.mp3 type mpegvideo alias lvlupsfx", NULL, 0, NULL);
 
 	int mmc = 0;
 	int temp2 = 0;
@@ -1231,6 +1272,7 @@ int main()
 			{
 			case 1: c = {};
 				  c.cclass = "Orc";
+				  c.name = "";
 				  c.chp = 200;
 				  c.mchp = 200;
 				  c.catt = 10;
@@ -1243,6 +1285,7 @@ int main()
 				  break;
 			case 2: c = {};
 				  c.cclass = "Human";
+				  c.name = "";
 				  c.chp = 100;
 				  c.mchp = 100;
 				  c.catt = 20;
@@ -1255,6 +1298,7 @@ int main()
 				  break;
 			case 3: c = {};
 				  c.cclass = "Elf";
+				  c.name = "";
 				  c.chp = 50;
 				  c.mchp = 50;
 				  c.catt = 40;
