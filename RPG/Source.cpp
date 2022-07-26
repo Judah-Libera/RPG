@@ -1,7 +1,7 @@
-//     RPG V3.0.0				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V3.0.1				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//swap functions don't work. swapweapon(weapon &i, weapon &j) has invalid read location error. swapweapon(weapon i, weapon j) doesn't change passed in values. ||||| ???fixed itself??? ||| just weapons working
+//keep testing inv managment
 //test lvlup sfx
 //test titles
 //test new soundtrack
@@ -24,6 +24,29 @@
 
 using namespace std;
 
+struct character
+{
+	string cclass = "";
+	string name = "";
+	string nametitle = "";
+	int chp = 0;
+	int mchp = 0;
+	double catt = 0;
+	int attlvlups = 0;
+	double regen = 0;
+	int cxp = 0;
+	int lvl = 0;
+	int score = 0;
+	int dif = 1;
+	weapon we = { " ", 0 }; //weapon equiped
+	//weapon weaponsarray[5]; // doesn't work if these arrays are not here. idk why, they arn't used as far as i know. doesn't seem to matter what they're called
+	armor ae = { " ", 0, 0, 0 };
+	//armor armorsarray[5];
+	helmet he = { " ", 0, 0, 0 };
+	//helmet helmetsarray[5];
+};
+character c = {};
+
 void viewhscores();
 void updatehscores();
 void lvlup();
@@ -42,30 +65,11 @@ int FullScreen = 1; // 1=fs, 0=windowed
 int mvolume = 1000; // = 0-10 * 100
 int sfxvolume = 1000; // ^^^
 int soundtracknum = 1;
-string charactername = "";
+//string charactername = "";
 
 
-struct character
-{
-	string cclass = "";
-	string name = "";
-	int chp = 0;
-	int mchp = 0;
-	double catt = 0;
-	int attlvlups = 0;
-	double regen = 0;
-	int cxp = 0;
-	int lvl = 0;
-	int score = 0;
-	int dif = 1;
-	weapon we = { " ", 0 }; //weapon equiped
-	weapon weaponsarray[5]; // doesn't work if these arrays are not here. idk why, they arn't used as far as i know. doesn't seem to matter what they're called
-	armor ae = { " ", 0, 0, 0 };
-	armor armorsarray[5];
-	helmet he = { " ", 0, 0, 0 };
-	helmet helmetsarray[5];
-};
-character c; //active character
+
+//character c; //active character
 weapon weaponsarray[5]; //arrays for inv
 armor armorsarray[5];
 helmet helmetsarray[5];
@@ -452,25 +456,25 @@ void lvlup()
 	if (c.lvl == 5)
 	{
 		cout << "Your journey as a warrior has begun. Who will you be remembered as?" << endl;
-		cin >> charactername;
-		c.name = charactername + " the distinguished";
+		cin >> c.name;
+		c.nametitle = c.name + " the distinguished";
 	}
 	if (c.lvl == 10)
-		c.name = charactername + " the prestigious";
+		c.nametitle = c.name + " the prestigious";
 	if (c.lvl == 15)
-		c.name = charactername + " the renowned";
+		c.nametitle = c.name + " the renowned";
 	if (c.lvl == 20)
-		c.name = "the glorious " + charactername;
+		c.nametitle = "the glorious " + c.name;
 	if (c.lvl == 25)
-		c.name = charactername + " the legend";
+		c.nametitle = c.name + " the legend";
 	if (c.lvl == 30)
-		c.name = charactername + " the fabled";
-	if (c.lvl == 35)
-		c.name = charactername + " the exalted";
-	if (c.lvl == 40)
-		c.name = charactername + " the immortal";
-	if (c.lvl == 50)
-		c.name == "Immortal High King " + charactername;
+		c.nametitle = c.name + " the fabled";
+		if (c.lvl == 35)
+		c.nametitle = c.name + " the exalted";
+		if (c.lvl == 40)
+		c.nametitle = c.name + " the immortal";
+		if (c.lvl == 50)
+		c.nametitle == "Immortal High King " + c.name;
 }
 
 void play()
@@ -578,7 +582,7 @@ void play()
 			cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
 			if (c.dif == 2) // if hardcore, creates empty char to overwrite save data
 			{
-				character q = { "", "", 200, 200, 10, 0, 3, 0, 1, 0, difsel};
+				character q = { "", "", "", 200, 200, 10, 0, 3, 0, 1, 0, difsel};
 				FILE* ofpb = fopen("chardata.bin", "wb");
 				fwrite(&q, sizeof(character), 1, ofpb);
 				fclose(ofpb);
@@ -751,9 +755,9 @@ void play()
 
 void viewchar(int pac)
 {
-	if (c.dif == 2) // dispaly in red for HC character
+	if (c.dif == 2) // display in red for HC character
 		SetConsoleTextAttribute(hConsole, 4);
-	if (c.name == "")
+	if (c.name == "") //show name with title if applicable
 		cout << "Class - " << c.cclass << endl;
 	else
 		cout << c.name << endl;
@@ -1022,14 +1026,14 @@ void loadchar()
 	ifstream sdata1;
 	sdata1.open("char/weapons.txt");
 	int counter1 = 0;
-	//getline(sdata1, line1);// see if i can get this to work. otherwise just do its own file again. hopefulyl this fixes inv issues. seems to only have problems after loading a saved game. and equiped item names are unreadable by compiler.
-	//istringstream ss(line1);
-	//ss >> c.we.wcatt >> w1 >> w2 >> w3;
-	//c.we.wname = w1 + " " + w2 + " " + w3;
+	getline(sdata1, line1);
+	istringstream iss1(line1);
+	iss1 >> c.we.wcatt >> w1 >> w2 >> w3;
+	c.we.wname = w1 + " " + w2 + " " + w3;
 	while (getline(sdata1, line1)) 
 	{
-		istringstream ss(line1);
-		ss >> weaponsarray[counter1].wcatt >> w1 >> w2 >> w3;
+		istringstream ssi(line1);
+		ssi >> weaponsarray[counter1].wcatt >> w1 >> w2 >> w3;
 		weaponsarray[counter1].wname = w1 + " " + w2 + " " + w3;
 		counter1++;
 	}
@@ -1040,14 +1044,14 @@ void loadchar()
 	ifstream sdata2;
 	sdata2.open("char/armors.txt");
 	int counter2 = 0;
-	//getline(sdata2, line2);
-	//istringstream ss(line2);
-	//ss >> c.ae.atotalstat >> c.ae.aregen >> c.ae.amchp >> a1 >> a2 >> a3;
-	//c.ae.aname = a1 + " " + a2 + " " + a3;
+	getline(sdata2, line2);
+	istringstream iss2(line2);
+	iss2 >> c.ae.atotalstat >> c.ae.aregen >> c.ae.amchp >> a1 >> a2 >> a3;
+	c.ae.aname = a1 + " " + a2 + " " + a3;
 	while (getline(sdata2, line2))
 	{
-		istringstream ss(line2);
-		ss >> armorsarray[counter2].atotalstat >> armorsarray[counter2].aregen >> armorsarray[counter2].amchp >> a1 >> a2 >> a3;
+		istringstream ss2(line2);
+		ss2 >> armorsarray[counter2].atotalstat >> armorsarray[counter2].aregen >> armorsarray[counter2].amchp >> a1 >> a2 >> a3;
 		armorsarray[counter2].aname = a1 + " " + a2 + " " + a3;
 		counter2++;
 	}
@@ -1058,14 +1062,14 @@ void loadchar()
 	ifstream sdata3;
 	sdata3.open("char/helmets.txt");
 	int counter3 = 0;
-	//getline(sdata3, line3);
-	//stringstream ss(line3);
-	//ss >> c.he.htotalstat >> c.he.hregen >> c.he.hmchp >> h1 >> h2 >> h3;
-	//c.ae.aname = h1 + " " + h2 + " " + h3;
+	getline(sdata3, line3);
+	stringstream iss3(line3);
+	iss3 >> c.he.htotalstat >> c.he.hregen >> c.he.hmchp >> h1 >> h2 >> h3;
+	c.he.hname = h1 + " " + h2 + " " + h3;
 	while (getline(sdata3, line3))
 	{
-		istringstream ss(line3);
-		ss >> helmetsarray[counter3].htotalstat >> helmetsarray[counter3].hregen >> helmetsarray[counter3].hmchp >> h1 >> h2 >> h3;
+		istringstream ss3(line3);
+		ss3 >> helmetsarray[counter3].htotalstat >> helmetsarray[counter3].hregen >> helmetsarray[counter3].hmchp >> h1 >> h2 >> h3;
 		helmetsarray[counter3].hname = h1 + " " + h2 + " " + h3;
 		counter3++;
 	}
@@ -1270,9 +1274,9 @@ int main()
 			system("CLS");
 			switch (temp)
 			{
-			case 1: c = {};
-				  c.cclass = "Orc";
+			case 1: c.cclass = "Orc";
 				  c.name = "";
+				  c.nametitle = "";
 				  c.chp = 200;
 				  c.mchp = 200;
 				  c.catt = 10;
@@ -1283,9 +1287,9 @@ int main()
 				  c.score = 0;
 				  c.dif = difsel;
 				  break;
-			case 2: c = {};
-				  c.cclass = "Human";
+			case 2: c.cclass = "Human";
 				  c.name = "";
+				  c.nametitle = "";
 				  c.chp = 100;
 				  c.mchp = 100;
 				  c.catt = 20;
@@ -1296,9 +1300,9 @@ int main()
 				  c.score = 0;
 				  c.dif = difsel;
 				  break;
-			case 3: c = {};
-				  c.cclass = "Elf";
+			case 3: c.cclass = "Elf";
 				  c.name = "";
+				  c.nametitle = "";
 				  c.chp = 50;
 				  c.mchp = 50;
 				  c.catt = 40;
