@@ -1,4 +1,4 @@
-//     RPG V2.6.5	        newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V2.7.5	        newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
 //swap functions don't work. swapweapon(weapon &i, weapon &j) has invalid read location error. swapweapon(weapon i, weapon j) doesn't change passed in values. ||||| ???fixed itself??? ||| just weapons working
@@ -6,13 +6,13 @@
 //EDITS
 //merge catt and catlvlups into same variable.
 //update pvp.cpp - sfx
+//try fibonacci for late game scaling? < x^2 till x > 12
 
 //FEATURES
 //lvlupsfx
 //real soundtrack
-//boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
-//try fibonacci for late game scaling? < x^2 till x > 12
 //renown title and name generation every 5 levels past 10
+//boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
 //colorize
 //?story mode?
 //?map/travel?
