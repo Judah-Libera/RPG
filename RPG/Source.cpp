@@ -1,4 +1,4 @@
-//     RPG V3.0.0	        newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V3.0.0				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
 //swap functions don't work. swapweapon(weapon &i, weapon &j) has invalid read location error. swapweapon(weapon i, weapon j) doesn't change passed in values. ||||| ???fixed itself??? ||| just weapons working
