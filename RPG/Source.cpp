@@ -1,7 +1,7 @@
 //     RPG V2.6.5	        newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//swap functions don't work. swapweapon(weapon &i, weapon &j) has invalid read location error. swapweapon(weapon i, weapon j) doesn't change passed in values. ||||| ???fixed itself???
+//swap functions don't work. swapweapon(weapon &i, weapon &j) has invalid read location error. swapweapon(weapon i, weapon j) doesn't change passed in values. ||||| ???fixed itself??? ||| just weapons working
 
 //EDITS
 //merge catt and catlvlups into same variable.
@@ -55,11 +55,11 @@ struct character
 	int lvl = 0;
 	int score = 0;
 	int dif = 1;
-	weapon we = { "", 0 }; //weapon equiped
+	weapon we = { " ", 0 }; //weapon equiped
 	weapon weaponsarray[5]; // doesn't work if these arrays are not here. idk why, they arn't used as far as i know. doesn't seem to matter what they're called
-	armor ae = { "", 0, 0, 0 };
+	armor ae = { " ", 0, 0, 0 };
 	armor armorsarray[5];
-	helmet he = { "", 0, 0, 0 };
+	helmet he = { " ", 0, 0, 0 };
 	helmet helmetsarray[5];
 };
 character c; //active character
@@ -790,8 +790,18 @@ void viewchar(int pac)
 				{
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
-					if (mc2 == 1)
-						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[0]); // would rather use deadlibrary function, but nto workign yet. now its working but armor isn't
+					if (mc2 == 1) {
+						//cout << c.we.wname << c.we.wcatt;
+						//system("pause");
+						//c.we.wcatt = 5;
+						//c.we.wname = "asdf";
+						//cout << c.we.wname << c.we.wcatt;
+						//system("pause");
+						//c.we = emptyweapon;
+						//cout << c.we.wname << c.we.wcatt;
+						//system("pause");
+						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[0]);
+					} // would rather use deadlibrary function, but nto workign yet. now its working but armor isn't
 					else if (mc2 == 2)
 						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[1]);
 					else if (mc2 == 3)
@@ -957,11 +967,11 @@ void savegame()
 
 	ofstream out2("char/armors.txt");
 	for (int i = 0; i < 5; i++)
-		out2 << armorsarray[i].atotalstat << armorsarray[i].aregen << armorsarray[i].amchp << " " << armorsarray[i].aname << "\n";
+		out2 << armorsarray[i].atotalstat << " " << armorsarray[i].aregen << " " << armorsarray[i].amchp << " " << armorsarray[i].aname << "\n";
 
 	ofstream out3("char/helmets.txt");
 	for (int i = 0; i < 5; i++)
-		out3 << helmetsarray[i].htotalstat << helmetsarray[i].hregen << helmetsarray[i].hmchp << " " << helmetsarray[i].hname << "\n";
+		out3 << helmetsarray[i].htotalstat << " " << helmetsarray[i].hregen << " " << helmetsarray[i].hmchp << " " << helmetsarray[i].hname << "\n";
 
 	out1.close();
 	out2.close();
@@ -1143,24 +1153,36 @@ void settings()
 
 int main()
 {
-	int dt; ///////////////////////////////////////////////
+	int dt; ///////////////////////////////////////////////item create for 6
 	//SetConsoleTextAttribute(hConsole, 15);
-	mciSendString(L"open audio/titletheme.mp3 type mpegvideo alias em3", NULL, 0, NULL); //open all audio files gonna be needed. 
-	mciSendString(L"open audio/fighttheme.mp3 type mpegvideo alias fighttheme", NULL, 0, NULL);
-	mciSendString(L"open audio/fighttheme2.mp3 type mpegvideo alias fighttheme2", NULL, 0, NULL);
-	mciSendString(L"open audio/maintheme.mp3 type mpegvideo alias maintheme", NULL, 0, NULL);
-	mciSendString(L"open audio/titletheme.mp3 type mpegvideo alias titletheme", NULL, 0, NULL);
-	mciSendString(L"open audio/critsfx.mp3 type mpegvideo alias critsfx", NULL, 0, NULL);
-	mciSendString(L"open audio/itemdsfx.mp3 type mpegvideo alias itemdsfx", NULL, 0, NULL);
-	mciSendString(L"open audio/elitesfx.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL);
-	mciSendString(L"open audio/vsfx.mp3 type mpegvideo alias vsfx", NULL, 0, NULL);
-	mciSendString(L"open audio/dsfx.mp3 type mpegvideo alias dsfx", NULL, 0, NULL);
+
+	string st = "st1";
+
 	FILE* ifp = fopen("settings.txt", "r"); //read in settigns
 	fscanf(ifp, "FullScreen %d\n", &FullScreen);
 	fscanf(ifp, "Start Difficulty %d\n", &difsel);
 	fscanf(ifp, "Music Volume %d\n", &mvolume);
 	fscanf(ifp, "Effects Volume %d", &sfxvolume);
+	//read in val for st here;
 	fclose(ifp);
+
+	string em3 = "open audio/" + st + "/titletheme.mp3 mpegvideo alias em3"; //creating all needed audio players
+	string fighttheme = "open audio/" + st + "/fighttheme.mp3 type mpegvideo alias fighttheme";
+	string fighttheme2 = "open audio/" + st + "/fighttheme2.mp3 type mpegvideo alias fight2theme";
+	string maintheme = "open audio/" + st + "/maintheme.mp3 type mpegvideo alias maintheme";
+	string titletheme = "open audio/" + st + "/titletheme.mp3 type mpegvideo alias titletheme";
+	string practicetheme = "open audio/" + st + "/practicetheme.mp3 type mpegvideo alias practicetheme";
+	mciSendStringA(em3.c_str(), NULL, 0, NULL);
+	mciSendStringA(fighttheme2.c_str(), NULL, 0, NULL);
+	mciSendStringA(fighttheme2.c_str(), NULL, 0, NULL);
+	mciSendStringA(maintheme.c_str(), NULL, 0, NULL);
+	mciSendStringA(titletheme.c_str(), NULL, 0, NULL);
+	mciSendStringA(practicetheme.c_str(), NULL, 0, NULL);
+	mciSendString(L"open audio/sfx/crit.mp3 type mpegvideo alias critsfx", NULL, 0, NULL);
+	mciSendString(L"open audio/sfx/itemd.mp3 type mpegvideo alias itemdsfx", NULL, 0, NULL);
+	mciSendString(L"open audio/sfx/elite.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL);
+	mciSendString(L"open audio/sfx/v.mp3 type mpegvideo alias vsfx", NULL, 0, NULL);
+	mciSendString(L"open audio/sfx/d.mp3 type mpegvideo alias dsfx", NULL, 0, NULL);
 
 	int mmc = 0;
 	int temp2 = 0;
@@ -1243,9 +1265,9 @@ int main()
 			}
 			for (int i = 0; i < 5; i++)
 			{
-				weaponsarray[i] = { "", 0 };
-				armorsarray[i] = { "", 0, 0, 0 };
-				helmetsarray[i] = { "", 0, 0, 0 };
+				weaponsarray[i] = { " ", 0 };
+				armorsarray[i] = { " ", 0, 0, 0 };
+				helmetsarray[i] = { " ", 0, 0, 0 };
 			}
 		}
 		else if (temp2 == 2)
@@ -1265,6 +1287,9 @@ int main()
 		}
 		else if (temp2 == 4)
 		{ // basically a copy of play()
+			mciSendString(L"pause maintheme", NULL, 0, NULL);
+			mciSendString(L"seek practicetheme to start", NULL, 0, NULL);
+			mciSendString(L"play practicetheme repeat", NULL, 0, NULL);
 			bool cont = true;
 			int numcheck = 11;
 			system("CLS");
@@ -1303,6 +1328,8 @@ int main()
 				if (sucat == numcheck && atttime < 1)
 				{
 					cout << "HIT" << "\n" << endl;
+					if (atttime < .6)
+						cntratt = 1;
 					if (cntratt == 0)
 						cout << "OUCH - Counter Attacked\n" << endl;
 				}
@@ -1322,6 +1349,9 @@ int main()
 			}
 			keepplaying = false;
 			system("CLS");
+			mciSendString(L"pause practicetheme", NULL, 0, NULL);
+			mciSendString(L"seek maintheme to start", NULL, 0, NULL);
+			mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 		}
 		else if (temp2 == 5)
 		{

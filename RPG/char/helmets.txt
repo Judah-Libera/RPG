@@ -1,5 +1,5 @@
-10325 Crown of Harmony
-9230 Helm of Harmony
-530 Mask of Rejuvenation
-315 Cap of Recovery
-000 
+10 4 20 Helm of Harmony
+9 5 5 Helm of youth
+6 3 5 Hood of Rejuvenation
+5 0 20 Mask of Life
+0 0 0 

@@ -1,5 +1,5 @@
-10325 Armor of Harmony
-9410 Cuirass of Youth
-9410 Cuirass of Youth
-9230 Cuirass of Harmony
-7310 Plate of Rejuvenation
+6 2 10 Plate of Rejuvenation
+6 2 15 Plate of Equilibrium
+5 2 5 Vestment of Rejuvenation
+4 0 20 Vestment of Life
+2 1 0 Tunic of Recovery

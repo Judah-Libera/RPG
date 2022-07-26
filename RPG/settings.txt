@@ -1,4 +1,4 @@
 FullScreen 0
-Start Difficulty 2
+Start Difficulty 1
 Music Volume 100
 Effects Volume 100
