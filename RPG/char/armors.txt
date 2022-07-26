@@ -1,6 +1,6 @@
-0 0 0 Armor of Youth
-9 4 10 Armor of Youth
+9 2 30 Armor of Harmony
+9 5 5 Armor of Youth
+8 2 25 Armor of Harmony
 0 0 0   
-0 0 0 
-0 0 0 Armor of Youth
-0 0 0 Armor of Youth
+0 0 0   
+0 0 0   

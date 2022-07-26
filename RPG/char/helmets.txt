@@ -1,6 +1,6 @@
-4 2 0 Mask of Rejuvenation
-10 4 20 Crown of Harmony
-10 3 25 Helm of Harmony
-0 0 0 
-0 0 0 
-0 0 0 Viel of Equilibrium
+4 0 20 Viel of Life
+7 4 5 Mask of Rejuvenation
+6 0 25 Viel of Life
+5 1 15 Mask of Equilibrium
+5 1 15 Mask of Equilibrium
+1 1 0 Circlet of Recovery

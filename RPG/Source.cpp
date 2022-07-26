@@ -1,17 +1,14 @@
-//     RPG V3.0.1				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V3.1.2				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//keep testing inv managment
-//test lvlup sfx
-//test titles
-//test new soundtrack
+//early game balance needs retested
 
 //EDITS
-//merge catt and catlvlups into same variable.
+//merge catt and catlvlups into same variable. //if it ain't broke dont fix it tho
 //update pvp.cpp - sfx
-//try fibonacci for late game scaling? < x^2 till x > 12
 
 //FEATURES
+// highlight highscore for active game on defeate
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
 //colorize
 //?story mode?
@@ -75,14 +72,13 @@ weapon weaponsarray[5]; //arrays for inv
 armor armorsarray[5];
 helmet helmetsarray[5];
 //scalers
-//((2.8 * pow(c.lvl,2)) + (20 * c.lvl) + starting value) // wolfram alpha
-const double aiattscaler() { return (.02 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; } //pow(1.17, c.lvl);
-const double aihpscaler() { return (.35 * pow(c.lvl, 2)) + (2.5 * (double)c.lvl) + 9; } //(pow(1.23, c.lvl) * 9);
-const double cattscaler() { return (c.catt + (.25 * (double)pow(c.attlvlups, 2) + 1.15 * (double)c.attlvlups + 1.5)); } //((c.catt * 1.2) + (c.we.wcatt * 1.1) + (sqrt(c.attlvlups) * c.attlvlups));
-const double mchpscaler() { return ((double)c.mchp * 1.3 + (((double)c.ae.amchp + (double)c.he.hmchp) * 1.15)); }
-const double xpgainscaler() { return ((rand() % 3) + (double)3) * (1 + (double)c.lvl / 2); }
-const double xpcostscaler() { return ((10 * (double)pow(1.3, c.lvl)) - ((double)sqrt(c.lvl)) * 4); }
-const double regenscaler() { return ((double)(c.regen + c.ae.aregen + c.he.hregen)) * (((double)c.mchp + (double)c.ae.amchp + (double)c.he.hmchp) / 3); } // * (1 - atttime) //global variables //global variables
+const double aiattscaler() { return (.035 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; }
+const double aihpscaler() { return (.3 * pow(c.lvl, 2)) + (2.5 * (double)c.lvl) + 9; }
+const double cattscaler() { return (c.catt + (.6 * c.attlvlups)); } //NOT USED IN DAMAGE CALCULATION. influence the effect of lvlups on natural attack //(c.catt + (.12 * (double)pow(c.attlvlups, 1.5) + 1.2 * (double)c.attlvlups + 1.5)); }//old
+const double mchpscaler() { return ((double)c.mchp * 1.08 + (((double)c.ae.amchp + (double)c.he.hmchp) * 1.04) + 5); }
+const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)c.lvl / 2); }
+const double xpcostscaler() { return ((.1 * (double)pow(c.lvl, 2)) + (double)(5 * c.lvl) + 15); }
+const double regenscaler() { return (.8 * (double)(c.regen + c.ae.aregen + c.he.hregen)) * ((double)c.mchp / 10); } // * (1 - atttime)
 
 weapon createweapon()
 {
@@ -378,18 +374,25 @@ void updatehscores()
 	sdatai.open("hscores.txt");
 
 	int counter = 0;
-	while (getline(sdatai, line)) //reads lines into place holders. data is stored in descending order and thus read in likewise
+	while (getline(sdatai, line, '\t')) //reads lines into place holders. data is stored in descending order and thus read in likewise
 	{
-		istringstream ss(line);
-		ss >> scorearray[counter] >> names[counter];
+		
+		scorearray[counter] = stoi(line);
+		getline(sdatai, line);
+		names[counter] = line;
 		counter++;
 	}
 	sdatai.close();
 	if (c.score >= scorearray[9]) // if list is full replace lowest entry with current games score
 	{
 		scorearray[10] = c.score;
-		printf("Enter name for highscore table.\n");
-		cin >> names[10];
+		if (c.nametitle == "")
+			if (c.cclass == "Human")
+				names[10] = "a " + c.cclass + " of no renown";
+			else
+				names[10] = "an " + c.cclass + " of no renown";
+		else
+			names[10] = c.nametitle;
 		for (int j = 0; j < 10; j++) //bubble sort cuase its easy
 		{
 			for (int i = 0; i < 10 - j; i++)
@@ -408,7 +411,7 @@ void updatehscores()
 		}
 		ofstream sdatao;
 		sdatao.open("hscores.txt"); //save sorted data
-		sdatao << scorearray[10] << " " << names[10] << "\n" << scorearray[9] << " " << names[9] << "\n" << scorearray[8] << " " << names[8] << "\n" << scorearray[7] << " " << names[7] << "\n" << scorearray[6] << " " << names[6] << "\n" << scorearray[5] << " " << names[5] << "\n" << scorearray[4] << " " << names[4] << "\n" << scorearray[3] << " " << names[3] << "\n" << scorearray[2] << " " << names[2] << "\n" << scorearray[1] << " " << names[1];
+		sdatao << scorearray[10] << "\t" << names[10] << "\n" << scorearray[9] << "\t" << names[9] << "\n" << scorearray[8] << "\t" << names[8] << "\n" << scorearray[7] << "\t" << names[7] << "\n" << scorearray[6] << "\t" << names[6] << "\n" << scorearray[5] << "\t" << names[5] << "\n" << scorearray[4] << "\t" << names[4] << "\n" << scorearray[3] << "\t" << names[3] << "\n" << scorearray[2] << "\t" << names[2] << "\n" << scorearray[1] << "\t" << names[1];
 		sdatao.close();
 	}
 }
@@ -456,36 +459,123 @@ void lvlup()
 
 	if (c.lvl == 5)
 	{
-		cout << "Your journey as a warrior has begun. Who will you be remembered as?" << endl;
+		cout << "Your journey as a hero has begun. Who will you be remembered as?" << endl;
 		cin >> c.name;
+		system("CLS");
+		cout << "And thus.";
+		Sleep(500);
+		cout << ".";
+		Sleep(500);
+		cout << "." << endl;
+		Sleep(1000);
+		cout << "A ";
+		Sleep(250);
+		cout << "Legend ";
+		Sleep(250);
+		cout << "was ";
+		Sleep(250);
+		cout << "born\n\n" << endl;
+		Sleep(1000);
+		system("pause");
+		system("CLS");
 		c.nametitle = c.name + " the distinguished";
 	}
 	if (c.lvl == 10)
+	{
+		cout << "Congratulations Hero! your prestige has grown" << endl;
+		Sleep(500);
+		system("pause");
+		system("CLS");
 		c.nametitle = c.name + " the prestigious";
+	}
 	if (c.lvl == 15)
+	{
+		cout << "Congratulations Hero! your fame is spreading" << endl;
+		Sleep(500);
+		system("pause");
+		system("CLS");
 		c.nametitle = c.name + " the renowned";
+	}
 	if (c.lvl == 20)
+	{
+		cout << "Congratulations Hero! your an icon to those following your path" << endl;
+		Sleep(500);
+		system("pause");
+		system("CLS");
 		c.nametitle = "the glorious " + c.name;
+	}
 	if (c.lvl == 25)
+	{
+		cout << "Congratulations Hero! you've become a legend to your followers" << endl;
+		Sleep(500);
+		system("pause");
+		system("CLS");
 		c.nametitle = c.name + " the legend";
+	}
 	if (c.lvl == 30)
+	{
+		cout << "Congratulations Hero! all have come to know your legend" << endl;
+		Sleep(500);
+		system("pause");
+		system("CLS");
 		c.nametitle = c.name + " the fabled";
-		if (c.lvl == 35)
+	}
+	if (c.lvl == 35)
+	{
+		cout << "Congratulations Hero! you've become exalted above humanity" << endl;
+		Sleep(500);
+		system("pause");
+		system("CLS");
 		c.nametitle = c.name + " the exalted";
-		if (c.lvl == 40)
+	}
+	if (c.lvl == 40)
+	{
+		cout << "Congratulations Hero! you've transcended all which has been" << endl;
+		Sleep(500);
+		system("pause");
+		system("CLS");
 		c.nametitle = c.name + " the immortal";
-		if (c.lvl == 50)
+	}
+	if (c.lvl == 50)
+	{
+		cout << "There is no higher honor. There is no higher power. All has become far beneath you." << endl;
+		Sleep(500);
+		cout << ".";
+		Sleep(500);
+		cout << ".";
+		Sleep(500);
+		cout << ".";
+		Sleep(500);
+		cout << "." << endl;;
+		Sleep(500);
+		cout << "You ";
+		Sleep(250);
+		cout << "are ";
+		Sleep(250);
+		cout << "the ";
+		Sleep(500);
+		cout << "Immortal ";
+		Sleep(750);
+		cout << "High ";
+		Sleep(750);
+		cout << "King " << endl;
+		Sleep(1500);
+		cout << "\n\n\n";
+		system("pause");
+		system("CLS");
 		c.nametitle == "Immortal High King " + c.name;
+	}
 }
 
 void play()
 {
 	cout << "When you see 'ATTACK #' hit the number then enter before times up" << endl;
-	int rng = rand() % 5 + 6; //6-10 // ai diff
+	int rng = rand() % 5 + 6; //6-10 // ai hp rng
 	int aihp = rng * aihpscaler();
 	int numcheck = 10;
 	int damage = 0;
 	int dt = 4;
+	int totalmaxhp = c.mchp + c.ae.amchp + c.he.hmchp;
 
 	bool boss = false;
 	if (rng >= 9) // boss
@@ -498,7 +588,7 @@ void play()
 	bool keepatt = true;
 	while (keepatt == true)
 	{
-		int aiatt = (((rand() % 11) + 15) * aiattscaler()); // rng att value
+		int aiatt = (((rand() % 12) + 16) * aiattscaler()); // rng att value
 		int cntratt = (rand() % 3); // rng if cntratt. 2 in 3 chance
 		int ct = ((rand() % 4) + 1) * 1000; // rng how long to wait for attack prompt
 		int sucat = (rand() % 10); // rng number to enter
@@ -536,7 +626,7 @@ void play()
 		}
 		if (sucat == numcheck && atttime < 1) // hit
 		{
-			double dmg = 3.5 * ((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness
+			double dmg = 2 * ((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness
 			if (c.dif == 2)
 				dmg = dmg * .9; // -10% damage for hardcore
 			aihp = aihp - (int)dmg;
@@ -599,15 +689,18 @@ void play()
 				updatehscores();
 			viewhscores();
 			system("pause");
-			mciSendString(L"close maintheme", NULL, 0, NULL); // close game
+			mciSendString(L"pause maintheme", NULL, 0, NULL); //close game
+			mciSendString(L"close maintheme", NULL, 0, NULL);
 			mciSendString(L"close em3", NULL, 0, NULL);
 			mciSendString(L"close fighttheme", NULL, 0, NULL);
 			mciSendString(L"close fighttheme2", NULL, 0, NULL);
+			mciSendString(L"close practicetheme", NULL, 0, NULL);
 			mciSendString(L"close critsfx", NULL, 0, NULL);
 			mciSendString(L"close itemdsfx", NULL, 0, NULL);
 			mciSendString(L"close elitesfx", NULL, 0, NULL);
 			mciSendString(L"close vsfx", NULL, 0, NULL);
 			mciSendString(L"close dsfx", NULL, 0, NULL);
+			mciSendString(L"close lvlupsfx", NULL, 0, NULL);
 			exit(0);
 		}
 		if (aihp < 1) // enemy dead
@@ -618,7 +711,7 @@ void play()
 			int xpgain = xpgainscaler();
 			c.cxp = c.cxp + xpgain;
 			cout << "victory! you gained " << xpgain << " xp.\nCurrent xp: " << c.cxp << "/" << (int)xpcostscaler() << endl;
-			cout << "\nhp remaining - " << c.chp << "\n" << endl;
+			cout << "\nhp remaining - " << c.chp << "/" << totalmaxhp << "\n" << endl;
 			c.score = c.score + xpgain;
 			if (c.cxp >= (int)xpcostscaler())
 			{
@@ -710,8 +803,8 @@ void play()
 			system("CLS");
 
 
-			int sucheal = (rand() % 10); // same as attack but heals instead
-			cout << "Time to get some hp back, make it count.\n" << endl;
+			int sucheal = (rand() % 6); // same as attack but heals instead and won't wait quite as long
+			cout << "Rest and heal. current hp - " << c.chp << "/" << totalmaxhp << endl;
 			system("pause");
 			cout << "HEAL: ";
 			Sleep(ct);
@@ -729,8 +822,8 @@ void play()
 				c.chp = c.chp + (regenscaler() * (1 - atttime));
 				temp = c.chp - temp;
 				cout << temp << " hp gained." << endl;
-				if (c.chp > (c.mchp + c.ae.amchp + c.he.hmchp))
-					c.chp = (c.mchp + c.ae.amchp + c.he.hmchp);
+				if (c.chp > totalmaxhp)
+					c.chp = totalmaxhp;
 			}
 			else
 			{
@@ -743,7 +836,7 @@ void play()
 		}
 
 		cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n" << endl;
-		cout << "\nhp - " << c.chp << "/" << c.mchp << "\nattack - " << c.catt + c.we.wcatt << "\n\n" << endl;
+		cout << "\nhp - " << c.chp << "/" << totalmaxhp << "\nattack - " << (double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1)) << "\n\n" << endl;
 		cout << "1 - continue attacking\n2 - retreat" << endl;
 		int temp3;
 		cin >> temp3;
@@ -759,15 +852,15 @@ void viewchar(int pac)
 	if (c.dif == 2) // display in red for HC character
 		SetConsoleTextAttribute(hConsole, 4);
 	if (c.name == "") //show name with title if applicable
-		cout << "Class - " << c.cclass << endl;
+		cout << "An " << c.cclass << endl;
 	else
-		cout << c.name << endl;
+		cout << c.nametitle << endl;
 	cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 	cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
-	cout << "attack - " << (int)((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) << " : weapon - " << (int)((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1)) << endl;
+	cout << "attack - " << (int)((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1))) << " : weapon - " << (int)((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1)) << endl;
 	cout << "Expierience - " << c.cxp << "/" << (int)xpcostscaler() << endl;
-	cout << "Level - " << (int)c.lvl << "\n\n" << endl;
-	cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << endl;
+	cout << "Level - " << (int)c.lvl << "\n" << endl;
+	cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << "\n" << endl;
 	if (c.dif == 2) // put color back normal
 		SetConsoleTextAttribute(hConsole, 15);
 
@@ -785,7 +878,6 @@ void viewchar(int pac)
 		if (mc3 == 1)
 		{
 			weapon emptyweapon = { "", 0 };
-			weapon emptyweapon1 = { "", 0 };
 			armor emptyarmor = { "", 0, 0, 0, };
 			helmet emptyhelmet = { "", 0, 0, 0 };
 			do
@@ -793,7 +885,6 @@ void viewchar(int pac)
 				ri = false;
 				system("CLS");
 				cout << "\nCurrent Weapon: " << c.we.wname << " - " << c.we.wcatt << " att" << "\nCurrent Armor: " << c.ae.aname << " - " << c.ae.amchp << " hp - " << c.ae.aregen << "regen" << "\nCurrent Helmet: " << c.he.hname << " - " << c.he.hmchp << " hp - " << c.he.hregen << " regen" << endl;
-
 
 				cout << "\nA - Weapons in inventory." << endl;
 				for (int i = 0; i < 5; i++)
@@ -824,6 +915,7 @@ void viewchar(int pac)
 				cin >> mc;
 				if (mc == 'a' || mc == 'A')
 				{
+					ri = true;
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
@@ -836,20 +928,12 @@ void viewchar(int pac)
 						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[3]);
 					else if (mc2 == 5)
 						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[4]);
-					//else if (mc2 == 6) ////////// forr debugging incase it crashes again
-					//{
-						//emptyweapon = c.we;
-						//emptyweapon1 = weaponsarray[0];
-						//cout << emptyweapon.wname << emptyweapon1.wname;
-						//deadlibrary::dlclass::swapweapon(emptyweapon, emptyweapon1);
-						//cout << emptyweapon.wname << emptyweapon1.wname;
-						//system("pause");
-					//}
 					else
 						skip = true;
 				}
 				else if (mc == 'b' || mc == 'B')
 				{
+					ri = true;
 					cout << "Enter the number of the armor you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
@@ -867,6 +951,7 @@ void viewchar(int pac)
 				}
 				else if (mc == 'c' || mc == 'C')
 				{
+					ri = true;
 					cout << "Enter the number of the helmet you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
@@ -975,13 +1060,13 @@ void viewchar(int pac)
 			if (c.name == "")
 				cout << "Class - " << c.cclass << endl;
 			else
-				cout << c.name << endl;
+				cout << c.nametitle << endl;
 			cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 			cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
-			cout << "attack - " << (int)((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1))) << " : weapon - " << (int)((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * .1)) << endl;
+			cout << "attack - " << (int)((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1))) << " : weapon - " << (int)((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1)) << endl;
 			cout << "Expierience - " << c.cxp << "/" << (int)xpcostscaler() << endl;
-			cout << "Level - " << c.lvl << "\n\n" << endl;
-			cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << endl;
+			cout << "Level - " << c.lvl << "\n" << endl;
+			cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << "\n" << endl;
 			system("pause");
 		}
 	}
@@ -1022,30 +1107,14 @@ void savegame()
 
 void loadchar()
 {
-	
-
-	/*
-	FILE* ifpb = fopen("char/chardata.bin", "rb"); //load char
-	fread(&c, sizeof(character) + sizeof(weapon) + sizeof(armor) + sizeof(helmet), 1, ifpb);
-	fclose(ifpb);
-	*/
-
-	//string t;
-
 	ifstream infile;
 	infile.open("char/chardata.txt");
 	string textline;
-	getline(infile, textline, '\n');
-	istringstream name(textline);
-	name >> c.name;
-	getline(infile, textline, '\n');
-	istringstream nametitle(textline);
-	nametitle >> c.nametitle;
+	getline(infile, c.name);
+	getline(infile, c.nametitle);
 	getline(infile, textline);
 	istringstream data(textline);
 	data >> c.cclass >> c.chp >> c.mchp >> c.catt >> c.attlvlups >> c.regen >> c.cxp >> c.lvl >> c.score >> c.dif;
-	
-	//system("pause");
 
 	c.we = {}; //idk if i need this
 	c.we.wname = "";
@@ -1067,9 +1136,6 @@ void loadchar()
 		helmetsarray[i] = { "", 0, 0, 0 };
 	}
 
-
-
-	//c.we = { };
 	string w1, w2, w3; //loads an inventory item type
 	string line1;
 	ifstream sdata1;
@@ -1078,30 +1144,15 @@ void loadchar()
 	getline(sdata1, line1);
 	istringstream iss1(line1);
 	iss1 >> c.we.wcatt >> w1 >> w2 >> w3;
-	//cout << c.we.wcatt << "\n";////////////////////////////////////////////////
-	//system("pause");
-	//cout << w1 << "\n";////////////////////////////////////////////////
-	//system("pause");
-	//cout << w2 << "\n";////////////////////////////////////////////////
-	//system("pause");
-	//cout << w3 << "\n";////////////////////////////////////////////////
-	//system("pause");
-	//string tempdebug = w1 + " " + w2 + " " + w3;
-	//cout << tempdebug << "\n";////////////////////////////////////////////////
-	//system("pause");
-	//cout << c.we.wname << "\n";////////////////////////////////////////////////
-	//system("pause");
-	//c.we.wname = w1 + " " + w2 + " " + w3;
-	//cout << c.we.wname << "\n";////////////////////////////////////////////////
-	//system("pause");
+
+	c.we.wname = w1 + " " + w2 + " " + w3;
 	while (getline(sdata1, line1)) 
 	{
+		w1 = w2 = w3 = "";
 		istringstream ssi(line1);
 		ssi >> weaponsarray[counter1].wcatt >> w1 >> w2 >> w3;
 		weaponsarray[counter1].wname = w1 + " " + w2 + " " + w3;
 		counter1++;
-		cout << weaponsarray[counter1].wname << "\n";////////////////////////////////////////////////
-		system("pause");
 	}
 	sdata1.close();
 
@@ -1116,6 +1167,7 @@ void loadchar()
 	c.ae.aname = a1 + " " + a2 + " " + a3;
 	while (getline(sdata2, line2))
 	{
+		a1 = a2 = a3 = "";
 		istringstream ss2(line2);
 		ss2 >> armorsarray[counter2].atotalstat >> armorsarray[counter2].aregen >> armorsarray[counter2].amchp >> a1 >> a2 >> a3;
 		armorsarray[counter2].aname = a1 + " " + a2 + " " + a3;
@@ -1134,6 +1186,7 @@ void loadchar()
 	c.he.hname = h1 + " " + h2 + " " + h3;
 	while (getline(sdata3, line3))
 	{
+		h1 = h2 = h3 = "";
 		istringstream ss3(line3);
 		ss3 >> helmetsarray[counter3].htotalstat >> helmetsarray[counter3].hregen >> helmetsarray[counter3].hmchp >> h1 >> h2 >> h3;
 		helmetsarray[counter3].hname = h1 + " " + h2 + " " + h3;
@@ -1249,7 +1302,6 @@ void settings()
 			cin >> soundtracknum;
 			break;
 		case 6: vi = true;
-			keepplaying = false;
 			break;
 		default: vi = false;
 			break;
@@ -1281,14 +1333,14 @@ int main()
 		st = "st1";
 	fclose(ifp);
 
-	string em3 = "open audio/" + st + "/titletheme.mp3 mpegvideo alias em3"; //creating all needed audio players
+	string em3 = "open audio/" + st + "/em3.mp3 type mpegvideo alias em3"; //creating all needed audio players
 	string fighttheme = "open audio/" + st + "/fighttheme.mp3 type mpegvideo alias fighttheme";
-	string fighttheme2 = "open audio/" + st + "/fighttheme2.mp3 type mpegvideo alias fight2theme";
+	string fighttheme2 = "open audio/" + st + "/fighttheme2.mp3 type mpegvideo alias fighttheme2";
 	string maintheme = "open audio/" + st + "/maintheme.mp3 type mpegvideo alias maintheme";
 	string titletheme = "open audio/" + st + "/titletheme.mp3 type mpegvideo alias titletheme";
 	string practicetheme = "open audio/" + st + "/practicetheme.mp3 type mpegvideo alias practicetheme";
 	mciSendStringA(em3.c_str(), NULL, 0, NULL);
-	mciSendStringA(fighttheme2.c_str(), NULL, 0, NULL);
+	mciSendStringA(fighttheme.c_str(), NULL, 0, NULL);
 	mciSendStringA(fighttheme2.c_str(), NULL, 0, NULL);
 	mciSendStringA(maintheme.c_str(), NULL, 0, NULL);
 	mciSendStringA(titletheme.c_str(), NULL, 0, NULL);
@@ -1312,21 +1364,30 @@ int main()
 	int pvpfullexit = titlescreen(); // returns 1 if pvp() wants to close app
 	mciSendString(L"pause titletheme", NULL, 0, NULL);
 	mciSendString(L"close titletheme", NULL, 0, NULL);
+	mciSendString(L"seek maintheme to start", NULL, 0, NULL);
+	mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 	system("CLS");
 
-	if (pvpfullexit == 1) // app closed form pvp()
+	if (pvpfullexit == 1) // app closed from pvp()
 	{
+		mciSendString(L"pause maintheme", NULL, 0, NULL);
 		mciSendString(L"close maintheme", NULL, 0, NULL);
 		mciSendString(L"close em3", NULL, 0, NULL);
 		mciSendString(L"close fighttheme", NULL, 0, NULL);
 		mciSendString(L"close fighttheme2", NULL, 0, NULL);
+		mciSendString(L"close practicetheme", NULL, 0, NULL);
+		mciSendString(L"close critsfx", NULL, 0, NULL);
+		mciSendString(L"close itemdsfx", NULL, 0, NULL);
+		mciSendString(L"close elitesfx", NULL, 0, NULL);
+		mciSendString(L"close vsfx", NULL, 0, NULL);
+		mciSendString(L"close dsfx", NULL, 0, NULL);
+		mciSendString(L"close lvlupsfx", NULL, 0, NULL);
 		return 0;
 	}
-
+	
 	do
 	{
-		mciSendString(L"seek maintheme to start", NULL, 0, NULL);
-		mciSendString(L"play maintheme repeat", NULL, 0, NULL);
+		
 		resetmenu = true;
 		cout << "1 - Start a New Game\n2 - Load Game\n3 - Gameplay Mechanics\n4 - Combat Practice\n5 - High Scores\n6 - settings\n7 - Exit Game" << endl;
 		cin >> temp2;
@@ -1345,9 +1406,9 @@ int main()
 				  c.nametitle = "";
 				  c.chp = 200;
 				  c.mchp = 200;
-				  c.catt = 10;
-				  c.attlvlups = 0;
-				  c.regen = 3;
+				  c.catt = 5;
+				  c.attlvlups = 1;
+				  c.regen = 1;
 				  c.cxp = 0;
 				  c.lvl = 1;
 				  c.score = 0;
@@ -1358,9 +1419,9 @@ int main()
 				  c.nametitle = "";
 				  c.chp = 100;
 				  c.mchp = 100;
-				  c.catt = 20;
-				  c.attlvlups = 0;
-				  c.regen = 3;
+				  c.catt = 10;
+				  c.attlvlups = 2;
+				  c.regen = 1;
 				  c.cxp = 0;
 				  c.lvl = 1;
 				  c.score = 0;
@@ -1371,9 +1432,9 @@ int main()
 				  c.nametitle = "";
 				  c.chp = 50;
 				  c.mchp = 50;
-				  c.catt = 40;
-				  c.attlvlups = 0;
-				  c.regen = 3;
+				  c.catt = 20;
+				  c.attlvlups = 4;
+				  c.regen = 1;
 				  c.cxp = 0;
 				  c.lvl = 1;
 				  c.score = 0;
@@ -1382,7 +1443,7 @@ int main()
 			default:
 				break;
 			}
-			c.we = {};
+			c.we = {};//idk if i need this
 			c.we.wname = "";
 			c.we.wcatt = 0;
 			c.ae = {};
@@ -1401,7 +1462,6 @@ int main()
 				armorsarray[i] = { "", 0, 0, 0 };
 				helmetsarray[i] = { "", 0, 0, 0 };
 			}
-			system("pause");
 		}
 		else if (temp2 == 2)
 		{
@@ -1417,6 +1477,7 @@ int main()
 			system("CLS");
 			keepplaying = false;
 			mciSendString(L"pause em3", NULL, 0, NULL);
+			mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 		}
 		else if (temp2 == 4)
 		{ // basically a copy of play()
@@ -1497,10 +1558,12 @@ int main()
 			system("CLS");
 			keepplaying = false;
 			mciSendString(L"pause em3", NULL, 0, NULL);
+			mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 		}
 		else if (temp2 == 6)
 		{
 			settings();
+			keepplaying = false;
 		}
 		else if (temp2 == 7)
 		{
@@ -1556,7 +1619,7 @@ int main()
 			case 5: keepplaying = false; // quite just gameplay loop
 				resetmenu = false; // quite main menu loop
 				break;
-			case 6:
+			case 737:
 				dt = (rand() % 3); // item drop type
 				mciSendString(L"seek itemdsfx to start", NULL, 0, NULL);
 				mciSendString(L"play itemdsfx", NULL, 0, NULL);
@@ -1634,17 +1697,20 @@ int main()
 			}
 		}
 		keepplaying = true;
-		mciSendString(L"pause maintheme", NULL, 0, NULL);
+		
 	} while (resetmenu == true);
+	mciSendString(L"pause maintheme", NULL, 0, NULL);
 
 	mciSendString(L"close maintheme", NULL, 0, NULL);
 	mciSendString(L"close em3", NULL, 0, NULL);
 	mciSendString(L"close fighttheme", NULL, 0, NULL);
 	mciSendString(L"close fighttheme2", NULL, 0, NULL);
+	mciSendString(L"close practicetheme", NULL, 0, NULL);
 	mciSendString(L"close critsfx", NULL, 0, NULL);
 	mciSendString(L"close itemdsfx", NULL, 0, NULL);
 	mciSendString(L"close elitesfx", NULL, 0, NULL);
 	mciSendString(L"close vsfx", NULL, 0, NULL);
 	mciSendString(L"close dsfx", NULL, 0, NULL);
+	mciSendString(L"close lvlupsfx", NULL, 0, NULL);
 	return 0;
 }

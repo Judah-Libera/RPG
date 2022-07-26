@@ -1,6 +1,6 @@
-9 scythe of Hades
+10 scythe of Chaos
+9 scythe of Death
+5 sword of Anguish
+5 sword of Brutality
+1 knife of Doom
 0   
-8 Longsword of Chaos
-8 Battle-Axe of Hades
-6 Flail of Destruction
-4 Flail of Brutality

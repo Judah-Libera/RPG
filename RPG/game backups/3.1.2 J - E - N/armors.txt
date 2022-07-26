@@ -1,0 +1,6 @@
+9 2 30 Armor of Harmony
+9 5 5 Armor of Youth
+2 0 5 Robe of Balance
+0 0 0   
+0 0 0   
+0 0 0   
