@@ -91,9 +91,9 @@ weapon createweapon()
 		else if (wnamei == 1)
 			wname1 = "Longsword of ";
 		else if (wnamei == 2)
-			wname1 = "Dueling Blades of ";
+			wname1 = "Blades of ";
 		else
-			wname1 = "Battle Axe of ";
+			wname1 = "Battle-Axe of ";
 
 		if (wnamei2 == 0)
 			wname2 = "Death";
@@ -263,7 +263,7 @@ helmet createhelmet()
 	else if (htotalstat > 3)
 	{
 		if (hname1i == 0)
-			hname1 = "Hood ";
+			hname1 = "Viel ";
 		else
 			hname1 = "Mask ";
 		if ((float)bhmchp / (float)htotalstat >= .7)
@@ -282,9 +282,9 @@ helmet createhelmet()
 	else
 	{
 		if (hname1i == 0)
-			hname1 = "Cap ";
+			hname1 = "Circlet ";
 		else
-			hname1 = "Hat ";
+			hname1 = "Hood ";
 		if ((float)bhmchp / (float)htotalstat >= .7)
 		{
 			hname2 = "of Health";
@@ -790,18 +790,8 @@ void viewchar(int pac)
 				{
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
-					if (mc2 == 1) {
-						//cout << c.we.wname << c.we.wcatt;
-						//system("pause");
-						//c.we.wcatt = 5;
-						//c.we.wname = "asdf";
-						//cout << c.we.wname << c.we.wcatt;
-						//system("pause");
-						//c.we = emptyweapon;
-						//cout << c.we.wname << c.we.wcatt;
-						//system("pause");
+					if (mc2 == 1)
 						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[0]);
-					} // would rather use deadlibrary function, but nto workign yet. now its working but armor isn't
 					else if (mc2 == 2)
 						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[1]);
 					else if (mc2 == 3)
@@ -962,14 +952,17 @@ void viewchar(int pac)
 void savegame()
 {
 	ofstream out1("char/weapons.txt"); // saves an inventory item type
+	out1 << c.we.wcatt << " " << c.we.wname << "\n";
 	for (int i = 0; i < 5; i++)
 		out1 << weaponsarray[i].wcatt << " " << weaponsarray[i].wname << "\n";
 
 	ofstream out2("char/armors.txt");
+	out2 << c.ae.atotalstat << " " << c.ae.aregen << " " << c.ae.amchp << " " << c.ae.aname << "\n";
 	for (int i = 0; i < 5; i++)
 		out2 << armorsarray[i].atotalstat << " " << armorsarray[i].aregen << " " << armorsarray[i].amchp << " " << armorsarray[i].aname << "\n";
 
 	ofstream out3("char/helmets.txt");
+	out3 << c.he.htotalstat << " " << c.he.hregen << " " << c.he.hmchp << " " << c.he.hname << "\n";
 	for (int i = 0; i < 5; i++)
 		out3 << helmetsarray[i].htotalstat << " " << helmetsarray[i].hregen << " " << helmetsarray[i].hmchp << " " << helmetsarray[i].hname << "\n";
 
@@ -995,6 +988,10 @@ void loadchar()
 	ifstream sdata1;
 	sdata1.open("char/weapons.txt");
 	int counter1 = 0;
+	getline(sdata1, line1);// see if i can get this to work. otherwise just do its own file again. hopefulyl this fixes inv issues. seems to only have problems after loading a saved game. and equiped item names are unreadable by compiler.
+	istringstream ss(line1);
+	ss >> c.we.wcatt >> w1 >> w2 >> w3;
+	c.we.wname = w1 + " " + w2 + " " + w3;
 	while (getline(sdata1, line1)) 
 	{
 		istringstream ss(line1);
@@ -1009,6 +1006,10 @@ void loadchar()
 	ifstream sdata2;
 	sdata2.open("char/armors.txt");
 	int counter2 = 0;
+	getline(sdata2, line2);
+	istringstream ss(line2);
+	ss >> c.ae.atotalstat >> c.ae.aregen >> c.ae.amchp >> a1 >> a2 >> a3;
+	c.ae.aname = a1 + " " + a2 + " " + a3;
 	while (getline(sdata2, line2))
 	{
 		istringstream ss(line2);
@@ -1023,6 +1024,10 @@ void loadchar()
 	ifstream sdata3;
 	sdata3.open("char/helmets.txt");
 	int counter3 = 0;
+	getline(sdata3, line3);
+	stringstream ss(line3);
+	ss >> c.he.htotalstat >> c.he.hregen >> c.he.hmchp >> h1 >> h2 >> h3;
+	c.ae.aname = h1 + " " + h2 + " " + h3;
 	while (getline(sdata3, line3))
 	{
 		istringstream ss(line3);

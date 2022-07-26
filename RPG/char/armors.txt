@@ -1,5 +1,0 @@
-6 2 10 Plate of Rejuvenation
-6 2 15 Plate of Equilibrium
-5 2 5 Vestment of Rejuvenation
-4 0 20 Vestment of Life
-2 1 0 Tunic of Recovery
