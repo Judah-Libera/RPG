@@ -1,11 +1,11 @@
-//     RPG V3.1.2				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V3.1.3				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
 //early game balance needs retested
 
 //EDITS
 //merge catt and catlvlups into same variable. //if it ain't broke dont fix it tho
-//update pvp.cpp - sfx
+//update pvp.cpp - sfx - swap funcs - char loads
 
 //FEATURES
 // highlight highscore for active game on defeate
@@ -16,9 +16,7 @@
 //have someone else put in multiple character slots
 
 #pragma warning(disable: 4996)
-
 #include "includes.h"
-
 using namespace std;
 
 struct character
@@ -36,14 +34,10 @@ struct character
 	int score = 0;
 	int dif = 1;
 	weapon we = {"", 0 }; //weapon equiped
-	//weapon weaponsarray[5]; // doesn't work if these arrays are not here. idk why, they arn't used as far as i know. doesn't seem to matter what they're called
 	armor ae = {"", 0, 0, 0 };
-	//armor armorsarray[5];
 	helmet he = {"", 0, 0, 0 };
-	//helmet helmetsarray[5];
 };
 character c = {};
-
 
 void viewhscores();
 void updatehscores();
@@ -63,15 +57,11 @@ int FullScreen = 1; // 1=fs, 0=windowed
 int mvolume = 1000; // = 0-10 * 100
 int sfxvolume = 1000; // ^^^
 int soundtracknum = 1;
-//string charactername = "";
 
-
-
-//character c; //active character
 weapon weaponsarray[5]; //arrays for inv
 armor armorsarray[5];
 helmet helmetsarray[5];
-//scalers
+
 const double aiattscaler() { return (.035 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; }
 const double aihpscaler() { return (.3 * pow(c.lvl, 2)) + (2.5 * (double)c.lvl) + 9; }
 const double cattscaler() { return (c.catt + (.6 * c.attlvlups)); } //NOT USED IN DAMAGE CALCULATION. influence the effect of lvlups on natural attack //(c.catt + (.12 * (double)pow(c.attlvlups, 1.5) + 1.2 * (double)c.attlvlups + 1.5)); }//old
@@ -321,7 +311,7 @@ int titlescreen()
 		ShowWindow(ConsoleWindow, SW_MAXIMIZE);
 	}
 
-	while (resetmenu == true) // not tested
+	while (resetmenu == true)
 	{
 		resetmenu = false;
 
@@ -332,7 +322,7 @@ int titlescreen()
 		fclose(fptr);
 
 		int choice;
-		printf("\n\n\nPress 1 for pvp or press enter to continue\n");
+		/*printf("\n\n\npress enter to continue\n"); //pvp is to outdatted to be remotely functional
 		if (cin.get() == '1')
 		{
 			choice = pvp(); //launch pvp script. will end returning 1 if exits game from pvp()
@@ -341,9 +331,9 @@ int titlescreen()
 			else if (choice == 0)
 				resetmenu = true;
 			else {}
-		}
+		}*/
 	}
-	cin.seekg(0, ios::end); // no idea what this does but i'd rather not cuase permanate damage tryign to fiugre it out
+	cin.seekg(0, ios::end); // no idea what this does but i'd rather not cuase permanate damage tryign to figure it out
 	cin.clear();
 	return 0;
 }
@@ -418,6 +408,9 @@ void updatehscores()
 
 void lvlup()
 {
+	mciSendString(L"open audio/sfx/lvlupsfx.mp3 type mpegvideo alias lvlupsfx", NULL, 0, NULL);
+	mciSendString(L"seek lvlupsfx to start", NULL, 0, NULL);
+	mciSendString(L"play lvlupsfx", NULL, 0, NULL);
 	for (int x = 0; x < 2; x++) // 2 SP per level
 	{
 		bool tryagain = false;
@@ -565,6 +558,7 @@ void lvlup()
 		system("CLS");
 		c.nametitle == "Immortal High King " + c.name;
 	}
+	mciSendString(L"close elitesfx", NULL, 0, NULL);
 }
 
 void play()
@@ -736,9 +730,10 @@ void play()
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
 								{
-									weapon temp = weaponsarray[j];
-									weaponsarray[j] = weaponsarray[j + 1];
-									weaponsarray[j + 1] = temp;
+									deadlibrary::dlclass::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+									//weapon temp = weaponsarray[j];
+									//weaponsarray[j] = weaponsarray[j + 1];
+									//weaponsarray[j + 1] = temp;
 								}
 						if (wd.wcatt > weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
 							weaponsarray[4] = wd;
@@ -746,9 +741,10 @@ void play()
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
 								{
-									weapon temp = weaponsarray[j];
-									weaponsarray[j] = weaponsarray[j + 1];
-									weaponsarray[j + 1] = temp;
+									deadlibrary::dlclass::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+									//weapon temp = weaponsarray[j];
+									//weaponsarray[j] = weaponsarray[j + 1];
+									//weaponsarray[j + 1] = temp;
 								}
 					}
 					if (dt == 1) // same as weapon drop
@@ -759,9 +755,10 @@ void play()
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
 								{
-									armor temp = armorsarray[j];
-									armorsarray[j] = armorsarray[j + 1];
-									armorsarray[j + 1] = temp;
+									deadlibrary::dlclass::swaparmor(armorsarray[j], armorsarray[j + 1]);
+									//armor temp = armorsarray[j];
+									//armorsarray[j] = armorsarray[j + 1];
+									//armorsarray[j + 1] = temp;
 								}
 						if (ad.atotalstat > armorsarray[4].atotalstat)
 							armorsarray[4] = ad;
@@ -769,9 +766,10 @@ void play()
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
 								{
-									armor temp = armorsarray[j];
-									armorsarray[j] = armorsarray[j + 1];
-									armorsarray[j + 1] = temp;
+									deadlibrary::dlclass::swaparmor(armorsarray[j], armorsarray[j + 1]);
+									//armor temp = armorsarray[j];
+									//armorsarray[j] = armorsarray[j + 1];
+									//armorsarray[j + 1] = temp;
 								}
 					}
 					if (dt == 2) // same as weapon drop
@@ -782,9 +780,10 @@ void play()
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
 								{
-									helmet temp = helmetsarray[j];
-									helmetsarray[j] = helmetsarray[j + 1];
-									helmetsarray[j + 1] = temp;
+									deadlibrary::dlclass::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+									//helmet temp = helmetsarray[j];
+									//helmetsarray[j] = helmetsarray[j + 1];
+									//helmetsarray[j + 1] = temp;
 								}
 						if (hd.htotalstat > helmetsarray[4].htotalstat)
 							helmetsarray[4] = hd;
@@ -792,16 +791,16 @@ void play()
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
 								{
-									helmet temp = helmetsarray[j];
-									helmetsarray[j] = helmetsarray[j + 1];
-									helmetsarray[j + 1] = temp;
+									deadlibrary::dlclass::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+									//helmet temp = helmetsarray[j];
+									//helmetsarray[j] = helmetsarray[j + 1];
+									//helmetsarray[j + 1] = temp;
 								}
 					}
 				}
 			}
 			system("pause");
 			system("CLS");
-
 
 			int sucheal = (rand() % 6); // same as attack but heals instead and won't wait quite as long
 			cout << "Rest and heal. current hp - " << c.chp << "/" << totalmaxhp << endl;
@@ -826,9 +825,7 @@ void play()
 					c.chp = totalmaxhp;
 			}
 			else
-			{
 				cout << "Your actually throwing, that was too important to choke this hard." << endl;
-			}
 			system("pause");
 			system("CLS");
 
@@ -844,7 +841,6 @@ void play()
 			keepatt = false;
 		system("CLS");
 	}
-	
 }
 
 void viewchar(int pac)
@@ -1050,9 +1046,7 @@ void viewchar(int pac)
 			} while (ri == true);
 		}
 		else
-		{
 			skip = true;
-		}
 
 		if (skip == false)
 		{
@@ -1090,18 +1084,14 @@ void savegame()
 	for (int i = 0; i < 5; i++)
 		out3 << helmetsarray[i].htotalstat << " " << helmetsarray[i].hregen << " " << helmetsarray[i].hmchp << " " << helmetsarray[i].hname << "\n";
 
+	ofstream out4("char/chardata.txt"); //cclass is one word so it can be read in like the other vars
+	out4 << c.name << "\n" << c.nametitle << "\n" << c.cclass << " " << c.chp << " " << c.mchp << " " << c.catt << " " << c.attlvlups << " " << c.regen << " " << c.cxp << " " << c.lvl << " " << c.score << " " << c.dif << "\n";
+	
 	out1.close();
 	out2.close();
 	out3.close();
-	/*
-	FILE* ofpb = fopen("char/chardata.bin", "wb"); //save char
-	fwrite(&c, sizeof(character) + sizeof(weapon) + sizeof(armor) + sizeof(helmet), 1, ofpb);
-	fclose(ofpb);
-	*/
-
-	ofstream out4("char/chardata.txt"); //cclass is one word so it can be read in like the other vars
-	out4 << c.name << "\n" << c.nametitle << "\n" << c.cclass << " " << c.chp << " " << c.mchp << " " << c.catt << " " << c.attlvlups << " " << c.regen << " " << c.cxp << " " << c.lvl << " " << c.score << " " << c.dif << "\n";
 	out4.close();
+
 	system("CLS");
 }
 
@@ -1116,19 +1106,19 @@ void loadchar()
 	istringstream data(textline);
 	data >> c.cclass >> c.chp >> c.mchp >> c.catt >> c.attlvlups >> c.regen >> c.cxp >> c.lvl >> c.score >> c.dif;
 
-	c.we = {}; //idk if i need this
-	c.we.wname = "";
-	c.we.wcatt = 0;
-	c.ae = {};
-	c.ae.aname = "";
-	c.ae.amchp = 0;
-	c.ae.aregen = 0;
-	c.ae.atotalstat = 0;
-	c.he = {};
-	c.he.hname = "";
-	c.he.hmchp = 0;
-	c.he.hregen = 0;
-	c.he.htotalstat = 0;
+	//c.we = {}; //idk if i need this
+	//c.we.wname = "";
+	//c.we.wcatt = 0;
+	//c.ae = {};
+	//c.ae.aname = "";
+	//c.ae.amchp = 0;
+	//c.ae.aregen = 0;
+	//c.ae.atotalstat = 0;
+	//c.he = {};
+	//c.he.hname = "";
+	//c.he.hmchp = 0;
+	//c.he.hregen = 0;
+	//c.he.htotalstat = 0;
 	for (int i = 0; i < 5; i++)
 	{
 		weaponsarray[i] = { "", 0 };
@@ -1215,6 +1205,9 @@ void volumeupdate()
 	vol = "setaudio titletheme volume to ";
 	vol.append(to_string(mvolume));
 	mciSendStringA(vol.c_str(), NULL, 0, 0);
+	vol = "setaudio practicetheme volume to ";
+	vol.append(to_string(mvolume));
+	mciSendStringA(vol.c_str(), NULL, 0, 0);
 	vol = "setaudio critsfx volume to ";
 	vol.append(to_string(sfxvolume));
 	mciSendStringA(vol.c_str(), NULL, 0, NULL);
@@ -1230,11 +1223,14 @@ void volumeupdate()
 	vol = "setaudio dssfx volume to ";
 	vol.append(to_string(sfxvolume));
 	mciSendStringA(vol.c_str(), NULL, 0, NULL);
+	vol = "setaudio lvlupsfx volume to ";
+	vol.append(to_string(sfxvolume));
+	mciSendStringA(vol.c_str(), NULL, 0, NULL);
 }
 
 void settings()
 {
-	mciSendString(L"open audio/elitesfx.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL); // to hear sfx whe nselecting
+	mciSendString(L"open audio/sfx/elitesfx.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL); // to hear sfx when selecting its vol
 	int cs = 0;
 	int mc = 0;
 	bool vi = true;
@@ -1309,7 +1305,7 @@ void settings()
 	} while (vi != true);
 	system("CLS");
 
-	FILE* ofp = fopen("settings.txt", "w"); //update settigns file
+	FILE* ofp = fopen("settings.txt", "w"); //update settings file
 	fprintf(ofp, "FullScreen %d\nStart Difficulty %d\nMusic Volume %d\nEffects Volume %d\nSoundtrack %d", FullScreen, difsel, mvolume, sfxvolume, soundtracknum);
 	fclose(ofp);
 	mciSendString(L"close elitesfx", NULL, 0, NULL);
@@ -1317,9 +1313,6 @@ void settings()
 
 int main()
 {
-	int dt; ///////////////////////////////////////////////item create for 6
-	//SetConsoleTextAttribute(hConsole, 15);
-
 	string st;
 	FILE* ifp = fopen("settings.txt", "r"); //read in settigns
 	fscanf(ifp, "FullScreen %d\n", &FullScreen);
@@ -1443,7 +1436,7 @@ int main()
 			default:
 				break;
 			}
-			c.we = {};//idk if i need this
+			c.we = {};
 			c.we.wname = "";
 			c.we.wcatt = 0;
 			c.ae = {};
@@ -1480,8 +1473,8 @@ int main()
 			mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 		}
 		else if (temp2 == 4)
-		{ // basically a copy of play()
-			mciSendString(L"pause maintheme", NULL, 0, NULL);
+		{
+			mciSendString(L"pause maintheme", NULL, 0, NULL); // basically a copy of play()
 			mciSendString(L"seek practicetheme to start", NULL, 0, NULL);
 			mciSendString(L"play practicetheme repeat", NULL, 0, NULL);
 			bool cont = true;
@@ -1501,9 +1494,7 @@ int main()
 				numcheck = 11;
 
 				clock_t begin = clock();
-
 				cin >> numcheck;
-
 				clock_t end = clock();
 
 				double atttime = double(end - begin) / CLOCKS_PER_SEC;
@@ -1619,85 +1610,11 @@ int main()
 			case 5: keepplaying = false; // quite just gameplay loop
 				resetmenu = false; // quite main menu loop
 				break;
-			case 737:
-				dt = (rand() % 3); // item drop type
-				mciSendString(L"seek itemdsfx to start", NULL, 0, NULL);
-				mciSendString(L"play itemdsfx", NULL, 0, NULL);
-				if (dt == 0)
-				{
-					weapon wd = createweapon();
-					cout << "You've found " << wd.wname << "!" << endl;
-					for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
-						for (int j = 0; j < 5 - i - 1; j++)
-							if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-							{
-								weapon temp = weaponsarray[j];
-								weaponsarray[j] = weaponsarray[j + 1];
-								weaponsarray[j + 1] = temp;
-							}
-					if (wd.wcatt > weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
-						weaponsarray[4] = wd;
-					for (int i = 0; i < 5 - 1; i++) // sort inv by descending power again with new item
-						for (int j = 0; j < 5 - i - 1; j++)
-							if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-							{
-								weapon temp = weaponsarray[j];
-								weaponsarray[j] = weaponsarray[j + 1];
-								weaponsarray[j + 1] = temp;
-							}
-				}
-				if (dt == 1) // same as weapon drop
-				{
-					armor ad = createarmor();
-					cout << "You've found " << ad.aname << "!" << endl;
-					for (int i = 0; i < 5 - 1; i++)
-						for (int j = 0; j < 5 - i - 1; j++)
-							if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-							{
-								armor temp = armorsarray[j];
-								armorsarray[j] = armorsarray[j + 1];
-								armorsarray[j + 1] = temp;
-							}
-					if (ad.atotalstat > armorsarray[4].atotalstat)
-						armorsarray[4] = ad;
-					for (int i = 0; i < 5 - 1; i++)
-						for (int j = 0; j < 5 - i - 1; j++)
-							if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-							{
-								armor temp = armorsarray[j];
-								armorsarray[j] = armorsarray[j + 1];
-								armorsarray[j + 1] = temp;
-							}
-				}
-				if (dt == 2) // same as weapon drop
-				{
-					helmet hd = createhelmet();
-					cout << "You've found " << hd.hname << "!" << endl;
-					for (int i = 0; i < 5 - 1; i++)
-						for (int j = 0; j < 5 - i - 1; j++)
-							if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-							{
-								helmet temp = helmetsarray[j];
-								helmetsarray[j] = helmetsarray[j + 1];
-								helmetsarray[j + 1] = temp;
-							}
-					if (hd.htotalstat > helmetsarray[4].htotalstat)
-						helmetsarray[4] = hd;
-					for (int i = 0; i < 5 - 1; i++)
-						for (int j = 0; j < 5 - i - 1; j++)
-							if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-							{
-								helmet temp = helmetsarray[j];
-								helmetsarray[j] = helmetsarray[j + 1];
-								helmetsarray[j + 1] = temp;
-							}
-				}
 			default:
 				break;
 			}
 		}
-		keepplaying = true;
-		
+		keepplaying = true;	
 	} while (resetmenu == true);
 	mciSendString(L"pause maintheme", NULL, 0, NULL);
 

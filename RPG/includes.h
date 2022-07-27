@@ -1,8 +1,6 @@
 #ifndef inlcudes_H
 #define inlcudes_H
-
 #pragma once
-
 #define NOMINMAX
 
 #include <iostream>
@@ -50,5 +48,4 @@ namespace deadlibrary
 }
 
 #pragma comment(lib, "Winmm.lib")
-
 #endif
