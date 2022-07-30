@@ -1,7 +1,7 @@
-//     RPG V3.1.3				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V3.2.3				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//early game balance needs retested
+//gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it)
 
 //EDITS
 //merge catt and catlvlups into same variable. //if it ain't broke dont fix it tho
@@ -63,7 +63,7 @@ armor armorsarray[5];
 helmet helmetsarray[5];
 
 const double aiattscaler() { return (.035 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; }
-const double aihpscaler() { return (.3 * pow(c.lvl, 2)) + (2.5 * (double)c.lvl) + 2; }
+const double aihpscaler() { return (.25 * pow(c.lvl, 1.9)) + (2 * (double)c.lvl) + 3; }
 const double cattscaler() { return (c.catt + (.6 * c.attlvlups)); } //NOT USED IN DAMAGE CALCULATION. influence the effect of lvlups on natural attack //(c.catt + (.12 * (double)pow(c.attlvlups, 1.5) + 1.2 * (double)c.attlvlups + 1.5)); }//old
 const double mchpscaler() { return ((double)c.mchp * 1.08 + (((double)c.ae.amchp + (double)c.he.hmchp) * 1.04) + 5); }
 const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)c.lvl / 2); }
@@ -1112,19 +1112,6 @@ void loadchar()
 	istringstream data(textline);
 	data >> c.cclass >> c.chp >> c.mchp >> c.catt >> c.attlvlups >> c.regen >> c.cxp >> c.lvl >> c.score >> c.dif;
 
-	//c.we = {}; //idk if i need this
-	//c.we.wname = "";
-	//c.we.wcatt = 0;
-	//c.ae = {};
-	//c.ae.aname = "";
-	//c.ae.amchp = 0;
-	//c.ae.aregen = 0;
-	//c.ae.atotalstat = 0;
-	//c.he = {};
-	//c.he.hname = "";
-	//c.he.hmchp = 0;
-	//c.he.hregen = 0;
-	//c.he.htotalstat = 0;
 	for (int i = 0; i < 5; i++)
 	{
 		weaponsarray[i] = { "", 0 };
@@ -1405,7 +1392,7 @@ int main()
 				  c.nametitle = "";
 				  c.chp = 200;
 				  c.mchp = 200;
-				  c.catt = 5;
+				  c.catt = 10;
 				  c.attlvlups = 1;
 				  c.regen = 1;
 				  c.cxp = 0;
@@ -1418,8 +1405,8 @@ int main()
 				  c.nametitle = "";
 				  c.chp = 100;
 				  c.mchp = 100;
-				  c.catt = 10;
-				  c.attlvlups = 2;
+				  c.catt = 15;
+				  c.attlvlups = 3;
 				  c.regen = 1;
 				  c.cxp = 0;
 				  c.lvl = 1;
@@ -1432,7 +1419,7 @@ int main()
 				  c.chp = 50;
 				  c.mchp = 50;
 				  c.catt = 20;
-				  c.attlvlups = 4;
+				  c.attlvlups = 5;
 				  c.regen = 1;
 				  c.cxp = 0;
 				  c.lvl = 1;
@@ -1572,6 +1559,7 @@ int main()
 
 		while (keepplaying == true) // starts when game is opened. main gameplay loop
 		{
+			cin.clear(); // to protect an invalid input from causing an infinite loop
 			if (lvlrdy == true)
 			{
 				cout << "Your character has a pending level up\n0 - Level up screen" << endl;
