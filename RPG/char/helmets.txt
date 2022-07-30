@@ -1,6 +1,6 @@
-4 0 20 Viel of Life
-7 4 5 Mask of Rejuvenation
-6 0 25 Viel of Life
-5 1 15 Mask of Equilibrium
-5 1 15 Mask of Equilibrium
-1 1 0 Circlet of Recovery
+0 0 0   
+0 0 0   
+0 0 0   
+0 0 0   
+0 0 0   
+0 0 0   

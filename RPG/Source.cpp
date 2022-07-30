@@ -63,12 +63,12 @@ armor armorsarray[5];
 helmet helmetsarray[5];
 
 const double aiattscaler() { return (.035 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; }
-const double aihpscaler() { return (.3 * pow(c.lvl, 2)) + (2.5 * (double)c.lvl) + 9; }
+const double aihpscaler() { return (.3 * pow(c.lvl, 2)) + (2.5 * (double)c.lvl) + 2; }
 const double cattscaler() { return (c.catt + (.6 * c.attlvlups)); } //NOT USED IN DAMAGE CALCULATION. influence the effect of lvlups on natural attack //(c.catt + (.12 * (double)pow(c.attlvlups, 1.5) + 1.2 * (double)c.attlvlups + 1.5)); }//old
 const double mchpscaler() { return ((double)c.mchp * 1.08 + (((double)c.ae.amchp + (double)c.he.hmchp) * 1.04) + 5); }
 const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)c.lvl / 2); }
-const double xpcostscaler() { return ((.1 * (double)pow(c.lvl, 2)) + (double)(5 * c.lvl) + 15); }
-const double regenscaler() { return (.8 * (double)(c.regen + c.ae.aregen + c.he.hregen)) * ((double)c.mchp / 10); } // * (1 - atttime)
+const double xpcostscaler() { return ((.1 * (double)pow(c.lvl, 2)) + (double)(5 * c.lvl) + 5); }
+const double regenscaler() { return (.8 * (double)(5 + c.regen + c.ae.aregen + c.he.hregen)) * ((double)c.mchp / 15); } // * (1 - atttime)
 
 weapon createweapon()
 {
@@ -620,11 +620,11 @@ void play()
 		}
 		if (sucat == numcheck && atttime < 1) // hit
 		{
-			double dmg = 2 * ((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness
+			double dmg = 3 * ((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt / 3) * ((double)(c.lvl - 1) * .5))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness. should hit for roughly what catt is on a mediocre hit.
 			if (c.dif == 2)
 				dmg = dmg * .9; // -10% damage for hardcore
 			aihp = aihp - (int)dmg;
-			cout << "HIT - " << dmg << "\n" << endl;
+			cout << "HIT - " << (int)dmg << "\n" << endl;
 
 			if (c.dif == 2) // crit needs .1 faster for hc. makes cntatt more frequant
 			{
@@ -832,8 +832,8 @@ void play()
 			break;
 		}
 
-		cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n" << endl;
-		cout << "\nhp - " << c.chp << "/" << totalmaxhp << "\nattack - " << (double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1)) << "\n\n" << endl;
+		cout << "\n\nhp - " << c.chp << "/" << totalmaxhp << "\nattack - " << (int)((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt/3) * ((double)(c.lvl - 1) * .5))) << "\n\n" << endl;
+		cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n" << endl;		
 		cout << "1 - continue attacking\n2 - retreat" << endl;
 		int temp3;
 		cin >> temp3;
@@ -848,12 +848,15 @@ void viewchar(int pac)
 	if (c.dif == 2) // display in red for HC character
 		SetConsoleTextAttribute(hConsole, 4);
 	if (c.name == "") //show name with title if applicable
-		cout << "An " << c.cclass << endl;
+		if (c.cclass == "Human")
+			cout << "A " << c.cclass << endl;
+		else
+			cout << "An " << c.cclass << endl;
 	else
 		cout << c.nametitle << endl;
 	cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 	cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
-	cout << "attack - " << (int)((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1))) << " : weapon - " << (int)((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1)) << endl;
+	cout << "attack - " << c.catt << " : weapon - " << (int)(c.we.wcatt + ((double)c.we.wcatt / 3) * ((double)(c.lvl - 1) * .5)) << endl;
 	cout << "Expierience - " << c.cxp << "/" << (int)xpcostscaler() << endl;
 	cout << "Level - " << (int)c.lvl << "\n" << endl;
 	cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << "\n" << endl;
@@ -1051,13 +1054,16 @@ void viewchar(int pac)
 		if (skip == false)
 		{
 			system("CLS");
-			if (c.name == "")
-				cout << "Class - " << c.cclass << endl;
+			if (c.name == "") //show name with title if applicable
+				if (c.cclass == "Human")
+					cout << "A " << c.cclass << endl;
+				else
+					cout << "An " << c.cclass << endl;
 			else
 				cout << c.nametitle << endl;
 			cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 			cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
-			cout << "attack - " << (int)((double)c.catt + ((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1))) << " : weapon - " << (int)((double)c.we.wcatt * (1 + ((double)c.lvl - 1) * 1)) << endl;
+			cout << "attack - " << c.catt << " : weapon - " << (int)(c.we.wcatt + ((double)c.we.wcatt / 3) * ((double)(c.lvl - 1) * .5)) << endl;
 			cout << "Expierience - " << c.cxp << "/" << (int)xpcostscaler() << endl;
 			cout << "Level - " << c.lvl << "\n" << endl;
 			cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << "\n" << endl;

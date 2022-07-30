@@ -1,5 +1,5 @@
 FullScreen 0
 Start Difficulty 1
-Music Volume 800
+Music Volume 0
 Effects Volume 1000
 Soundtrack 2
