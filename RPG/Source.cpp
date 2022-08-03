@@ -1,7 +1,8 @@
-//     RPG V3.2.3				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V3.2.4				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
 //gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it)
+//hc overwrite untested
 
 //EDITS
 //merge catt and catlvlups into same variable. //if it ain't broke dont fix it tho
@@ -322,6 +323,8 @@ int titlescreen()
 		fclose(fptr);
 
 		int choice;
+		cout << "\n\n";
+		system("pause");
 		/*printf("\n\n\npress enter to continue\n"); //pvp is to outdatted to be remotely functional
 		if (cin.get() == '1')
 		{
@@ -342,12 +345,29 @@ void viewhscores()
 {
 	string line;
 	ifstream sdata;
+	string n;
 	sdata.open("hscores.txt"); //just prints lines from hscores
 
 	cout << "High Scores" << endl;
 	while (getline(sdata, line))
 	{
-		cout << line << endl;
+		if (c.name == "") //to be able to accuratly compare with line
+			if (c.cclass == "Human")
+				n = "A Human of no renown";
+			else
+				n = "An " + c.cclass + " of no renown";
+		else
+			n = c.nametitle;
+
+		cout << (to_string(c.score) + "\t" + n) << endl;
+		if (line == (to_string(c.score) + "\t" + n)) // if record matches this games then off color
+		{
+			SetConsoleTextAttribute(hConsole, 7);
+			cout << line << endl;
+			SetConsoleTextAttribute(hConsole, 15);
+		}
+		else
+			cout << line << endl;
 	}
 	sdata.close();
 }
@@ -373,37 +393,30 @@ void updatehscores()
 		counter++;
 	}
 	sdatai.close();
-	if (c.score >= scorearray[9]) // if list is full replace lowest entry with current games score
-	{
-		scorearray[10] = c.score;
+
+		scorearray[10] = c.score; // put score into 11th index, should be empty as only 10 are stored.
 		if (c.nametitle == "")
 			if (c.cclass == "Human")
-				names[10] = "a " + c.cclass + " of no renown";
+				names[10] = "A " + c.cclass + " of no renown";
 			else
-				names[10] = "an " + c.cclass + " of no renown";
+				names[10] = "An " + c.cclass + " of no renown";
 		else
 			names[10] = c.nametitle;
-		for (int j = 0; j < 10; j++) //bubble sort cuase its easy
+		for (int i = 11; i != 0; --i) //descending bubble
 		{
-			for (int i = 0; i < 10 - j; i++)
+			for (int j = 11; --j != 11 - i;) //increment handled in condition
 			{
-				if (scorearray[i] > scorearray[i + 1])
+				if (scorearray[j - 1] < scorearray[j])
 				{
-					int temp = scorearray[i];
-					scorearray[i] = scorearray[i + 1];
-					scorearray[i + 1] = temp;
-
-					string temp2 = names[i]; // keep naems array matching
-					names[i] = names[i + 1];
-					names[i + 1] = temp2;
+					deadlibrary::numswap(&scorearray[j], &scorearray[j - 1]);
+					deadlibrary::strswap(&names[j], &names[j - 1]);
 				}
 			}
 		}
 		ofstream sdatao;
 		sdatao.open("hscores.txt"); //save sorted data
-		sdatao << scorearray[10] << "\t" << names[10] << "\n" << scorearray[9] << "\t" << names[9] << "\n" << scorearray[8] << "\t" << names[8] << "\n" << scorearray[7] << "\t" << names[7] << "\n" << scorearray[6] << "\t" << names[6] << "\n" << scorearray[5] << "\t" << names[5] << "\n" << scorearray[4] << "\t" << names[4] << "\n" << scorearray[3] << "\t" << names[3] << "\n" << scorearray[2] << "\t" << names[2] << "\n" << scorearray[1] << "\t" << names[1];
+		sdatao << scorearray[0] << "\t" << names[0] << "\n" << scorearray[1] << "\t" << names[1] << "\n" << scorearray[2] << "\t" << names[2] << "\n" << scorearray[3] << "\t" << names[3] << "\n" << scorearray[4] << "\t" << names[4] << "\n" << scorearray[5] << "\t" << names[5] << "\n" << scorearray[6] << "\t" << names[6] << "\n" << scorearray[7] << "\t" << names[7] << "\n" << scorearray[8] << "\t" << names[8] << "\n" << scorearray[9] << "\t" << names[9];
 		sdatao.close();
-	}
 }
 
 void lvlup()
@@ -665,12 +678,12 @@ void play()
 
 			cout << "hp - 0\nYour garbage and don't deserve a second chance looser. Your score was " << c.score << ".\n\n" << endl;
 			cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
+			if (c.dif != 0) // don't get score saved for easy
+				updatehscores();
 			if (c.dif == 2) // if hardcore, creates empty char to overwrite save data
 			{
-				character q = { "", "", "", 200, 200, 10, 0, 3, 0, 1, 0, difsel};
-				FILE* ofpb = fopen("chardata.bin", "wb");
-				fwrite(&q, sizeof(character), 1, ofpb);
-				fclose(ofpb);
+				c = { "", "", "", 0, 0, 0, 0, 0, 0, 0, 0, difsel};
+				savegame();
 				system("CLS");
 			}
 			mciSendString(L"pause fighttheme", NULL, 0, NULL);
@@ -679,8 +692,6 @@ void play()
 			mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 			system("pause");
 			system("CLS");
-			if (c.dif != 0) // don't get score saved for easy
-				updatehscores();
 			viewhscores();
 			system("pause");
 			mciSendString(L"pause maintheme", NULL, 0, NULL); //close game
@@ -729,23 +740,13 @@ void play()
 						for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-								{
-									deadlibrary::dlclass::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
-									//weapon temp = weaponsarray[j];
-									//weaponsarray[j] = weaponsarray[j + 1];
-									//weaponsarray[j + 1] = temp;
-								}
+									deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
 						if (wd.wcatt > weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
 							weaponsarray[4] = wd;
 						for (int i = 0; i < 5 - 1; i++) // sort inv by descending power again with new item
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-								{
-									deadlibrary::dlclass::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
-									//weapon temp = weaponsarray[j];
-									//weaponsarray[j] = weaponsarray[j + 1];
-									//weaponsarray[j + 1] = temp;
-								}
+									deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
 					}
 					if (dt == 1) // same as weapon drop
 					{
@@ -754,23 +755,13 @@ void play()
 						for (int i = 0; i < 5 - 1; i++)
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-								{
-									deadlibrary::dlclass::swaparmor(armorsarray[j], armorsarray[j + 1]);
-									//armor temp = armorsarray[j];
-									//armorsarray[j] = armorsarray[j + 1];
-									//armorsarray[j + 1] = temp;
-								}
+									deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
 						if (ad.atotalstat > armorsarray[4].atotalstat)
 							armorsarray[4] = ad;
 						for (int i = 0; i < 5 - 1; i++)
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-								{
-									deadlibrary::dlclass::swaparmor(armorsarray[j], armorsarray[j + 1]);
-									//armor temp = armorsarray[j];
-									//armorsarray[j] = armorsarray[j + 1];
-									//armorsarray[j + 1] = temp;
-								}
+									deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
 					}
 					if (dt == 2) // same as weapon drop
 					{
@@ -779,23 +770,13 @@ void play()
 						for (int i = 0; i < 5 - 1; i++)
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-								{
-									deadlibrary::dlclass::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
-									//helmet temp = helmetsarray[j];
-									//helmetsarray[j] = helmetsarray[j + 1];
-									//helmetsarray[j + 1] = temp;
-								}
+									deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
 						if (hd.htotalstat > helmetsarray[4].htotalstat)
 							helmetsarray[4] = hd;
 						for (int i = 0; i < 5 - 1; i++)
 							for (int j = 0; j < 5 - i - 1; j++)
 								if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-								{
-									deadlibrary::dlclass::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
-									//helmet temp = helmetsarray[j];
-									//helmetsarray[j] = helmetsarray[j + 1];
-									//helmetsarray[j + 1] = temp;
-								}
+									deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
 					}
 				}
 			}
@@ -805,6 +786,7 @@ void play()
 			int sucheal = (rand() % 6); // same as attack but heals instead and won't wait quite as long
 			cout << "Rest and heal. current hp - " << c.chp << "/" << totalmaxhp << endl;
 			system("pause");
+			system("CLS");
 			cout << "HEAL: ";
 			Sleep(ct);
 			cout << sucheal << endl;
@@ -918,15 +900,15 @@ void viewchar(int pac)
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[0]);
+						deadlibrary::swapweapon(c.we, weaponsarray[0]);
 					else if (mc2 == 2)
-						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[1]);
+						deadlibrary::swapweapon(c.we, weaponsarray[1]);
 					else if (mc2 == 3)
-						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[2]);
+						deadlibrary::swapweapon(c.we, weaponsarray[2]);
 					else if (mc2 == 4)
-						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[3]);
+						deadlibrary::swapweapon(c.we, weaponsarray[3]);
 					else if (mc2 == 5)
-						deadlibrary::dlclass::swapweapon(c.we, weaponsarray[4]);
+						deadlibrary::swapweapon(c.we, weaponsarray[4]);
 					else
 						skip = true;
 				}
@@ -936,15 +918,15 @@ void viewchar(int pac)
 					cout << "Enter the number of the armor you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						deadlibrary::dlclass::swaparmor(c.ae, armorsarray[0]);
+						deadlibrary::swaparmor(c.ae, armorsarray[0]);
 					else if (mc2 == 2)
-						deadlibrary::dlclass::swaparmor(c.ae, armorsarray[1]);
+						deadlibrary::swaparmor(c.ae, armorsarray[1]);
 					else if (mc2 == 3)
-						deadlibrary::dlclass::swaparmor(c.ae, armorsarray[2]);
+						deadlibrary::swaparmor(c.ae, armorsarray[2]);
 					else if (mc2 == 4)
-						deadlibrary::dlclass::swaparmor(c.ae, armorsarray[3]);
+						deadlibrary::swaparmor(c.ae, armorsarray[3]);
 					else if (mc2 == 5)
-						deadlibrary::dlclass::swaparmor(c.ae, armorsarray[4]);
+						deadlibrary::swaparmor(c.ae, armorsarray[4]);
 					else
 						skip = true;
 				}
@@ -954,15 +936,15 @@ void viewchar(int pac)
 					cout << "Enter the number of the helmet you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						deadlibrary::dlclass::swaphelmet(c.he, helmetsarray[0]);
+						deadlibrary::swaphelmet(c.he, helmetsarray[0]);
 					else if (mc2 == 2)
-						deadlibrary::dlclass::swaphelmet(c.he, helmetsarray[1]);
+						deadlibrary::swaphelmet(c.he, helmetsarray[1]);
 					else if (mc2 == 3)
-						deadlibrary::dlclass::swaphelmet(c.he, helmetsarray[2]);
+						deadlibrary::swaphelmet(c.he, helmetsarray[2]);
 					else if (mc2 == 4)
-						deadlibrary::dlclass::swaphelmet(c.he, helmetsarray[3]);
+						deadlibrary::swaphelmet(c.he, helmetsarray[3]);
 					else if (mc2 == 5)
-						deadlibrary::dlclass::swaphelmet(c.he, helmetsarray[4]);
+						deadlibrary::swaphelmet(c.he, helmetsarray[4]);
 					else
 						skip = true;
 				}
@@ -992,7 +974,7 @@ void viewchar(int pac)
 							for (int i = 0; i < 5 - 1; i++) // sort again as theres a new item in inv
 								for (int j = 0; j < 5 - i - 1; j++)
 									if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-										deadlibrary::dlclass::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+										deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
 						}
 					}
 					else if (mc4 == 'b' || mc == 'B')
@@ -1016,7 +998,7 @@ void viewchar(int pac)
 							for (int i = 0; i < 5 - 1; i++)
 								for (int j = 0; j < 5 - i - 1; j++)
 									if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-										deadlibrary::dlclass::swaparmor(armorsarray[j], armorsarray[j + 1]);
+										deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
 						}
 					}
 					else if (mc4 == 'c' || mc == 'C')
@@ -1040,7 +1022,7 @@ void viewchar(int pac)
 							for (int i = 0; i < 5 - 1; i++)
 								for (int j = 0; j < 5 - i - 1; j++)
 									if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-										deadlibrary::dlclass::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+										deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
 						}
 					}
 					else
@@ -1347,7 +1329,7 @@ int main()
 	volumeupdate();
 
 	mciSendString(L"play titletheme repeat", NULL, 0, NULL);
-	int pvpfullexit = titlescreen(); // returns 1 if pvp() wants to close app
+	int pvpfullexit = titlescreen(); // returns 1 if pvp() wants to close app //handles screensize
 	mciSendString(L"pause titletheme", NULL, 0, NULL);
 	mciSendString(L"close titletheme", NULL, 0, NULL);
 	mciSendString(L"seek maintheme to start", NULL, 0, NULL);

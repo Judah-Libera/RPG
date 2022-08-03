@@ -38,13 +38,11 @@ struct helmet
 
 namespace deadlibrary
 {
-	class dlclass
-	{
-	public:
 		static void swapweapon(weapon& i, weapon& j);
 		static void swaparmor(armor& i, armor& j);
 		static void swaphelmet(helmet& i, helmet& j);
-	};
+		static void numswap(int *a, int *b);
+		static void strswap(std::string *a, std::string *b);
 }
 
 #pragma comment(lib, "Winmm.lib")

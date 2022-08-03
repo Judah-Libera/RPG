@@ -2,22 +2,36 @@
 
 namespace deadlibrary
 {
-	void dlclass::swapweapon(weapon &i, weapon &j)
+	void swapweapon(weapon &i, weapon &j)
 	{
 		weapon t = i;
 		i = j;
 		j = t;
 	}
-	void dlclass::swaparmor(armor &i, armor &j)
+	void swaparmor(armor &i, armor &j)
 	{
 		armor t = i;
 		i = j;
 		j = t;
 	}
-	void dlclass::swaphelmet(helmet &i, helmet &j)
+	void swaphelmet(helmet &i, helmet &j)
 	{
 		helmet t = i;
 		i = j;
 		j = t;
+	}
+
+	void numswap(int *a, int *b)
+	{
+		int c = *a;
+		*a = *b;
+		*b = c;
+	}
+
+	void strswap(std::string *a, std::string *b)
+	{
+		std::string c = *a;
+		*a = *b;
+		*b = c;
 	}
 }
