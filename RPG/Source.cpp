@@ -9,11 +9,12 @@
 //update pvp.cpp - sfx - swap funcs - char loads
 
 //FEATURES
-// highlight highscore for active game on defeate
+//multiple save games. read folders in savedata folder, each character gets a folder with a number, user enters number to load filepath using that number. save game into folder with what ever number is entered.
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
 //colorize
+//dungeon feature. no heal/lvlup (make sure multple lvl in row can happen), boss at end (not elite), where bonus reward comes. extra drop/xp? set c.lvl to dung dif for scaling then set back. elite drop hp? forced to pplay normal for regen. useasciimap.cpp code
 //?story mode?
-//?map/travel?
+//?map/travel? probably means reworkign drops to base off level. level scaling would need to be off location level. ascii map with letter for location. unlock through clevel? final dungeon for last title?
 //have someone else put in multiple character slots
 
 #pragma warning(disable: 4996)
