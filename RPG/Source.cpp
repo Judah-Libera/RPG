@@ -1163,7 +1163,7 @@ void loadchar()
 	system("CLS");
 }
 
-void volumeupdate()
+void volumeupdate() //works in deadlib? make volup func that takes file name and num
 {
 	string vol;
 	vol = "setaudio em3 volume to ";
