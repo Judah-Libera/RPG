@@ -1,6 +1,9 @@
 #ifndef inlcudes_H
 #define inlcudes_H
 #pragma once
+#pragma warning(disable: 4996) // VS has another function it likes more
+#pragma warning(disable: 6031) // don't check func return for failure
+#pragma warning(disable: 4244) // int = double
 #define NOMINMAX
 
 #include <iostream>
@@ -52,12 +55,15 @@ struct character
 	helmet he = { "", 0, 0, 0 };
 };
 
-static int pvp(); //linkign errors i don't feel like dealing with rn
+//int pvp();
 int dungeon(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 
-weapon createweapon(); // found in Source.cpp
-armor createarmor();
-helmet createhelmet();
+namespace equipment
+{
+	weapon createweapon(); // found in Source.cpp
+	armor createarmor();
+	helmet createhelmet();
+}
 
 namespace deadlibrary
 {

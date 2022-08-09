@@ -2,7 +2,7 @@
 #include <conio.h> // for _getchar(). only used in this file
 
 //BUGS
-
+//make sure progress stays
 
 //FEATURES
 //have a 4th drop item of hp pot. can make it stay with chara after dungeon later
@@ -22,6 +22,16 @@ const char ENEMY = 'M';
 
 using namespace std;
 
+static void init();
+static void printmap();
+static void updatefog();
+static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[]);
+static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
+static void dungeonboss(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
+void exitdungeon();
+static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
+int dungeon(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
+
 char map[MAP_SIZE_X][MAP_SIZE_Y]; //x y // rows x columns // going down the matrix and going across the matrix
 char fog[MAP_SIZE_X][MAP_SIZE_Y]; // ' ' is hidden, '.' is revealed
 int charx = 0;
@@ -34,7 +44,7 @@ static const double aiattscaler() { return (.035 * pow(dungeondiff, 2)) + (.1 * 
 static const double aihpscaler() { return (.25 * pow(dungeondiff, 1.9)) + (2 * (double)dungeondiff) + 3; }
 static const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)dungeondiff / 2); }
 static const double xpcostscaler() { return ((.1 * (double)pow(charlevel, 2)) + (double)(5 * charlevel) + 5); }
-void exitdungeon();
+
 /*
 static weapon createweapon()
 {
@@ -261,7 +271,7 @@ static helmet createhelmet()
 	return h;
 }
 */
-void init()
+static void init()
 {
     for (int y = 0; y < MAP_SIZE_X; y++) // create FOW
         for (int x = 0; x < MAP_SIZE_Y; x++)
@@ -277,7 +287,7 @@ void init()
             }
 }
 
-void printmap()
+static void printmap()
 {
     tileunderplayer = map[charx][chary];
     map[charx][chary] = 'c';
@@ -298,7 +308,7 @@ void printmap()
     map[charx][chary] = tileunderplayer;
 }
 
-void updatefog()
+static void updatefog()
 {
     fog[charx + 1][chary] = '.';//normals
     fog[charx - 1][chary] = '.';
@@ -324,14 +334,14 @@ void updatefog()
         fog[charx][chary - 2] = '.';
 }
 
-void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[])
+static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[])
 {
     int dt = (rand() % 3); // item drop type
     mciSendString(L"seek itemdsfx to start", NULL, 0, NULL);
     mciSendString(L"play itemdsfx", NULL, 0, NULL);
     if (dt == 0)
     {
-        weapon wd = createweapon();
+        weapon wd = equipment::createweapon();
         cout << "You've found " << wd.wname << "!" << endl;
         for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
             for (int j = 0; j < 5 - i - 1; j++)
@@ -346,7 +356,7 @@ void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], helmet h
     }
     if (dt == 1)
     {
-        armor ad = createarmor();
+        armor ad = equipment::createarmor();
         cout << "You've found " << ad.aname << "!" << endl;
         for (int i = 0; i < 5 - 1; i++)
             for (int j = 0; j < 5 - i - 1; j++)
@@ -361,7 +371,7 @@ void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], helmet h
     }
     if (dt == 2)
     {
-        helmet hd = createhelmet();
+        helmet hd = equipment::createhelmet();
         cout << "You've found " << hd.hname << "!" << endl;
         for (int i = 0; i < 5 - 1; i++)
             for (int j = 0; j < 5 - i - 1; j++)
@@ -378,7 +388,7 @@ void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], helmet h
 	//audio here
 }
 
-int battle(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[])
+static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[])
 {
 	system("CLS");
 	cout << "When you see 'ATTACK #' hit the number then enter before times up" << endl;
@@ -534,19 +544,19 @@ int battle(character& c, weapon weaponsarray[], armor armorsarry[], helmet helme
 	return 0;
 }
 
-void dungeonboss(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[])
+static void dungeonboss(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[])
 {
 	dungeondiff += 2; // boss fight is same but enemy is harder by 2 levels
 	battle(c, weaponsarray, armorsarry, helmetsarray);
 	dungeondiff -= 2;
 }
 
-void exitdungeon()
+static void exitdungeon()
 {
 	//commands before returnign to source.cpp
 }
 
-int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) // 0 - alive, 1 - dead, 2 - exit
+static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) // 0 - alive, 1 - dead, 2 - exit
 {
     if (map[charx][chary] == ITEM)
     {

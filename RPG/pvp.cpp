@@ -14,98 +14,12 @@ static armor armorsarray2[5];
 static helmet helmetsarray2[5];
 static character c1, c2;
 
-static int pvp();
 static void pvpplay();
 static character pvpheal(character c);
 static void pvpviewchar(int pac, character c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[]);
 static character pvploadchar(int pnum);
 static character pvpnewchar();
-
-static int pvp()
-{
-	mciSendString(L"open fighttheme.mp3 type mpegvideo alias fighttheme", NULL, 0, NULL);
-	mciSendString(L"open fighttheme2.mp3 type mpegvideo alias fighttheme2", NULL, 0, NULL);
-	mciSendString(L"open titletheme.mp3 type mpegvideo alias titletheme", NULL, 0, NULL);
-	bool rematch = true;
-	bool newchars = true;
-	bool battleloop = true;
-	bool goodinput = false;
-	int ts, mmc;
-	while (rematch == true)
-	{
-		if (newchars == true)
-		{
-			c1 = pvploadchar(1);
-			c2 = pvploadchar(2);
-		}
-		while (battleloop == true)
-		{
-			cout << "0 - Battle\n1 - P1 View character\n2 - P2 View character" << endl;
-			cin >> mmc;
-			system("CLS");
-			switch (mmc)
-			{
-			case 0: ts = rand() % 2;
-				if (ts == 0)
-				{
-					battleloop = false;
-					mciSendString(L"pause titletheme", NULL, 0, NULL);
-					mciSendString(L"play fighttheme repeat", NULL, 0, NULL);
-					pvpplay();
-					mciSendString(L"pause fighttheme", NULL, 0, NULL);
-					mciSendString(L"play titletheme repeat", NULL, 0, NULL);
-				}
-				else
-				{
-					battleloop = false;
-					mciSendString(L"pause titletheme", NULL, 0, NULL);
-					mciSendString(L"play fighttheme2 repeat", NULL, 0, NULL);
-					pvpplay();
-					mciSendString(L"pause fighttheme2", NULL, 0, NULL);
-					mciSendString(L"play titletheme repeat", NULL, 0, NULL);
-				}
-				break;
-			case 1: pvpviewchar(1, c1, weaponsarray, armorsarray,helmetsarray);
-				break;
-			case 2: pvpviewchar(1, c2, weaponsarray2, armorsarray2, helmetsarray2);
-				break;
-			default:
-				break;
-			}
-		}
-		battleloop = true;
-		while (goodinput == false)
-		{
-			cout << "0 - rematch\n1 - select new characters\n2 - Main Menu\n3 - Exit game" << endl;
-			cin >> mmc;
-			system("CLS");
-			switch (mmc)
-			{
-			case 0: rematch = true;
-				newchars = false;
-				goodinput = true;
-				break;
-			case 1: newchars = true;
-				rematch = true;
-				goodinput = true;
-				break;
-			case 2: rematch = false;
-				goodinput = true;
-				return 0;
-				break;
-			case 3: rematch = false;
-				goodinput = true;
-				return 1;
-				break;
-			default:
-				goodinput = false;
-				break;
-			}
-		}
-	}
-	mciSendString(L"pause maintheme", NULL, 0, NULL);
-	return 0;
-}
+int pvp();
 
 static void pvpplay()
 {
@@ -493,4 +407,90 @@ static character pvpnewchar()
 	
 	}
 	return c;
+}
+
+int pvp()
+{
+	mciSendString(L"open fighttheme.mp3 type mpegvideo alias fighttheme", NULL, 0, NULL);
+	mciSendString(L"open fighttheme2.mp3 type mpegvideo alias fighttheme2", NULL, 0, NULL);
+	mciSendString(L"open titletheme.mp3 type mpegvideo alias titletheme", NULL, 0, NULL);
+	bool rematch = true;
+	bool newchars = true;
+	bool battleloop = true;
+	bool goodinput = false;
+	int ts, mmc;
+	while (rematch == true)
+	{
+		if (newchars == true)
+		{
+			c1 = pvploadchar(1);
+			c2 = pvploadchar(2);
+		}
+		while (battleloop == true)
+		{
+			cout << "0 - Battle\n1 - P1 View character\n2 - P2 View character" << endl;
+			cin >> mmc;
+			system("CLS");
+			switch (mmc)
+			{
+			case 0: ts = rand() % 2;
+				if (ts == 0)
+				{
+					battleloop = false;
+					mciSendString(L"pause titletheme", NULL, 0, NULL);
+					mciSendString(L"play fighttheme repeat", NULL, 0, NULL);
+					pvpplay();
+					mciSendString(L"pause fighttheme", NULL, 0, NULL);
+					mciSendString(L"play titletheme repeat", NULL, 0, NULL);
+				}
+				else
+				{
+					battleloop = false;
+					mciSendString(L"pause titletheme", NULL, 0, NULL);
+					mciSendString(L"play fighttheme2 repeat", NULL, 0, NULL);
+					pvpplay();
+					mciSendString(L"pause fighttheme2", NULL, 0, NULL);
+					mciSendString(L"play titletheme repeat", NULL, 0, NULL);
+				}
+				break;
+			case 1: pvpviewchar(1, c1, weaponsarray, armorsarray, helmetsarray);
+				break;
+			case 2: pvpviewchar(1, c2, weaponsarray2, armorsarray2, helmetsarray2);
+				break;
+			default:
+				break;
+			}
+		}
+		battleloop = true;
+		while (goodinput == false)
+		{
+			cout << "0 - rematch\n1 - select new characters\n2 - Main Menu\n3 - Exit game" << endl;
+			cin >> mmc;
+			system("CLS");
+			switch (mmc)
+			{
+			case 0: rematch = true;
+				newchars = false;
+				goodinput = true;
+				break;
+			case 1: newchars = true;
+				rematch = true;
+				goodinput = true;
+				break;
+			case 2: rematch = false;
+				goodinput = true;
+				return 0;
+				break;
+			case 3: rematch = false;
+				goodinput = true;
+				return 1;
+				break;
+			default:
+				goodinput = false;
+				break;
+			}
+		}
+	}
+	mciSendString(L"pause maintheme", NULL, 0, NULL);
+	return 0;
 }

@@ -1,6 +1,7 @@
 //     RPG V4.0.0				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
+//add statics check over warnings
 //highscore table looks broken
 //gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it). forces name that will work rn
 //hc overwrite untested
@@ -18,20 +19,23 @@
 //?map/travel? probably means reworkign drops to base off level. level scaling would need to be off location level. ascii map with letter for location. unlock through clevel? final dungeon for last title?
 //have someone else put in multiple character slots
 
-#pragma warning(disable: 4996)
 #include "includes.h"
 using namespace std;
 
-void viewhscores();
-void updatehscores();
-void lvlup();
-void play();
-void savegame();
-void viewchar(int pac);
-void loadchar();
-int titlescreen();
-void settings();
-void killchar();
+static int titlescreen();
+static void viewhscores();
+static void updatehscores();
+static void lvlup();
+static void play();
+static void killchar();
+static void viewchar(int pac);
+static void savegame();
+static void loadchar();
+static void volumeupdate();
+static void settings();
+weapon equipment::createweapon();
+armor equipment::createarmor();
+helmet equipment::createhelmet();
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 bool keepplaying = true;
@@ -47,15 +51,15 @@ weapon weaponsarray[5]; //arrays for inv
 armor armorsarray[5];
 helmet helmetsarray[5];
 
-const double aiattscaler() { return (.035 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; }
-const double aihpscaler() { return (.25 * pow(c.lvl, 1.9)) + (2 * (double)c.lvl) + 3; }
-const double cattscaler() { return (c.catt + (.6 * c.attlvlups)); } //NOT USED IN DAMAGE CALCULATION. influence the effect of lvlups on natural attack //(c.catt + (.12 * (double)pow(c.attlvlups, 1.5) + 1.2 * (double)c.attlvlups + 1.5)); }//old
-const double mchpscaler() { return ((double)c.mchp * 1.08 + (((double)c.ae.amchp + (double)c.he.hmchp) * 1.04) + 5); }
-const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)c.lvl / 2); }
-const double xpcostscaler() { return ((.1 * (double)pow(c.lvl, 2)) + (double)(5 * c.lvl) + 5); }
-const double regenscaler() { return (.8 * (double)(5 + c.regen + c.ae.aregen + c.he.hregen)) * ((double)c.mchp / 15); } // * (1 - atttime)
+static const double aiattscaler() { return (.035 * pow(c.lvl, 2)) + (.1 * (double)c.lvl) + 1; } // uses different variables in other files, so they get there own set.
+static const double aihpscaler() { return (.25 * pow(c.lvl, 1.9)) + (2 * (double)c.lvl) + 3; }
+static const double cattscaler() { return (c.catt + (.6 * c.attlvlups)); } //NOT USED IN DAMAGE CALCULATION. influence the effect of lvlups on natural attack //(c.catt + (.12 * (double)pow(c.attlvlups, 1.5) + 1.2 * (double)c.attlvlups + 1.5)); }//old
+static const double mchpscaler() { return ((double)c.mchp * 1.08 + (((double)c.ae.amchp + (double)c.he.hmchp) * 1.04) + 5); }
+static const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)c.lvl / 2); }
+static const double xpcostscaler() { return ((.1 * (double)pow(c.lvl, 2)) + (double)(5 * c.lvl) + 5); }
+static const double regenscaler() { return (.8 * (double)(5 + c.regen + c.ae.aregen + c.he.hregen)) * ((double)c.mchp / 15); } // * (1 - atttime)
 
-weapon createweapon()
+weapon equipment::createweapon()
 {
 	string wname; // total name, part1, part2
 	string wname1;
@@ -131,7 +135,7 @@ weapon createweapon()
 }
 weapon wd = { "", 0 }; // for dropped items
 
-armor createarmor()
+armor equipment::createarmor()
 {
 	string aname; // works same as createweapon()
 	string aname1;
@@ -207,7 +211,7 @@ armor createarmor()
 }
 armor ad = { "", 0, 0, 0 };
 
-helmet createhelmet()
+helmet equipment::createhelmet()
 {
 	string hname; // worsk same as createweapon()
 	string hname1;
@@ -283,7 +287,7 @@ helmet createhelmet()
 }
 helmet hd = { "", 0, 0, 0 };
 
-int titlescreen()
+static int titlescreen()
 {
 	bool resetmenu = true;
 
@@ -325,7 +329,7 @@ int titlescreen()
 	return 0;
 }
 
-void viewhscores()
+static void viewhscores()
 {
 	string line;
 	ifstream sdata;
@@ -356,7 +360,7 @@ void viewhscores()
 	sdata.close();
 }
 
-void updatehscores()
+static void updatehscores()
 {
 	if (c.dif == 2) // double score for hardcore
 		c.score = c.score * 2;
@@ -403,7 +407,7 @@ void updatehscores()
 		sdatao.close();
 }
 
-void lvlup()
+static void lvlup()
 {
 	mciSendString(L"open audio/sfx/lvlupsfx.mp3 type mpegvideo alias lvlupsfx", NULL, 0, NULL);
 	mciSendString(L"seek lvlupsfx to start", NULL, 0, NULL);
@@ -560,7 +564,7 @@ void lvlup()
 	mciSendString(L"close elitesfx", NULL, 0, NULL);
 }
 
-void play()
+static void play()
 {
 	cout << "When you see 'ATTACK #' hit the number then enter before times up" << endl;
 	int rng = rand() % 5 + 6; //6-10 // ai hp rng
@@ -722,7 +726,7 @@ void play()
 					mciSendString(L"play itemdsfx", NULL, 0, NULL);
 					if (dt == 0)
 					{
-						weapon wd = createweapon();
+						weapon wd = equipment::createweapon();
 						cout << "You've found " << wd.wname << "!" << endl;
 						for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
 							for (int j = 0; j < 5 - i - 1; j++)
@@ -737,7 +741,7 @@ void play()
 					}
 					if (dt == 1) // same as weapon drop
 					{
-						armor ad = createarmor();
+						armor ad = equipment::createarmor();
 						cout << "You've found " << ad.aname << "!" << endl;
 						for (int i = 0; i < 5 - 1; i++)
 							for (int j = 0; j < 5 - i - 1; j++)
@@ -752,7 +756,7 @@ void play()
 					}
 					if (dt == 2) // same as weapon drop
 					{
-						helmet hd = createhelmet();
+						helmet hd = equipment::createhelmet();
 						cout << "You've found " << hd.hname << "!" << endl;
 						for (int i = 0; i < 5 - 1; i++)
 							for (int j = 0; j < 5 - i - 1; j++)
@@ -812,7 +816,7 @@ void play()
 	}
 }
 
-void killchar()
+static void killchar()
 {
 	mciSendString(L"seek dsfx to start", NULL, 0, NULL);
 	mciSendString(L"play dsfx", NULL, 0, NULL);
@@ -848,7 +852,7 @@ void killchar()
 	exit(0);
 }
 
-void viewchar(int pac)
+static void viewchar(int pac)
 {
 	if (c.dif == 2) // display in red for HC character
 		SetConsoleTextAttribute(hConsole, 4);
@@ -1078,7 +1082,7 @@ void viewchar(int pac)
 	system("CLS");
 }
 
-void savegame()
+static void savegame()
 {
 	ofstream out1("char/weapons.txt"); // saves an inventory item type
 	out1 << c.we.wcatt << " " << c.we.wname << "\n";
@@ -1106,7 +1110,7 @@ void savegame()
 	system("CLS");
 }
 
-void loadchar()
+static void loadchar()
 {
 	ifstream infile;
 	infile.open("char/chardata.txt");
@@ -1185,7 +1189,7 @@ void loadchar()
 	system("CLS");
 }
 
-void volumeupdate() //works in deadlib? make volup func that takes file name and num
+static void volumeupdate() //works in deadlib? make volup func that takes file name and num
 {
 	string vol;
 	vol = "setaudio em3 volume to ";
@@ -1226,7 +1230,7 @@ void volumeupdate() //works in deadlib? make volup func that takes file name and
 	mciSendStringA(vol.c_str(), NULL, 0, NULL);
 }
 
-void settings()
+static void settings()
 {
 	mciSendString(L"open audio/sfx/elitesfx.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL); // to hear sfx when selecting its vol
 	int cs = 0;
