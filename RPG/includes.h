@@ -14,8 +14,6 @@
 #include <stdio.h>
 #include <filesystem>
 
-int pvp();
-
 struct weapon
 {
 	std::string wname = "";
@@ -35,14 +33,39 @@ struct helmet
 	int hregen = 0;
 	int htotalstat = 0;
 };
+struct character
+{
+	std::string cclass = "";
+	std::string name = "";
+	std::string nametitle = "";
+	int chp = 0;
+	int mchp = 0;
+	double catt = 0;
+	int attlvlups = 0;
+	double regen = 0;
+	int cxp = 0;
+	int lvl = 0;
+	int score = 0;
+	int dif = 1;
+	weapon we = { "", 0 }; //weapon equiped
+	armor ae = { "", 0, 0, 0 };
+	helmet he = { "", 0, 0, 0 };
+};
+
+static int pvp(); //linkign errors i don't feel like dealing with rn
+int dungeon(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
+
+weapon createweapon(); // found in Source.cpp
+armor createarmor();
+helmet createhelmet();
 
 namespace deadlibrary
 {
-		static void swapweapon(weapon& i, weapon& j);
-		static void swaparmor(armor& i, armor& j);
-		static void swaphelmet(helmet& i, helmet& j);
-		static void numswap(int *a, int *b);
-		static void strswap(std::string *a, std::string *b);
+	void swapweapon(weapon& i, weapon& j);
+	void swaparmor(armor& i, armor& j);
+	void swaphelmet(helmet& i, helmet& j);
+	void numswap(int *a, int *b);
+	void strswap(std::string *a, std::string *b);
 }
 
 #pragma comment(lib, "Winmm.lib")

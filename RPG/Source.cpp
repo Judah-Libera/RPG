@@ -1,12 +1,13 @@
-//     RPG V3.2.4				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V4.0.0				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it)
+//highscore table looks broken
+//gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it). forces name that will work rn
 //hc overwrite untested
 
 //EDITS
 //merge catt and catlvlups into same variable. //if it ain't broke dont fix it tho
-//update pvp.cpp - sfx - swap funcs - char loads
+//update pvp.cpp - sfx - char loads
 
 //FEATURES
 //multiple save games. read folders in savedata folder, each character gets a folder with a number, user enters number to load filepath using that number. save game into folder with what ever number is entered.
@@ -21,26 +22,6 @@
 #include "includes.h"
 using namespace std;
 
-struct character
-{
-	string cclass = "";
-	string name = "";
-	string nametitle = "";
-	int chp = 0;
-	int mchp = 0;
-	double catt = 0;
-	int attlvlups = 0;
-	double regen = 0;
-	int cxp = 0;
-	int lvl = 0;
-	int score = 0;
-	int dif = 1;
-	weapon we = {"", 0 }; //weapon equiped
-	armor ae = {"", 0, 0, 0 };
-	helmet he = {"", 0, 0, 0 };
-};
-character c = {};
-
 void viewhscores();
 void updatehscores();
 void lvlup();
@@ -50,6 +31,7 @@ void viewchar(int pac);
 void loadchar();
 int titlescreen();
 void settings();
+void killchar();
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 bool keepplaying = true;
@@ -60,6 +42,7 @@ int mvolume = 1000; // = 0-10 * 100
 int sfxvolume = 1000; // ^^^
 int soundtracknum = 1;
 
+character c = {};
 weapon weaponsarray[5]; //arrays for inv
 armor armorsarray[5];
 helmet helmetsarray[5];
@@ -461,13 +444,15 @@ void lvlup()
 		system("CLS");
 	}
 	c.cxp = c.cxp - (int)xpcostscaler(); // reset xp and up lvl
-	lvlrdy = false;
 	c.lvl++;
+	if (c.cxp < (int)xpcostscaler)
+		lvlrdy = false;
 
 	if (c.lvl == 5)
 	{
 		cout << "Your journey as a hero has begun. Who will you be remembered as?" << endl;
 		cin >> c.name;
+		remove(c.name.begin(), c.name.end(), ' ');
 		system("CLS");
 		cout << "And thus.";
 		Sleep(500);
@@ -674,11 +659,12 @@ void play()
 		}
 		if (c.chp < 1) // character dead
 		{
-			mciSendString(L"seek dsfx to start", NULL, 0, NULL);
-			mciSendString(L"play dsfx", NULL, 0, NULL);
+			//mciSendString(L"seek dsfx to start", NULL, 0, NULL);
+			//mciSendString(L"play dsfx", NULL, 0, NULL);
 
 			cout << "hp - 0\nYour garbage and don't deserve a second chance looser. Your score was " << c.score << ".\n\n" << endl;
 			cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
+			/*
 			if (c.dif != 0) // don't get score saved for easy
 				updatehscores();
 			if (c.dif == 2) // if hardcore, creates empty char to overwrite save data
@@ -707,7 +693,7 @@ void play()
 			mciSendString(L"close vsfx", NULL, 0, NULL);
 			mciSendString(L"close dsfx", NULL, 0, NULL);
 			mciSendString(L"close lvlupsfx", NULL, 0, NULL);
-			exit(0);
+			exit(0);*/
 		}
 		if (aihp < 1) // enemy dead
 		{
@@ -824,6 +810,42 @@ void play()
 			keepatt = false;
 		system("CLS");
 	}
+}
+
+void killchar()
+{
+	mciSendString(L"seek dsfx to start", NULL, 0, NULL);
+	mciSendString(L"play dsfx", NULL, 0, NULL);
+
+	if (c.dif != 0) // don't get score saved for easy
+		updatehscores();
+	if (c.dif == 2) // if hardcore, creates empty char to overwrite save data
+	{
+		c = { "", "", "", 0, 0, 0, 0, 0, 0, 0, 0, difsel };
+		savegame();
+		//system("CLS");
+	}
+	mciSendString(L"pause fighttheme", NULL, 0, NULL);//can probably just add a pause here if this ever comes up with something else playing
+	mciSendString(L"pause fighttheme2", NULL, 0, NULL);
+	mciSendString(L"seek maintheme to start", NULL, 0, NULL);
+	mciSendString(L"play maintheme repeat", NULL, 0, NULL);
+	system("pause");
+	system("CLS");
+	viewhscores();
+	system("pause");
+	mciSendString(L"pause maintheme", NULL, 0, NULL); //close game
+	mciSendString(L"close maintheme", NULL, 0, NULL);
+	mciSendString(L"close em3", NULL, 0, NULL);
+	mciSendString(L"close fighttheme", NULL, 0, NULL);
+	mciSendString(L"close fighttheme2", NULL, 0, NULL);
+	mciSendString(L"close practicetheme", NULL, 0, NULL);
+	mciSendString(L"close critsfx", NULL, 0, NULL);
+	mciSendString(L"close itemdsfx", NULL, 0, NULL);
+	mciSendString(L"close elitesfx", NULL, 0, NULL);
+	mciSendString(L"close vsfx", NULL, 0, NULL);
+	mciSendString(L"close dsfx", NULL, 0, NULL);
+	mciSendString(L"close lvlupsfx", NULL, 0, NULL);
+	exit(0);
 }
 
 void viewchar(int pac)
@@ -1323,6 +1345,7 @@ int main()
 
 	int mmc = 0;
 	int temp2 = 0;
+	int dungeonresult = 0;
 	bool resetmenu = true;
 	srand((unsigned)time(0));
 	int ts;
@@ -1548,7 +1571,7 @@ int main()
 				cout << "Your character has a pending level up\n0 - Level up screen" << endl;
 			}
 
-			cout << "1 - Battle\n2 - View character\n3 - Save game\n4 - Main Menu\n5 - Exit game" << endl;
+			cout << "1 - Battle\n2 - View character\n3 - Save game\n4 - Main Menu\n5 - Dungeon Map\n6 - Exit game" << endl;
 			cin >> mmc;
 			system("CLS");
 			switch (mmc)
@@ -1584,7 +1607,11 @@ int main()
 				break;
 			case 4: keepplaying = false;
 				break;
-			case 5: keepplaying = false; // quite just gameplay loop
+			case 5: dungeonresult = dungeon(c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died
+				if (dungeonresult == 1)
+					killchar();
+				break;
+			case 6: keepplaying = false; // quite just gameplay loop
 				resetmenu = false; // quite main menu loop
 				break;
 			default:

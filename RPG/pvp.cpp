@@ -6,33 +6,22 @@
 
 using namespace std;
 
-struct character
-{
-	string cclass = "";
-	int chp = 0;
-	int mchp = 0;
-	double catt = 0;
-	int attlvlups = 0;
-	double regen = 0;
-	int cxp = 0;
-	int lvl = 0;
-	int score = 0;
-	weapon we = { "", 0 };
-	weapon weaponsarray[5];
-	armor ae = { "", 0, 0 };
-	armor armorsarray[5];
-	helmet he = { "", 0, 0 };
-	helmet helmetsarray[5];
-};
-character c1, c2;
+static weapon weaponsarray[5];
+static armor armorsarray[5];
+static helmet helmetsarray[5];
+static weapon weaponsarray2[5]; // second set will be needed as these are no logner a part of character
+static armor armorsarray2[5];
+static helmet helmetsarray2[5];
+static character c1, c2;
 
-void pvpplay();
-character pvpheal(character c);
-void pvpviewchar(int pac, character c);
-character pvploadchar(int pnum);
-character pvpnewchar();
+static int pvp();
+static void pvpplay();
+static character pvpheal(character c);
+static void pvpviewchar(int pac, character c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[]);
+static character pvploadchar(int pnum);
+static character pvpnewchar();
 
-int pvp()
+static int pvp()
 {
 	mciSendString(L"open fighttheme.mp3 type mpegvideo alias fighttheme", NULL, 0, NULL);
 	mciSendString(L"open fighttheme2.mp3 type mpegvideo alias fighttheme2", NULL, 0, NULL);
@@ -76,9 +65,9 @@ int pvp()
 					mciSendString(L"play titletheme repeat", NULL, 0, NULL);
 				}
 				break;
-			case 1: pvpviewchar(1, c1);
+			case 1: pvpviewchar(1, c1, weaponsarray, armorsarray,helmetsarray);
 				break;
-			case 2: pvpviewchar(1, c2);
+			case 2: pvpviewchar(1, c2, weaponsarray2, armorsarray2, helmetsarray2);
 				break;
 			default:
 				break;
@@ -118,7 +107,7 @@ int pvp()
 	return 0;
 }
 
-void pvpplay()
+static void pvpplay()
 {
 	cout << "When you see 'ATTACK #' hit the number then enter before times up" << endl;
 
@@ -257,7 +246,7 @@ void pvpplay()
 	}
 }
 
-character pvpheal(character c)
+static character pvpheal(character c)
 {
 	int ct = ((rand() % 4) + 1) * 1000;
 	int numcheck;
@@ -292,7 +281,7 @@ character pvpheal(character c)
 	return c;
 }
 
-void pvpviewchar(int pac, character c)
+static void pvpviewchar(int pac, character c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[]) //pass in array for needed character
 {
 	cout << "Class - " << c.cclass << endl;
 	cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
@@ -322,13 +311,13 @@ void pvpviewchar(int pac, character c)
 
 				cout << "\nA - Weapons in inventory." << endl;
 				for (int i = 0; i < 5; i++)
-					cout << i + 1 << " - " << c.weaponsarray[i].wname << " - " << c.weaponsarray[i].wcatt << " att" << endl;
+					cout << i + 1 << " - " << weaponsarray[i].wname << " - " << weaponsarray[i].wcatt << " att" << endl;
 				cout << "\nB - Armors in inventory." << endl;
 				for (int i = 0; i < 5; i++)
-					cout << i + 1 << " - " << c.armorsarray[i].aname << " - " << c.armorsarray[i].amchp << " hp" << " - " << c.armorsarray[i].aregen << " regen" << endl;
+					cout << i + 1 << " - " << armorsarray[i].aname << " - " << armorsarray[i].amchp << " hp" << " - " << armorsarray[i].aregen << " regen" << endl;
 				cout << "\nC - Helmets in inventory." << endl;
 				for (int i = 0; i < 5; i++)
-					cout << i + 1 << " - " << c.helmetsarray[i].hname << " - " << c.helmetsarray[i].hmchp << " hp" << " - " << c.helmetsarray[i].hregen << " regen" << endl;
+					cout << i + 1 << " - " << helmetsarray[i].hname << " - " << helmetsarray[i].hmchp << " hp" << " - " << helmetsarray[i].hregen << " regen" << endl;
 
 				cout << "\nTo switch items enter the letter of the item type you would like to replace, or D to delete/unequip. Enter 0 at any time to exit." << endl;
 				cin >> mc;
@@ -337,15 +326,15 @@ void pvpviewchar(int pac, character c)
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						c.we = c.weaponsarray[0];
+						c.we = weaponsarray[0];
 					else if (mc2 == 2)
-						c.we = c.weaponsarray[1];
+						c.we = weaponsarray[1];
 					else if (mc2 == 3)
-						c.we = c.weaponsarray[2];
+						c.we = weaponsarray[2];
 					else if (mc2 == 4)
-						c.we = c.weaponsarray[3];
+						c.we = weaponsarray[3];
 					else if (mc2 == 5)
-						c.we = c.weaponsarray[4];
+						c.we = weaponsarray[4];
 					else
 						skip = true;
 				}
@@ -354,15 +343,15 @@ void pvpviewchar(int pac, character c)
 					cout << "Enter the number of the armor you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						c.ae = c.armorsarray[0];
+						c.ae = armorsarray[0];
 					else if (mc2 == 2)
-						c.ae = c.armorsarray[1];
+						c.ae = armorsarray[1];
 					else if (mc2 == 3)
-						c.ae = c.armorsarray[2];
+						c.ae = armorsarray[2];
 					else if (mc2 == 4)
-						c.ae = c.armorsarray[3];
+						c.ae = armorsarray[3];
 					else if (mc2 == 5)
-						c.ae = c.armorsarray[4];
+						c.ae = armorsarray[4];
 					else
 						skip = true;
 				}
@@ -371,15 +360,15 @@ void pvpviewchar(int pac, character c)
 					cout << "Enter the number of the helmet you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 == 1)
-						c.he = c.helmetsarray[0];
+						c.he = helmetsarray[0];
 					else if (mc2 == 2)
-						c.he = c.helmetsarray[1];
+						c.he = helmetsarray[1];
 					else if (mc2 == 3)
-						c.he = c.helmetsarray[2];
+						c.he = helmetsarray[2];
 					else if (mc2 == 4)
-						c.he = c.helmetsarray[3];
+						c.he = helmetsarray[3];
 					else if (mc2 == 5)
-						c.he = c.helmetsarray[4];
+						c.he = helmetsarray[4];
 					else
 						skip = true;
 				}
@@ -393,26 +382,22 @@ void pvpviewchar(int pac, character c)
 						cout << "Enter the number of the weapon you would like to delete or enter 6 to unequip your current weapon." << endl;
 						cin >> mc5;
 						if (mc5 == 1)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[0] = { "",0 };
 						else if (mc5 == 2)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[0] = { "",0 };
 						else if (mc5 == 3)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[0] = { "",0 };
 						else if (mc5 == 4)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[0] = { "",0 };
 						else if (mc5 == 5)
-							c.weaponsarray[0] = { "",0 };
+							weaponsarray[0] = { "",0 };
 						else if (mc5 == 6)
 						{
 							for (int i = 0; i < 5 - 1; i++)
 								for (int j = 0; j < 5 - i - 1; j++)
-									if (c.weaponsarray[j].wcatt < c.weaponsarray[j + 1].wcatt)
-									{
-										weapon temp = c.weaponsarray[j];
-										c.weaponsarray[j] = c.weaponsarray[j + 1];
-										c.weaponsarray[j + 1] = temp;
-									}
-							c.weaponsarray[4] = c.we;
+									if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
+										deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+							weaponsarray[4] = c.we;
 							c.we = { "",0 };
 						}
 					}
@@ -421,26 +406,22 @@ void pvpviewchar(int pac, character c)
 						cout << "Enter the number of the armor you would like to delete or enter 6 to unequip your current armor." << endl;
 						cin >> mc5;
 						if (mc5 == 1)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[0] = { "",0 };
 						else if (mc5 == 2)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[0] = { "",0 };
 						else if (mc5 == 3)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[0] = { "",0 };
 						else if (mc5 == 4)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[0] = { "",0 };
 						else if (mc5 == 5)
-							c.armorsarray[0] = { "",0 };
+							armorsarray[0] = { "",0 };
 						else if (mc5 == 6)
 						{
 							for (int i = 0; i < 5 - 1; i++)
 								for (int j = 0; j < 5 - i - 1; j++)
-									if (c.armorsarray[j].atotalstat < c.armorsarray[j + 1].atotalstat)
-									{
-										armor temp = c.armorsarray[j];
-										c.armorsarray[j] = c.armorsarray[j + 1];
-										c.armorsarray[j + 1] = temp;
-									}
-							c.armorsarray[4] = c.ae;
+									if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
+										deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
+							armorsarray[4] = c.ae;
 							c.ae = { "",0 };
 						}
 					}
@@ -449,26 +430,22 @@ void pvpviewchar(int pac, character c)
 						cout << "Enter the number of the helmet you would like to delete or enter 6 to unequip your current helmet." << endl;
 						cin >> mc5;
 						if (mc5 == 1)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[0] = { "",0 };
 						else if (mc5 == 2)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[0] = { "",0 };
 						else if (mc5 == 3)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[0] = { "",0 };
 						else if (mc5 == 4)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[0] = { "",0 };
 						else if (mc5 == 5)
-							c.helmetsarray[0] = { "",0 };
+							helmetsarray[0] = { "",0 };
 						else if (mc5 == 6)
 						{
 							for (int i = 0; i < 5 - 1; i++)
 								for (int j = 0; j < 5 - i - 1; j++)
-									if (c.helmetsarray[j].htotalstat < c.helmetsarray[j + 1].htotalstat)
-									{
-										helmet temp = c.helmetsarray[j];
-										c.helmetsarray[j] = c.helmetsarray[j + 1];
-										c.helmetsarray[j + 1] = temp;
-									}
-							c.helmetsarray[4] = c.he;
+									if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
+										deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+							helmetsarray[4] = c.he;
 							c.he = { "",0 };
 						}
 					}
@@ -497,61 +474,13 @@ void pvpviewchar(int pac, character c)
 	system("CLS");
 }
 
-character pvploadchar(int pnum)
+static character pvploadchar(int pnum) //redo completely
 {
-	character c;
-	character savedgames[10];
-	FILE* pvpifpb = fopen("chardata.bin", "rb");
-	fread(&savedgames, sizeof(character) * 10, 1, pvpifpb);
-	fclose(pvpifpb);
-
-	system("CLS");
-	int cs = 11;
-	bool vi = true;
-	cout << "Player " << pnum << ", Please select the save slot you would like to load. Hp will be filled for the duel." << endl;
-	cout << "\n0 - new character" << endl;
-	for (int i = 0; i < 10; i++)
-		cout << i+1 << " - " << savedgames[i].cclass << " level " << savedgames[i].lvl << endl;
-	do
-	{
-		vi = true;
-		cin >> cs;
-		switch (cs)
-		{
-		case 0: c = pvpnewchar();
-			break;
-		case 1: c = savedgames[0];
-			break;
-		case 2: c = savedgames[1];
-			break;
-		case 3: c = savedgames[2];
-			break;
-		case 4: c = savedgames[3];
-			break;
-		case 5: c = savedgames[4];
-			break;
-		case 6: c = savedgames[5];
-			break;
-		case 7: c = savedgames[6];
-			break;
-		case 8: c = savedgames[7];
-			break;
-		case 9: c = savedgames[8];
-			break;
-		case 10: c = savedgames[9];
-			break;
-		case 11:
-			break;
-		default: vi = false;
-			break;
-		}
-	} while (vi != true);
-	system("CLS");
-	c.chp = c.mchp;
+	character c; //load into this
 	return c;
 }
 
-character pvpnewchar()
+static character pvpnewchar()
 {
 	character c;
 	system("CLS");
@@ -559,16 +488,9 @@ character pvpnewchar()
 	int temp;
 	cin >> temp;
 	system("CLS");
-	switch (temp)
+	switch (temp) //character create, recopy
 	{
-	case 1: c = { "Orc", 200, 200, 10, 0, 3, 0, 1, 0 };
-		  break;
-	case 2: c = { "Human", 100, 100, 20, 0, 3, 0, 1, 0 };
-		  break;
-	case 3: c = { "Elf", 50, 50, 40, 0, 3, 0, 1, 0 };
-		  break;
-	default:
-		break;
+	
 	}
 	return c;
 }

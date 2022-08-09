@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="deadlibrary.cpp" />
+    <ClCompile Include="Dungeons.cpp" />
     <ClCompile Include="pvp.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
