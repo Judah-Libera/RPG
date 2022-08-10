@@ -1,7 +1,11 @@
-//     RPG V4.0.0				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V4.0.2				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
+//put itemdrop into deadlibrary
+//see if volumeupdate works in deadlibrary
+//lots of commented out code to remove if it works
 //add statics check over warnings
+//create another .cpp functions file for rpg functions (keep deadlib prtable)
 //highscore table looks broken
 //gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it). forces name that will work rn
 //hc overwrite untested
@@ -33,9 +37,9 @@ static void savegame();
 static void loadchar();
 static void volumeupdate();
 static void settings();
-weapon equipment::createweapon();
-armor equipment::createarmor();
-helmet equipment::createhelmet();
+static weapon createweapon();
+static armor createarmor();
+static helmet createhelmet();
 
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 bool keepplaying = true;
@@ -59,7 +63,7 @@ static const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + 
 static const double xpcostscaler() { return ((.1 * (double)pow(c.lvl, 2)) + (double)(5 * c.lvl) + 5); }
 static const double regenscaler() { return (.8 * (double)(5 + c.regen + c.ae.aregen + c.he.hregen)) * ((double)c.mchp / 15); } // * (1 - atttime)
 
-weapon equipment::createweapon()
+static weapon createweapon()
 {
 	string wname; // total name, part1, part2
 	string wname1;
@@ -135,7 +139,7 @@ weapon equipment::createweapon()
 }
 weapon wd = { "", 0 }; // for dropped items
 
-armor equipment::createarmor()
+static armor createarmor()
 {
 	string aname; // works same as createweapon()
 	string aname1;
@@ -211,7 +215,7 @@ armor equipment::createarmor()
 }
 armor ad = { "", 0, 0, 0 };
 
-helmet equipment::createhelmet()
+static helmet createhelmet()
 {
 	string hname; // worsk same as createweapon()
 	string hname1;
@@ -310,7 +314,7 @@ static int titlescreen()
 			printf("%s", read_string);
 		fclose(fptr);
 
-		int choice;
+		//int choice;
 		cout << "\n\n";
 		system("pause");
 		/*printf("\n\n\npress enter to continue\n"); //pvp is to outdatted to be remotely functional
@@ -726,48 +730,30 @@ static void play()
 					mciSendString(L"play itemdsfx", NULL, 0, NULL);
 					if (dt == 0)
 					{
-						weapon wd = equipment::createweapon();
+						weapon wd = createweapon();
 						cout << "You've found " << wd.wname << "!" << endl;
-						for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
-							for (int j = 0; j < 5 - i - 1; j++)
-								if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-									deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+						deadlibrary::sortweapon(weaponsarray);
 						if (wd.wcatt > weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
 							weaponsarray[4] = wd;
-						for (int i = 0; i < 5 - 1; i++) // sort inv by descending power again with new item
-							for (int j = 0; j < 5 - i - 1; j++)
-								if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-									deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+						deadlibrary::sortweapon(weaponsarray);
 					}
 					if (dt == 1) // same as weapon drop
 					{
-						armor ad = equipment::createarmor();
+						armor ad = createarmor();
 						cout << "You've found " << ad.aname << "!" << endl;
-						for (int i = 0; i < 5 - 1; i++)
-							for (int j = 0; j < 5 - i - 1; j++)
-								if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-									deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
+						deadlibrary::sortarmor(armorsarray);
 						if (ad.atotalstat > armorsarray[4].atotalstat)
 							armorsarray[4] = ad;
-						for (int i = 0; i < 5 - 1; i++)
-							for (int j = 0; j < 5 - i - 1; j++)
-								if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-									deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
+						deadlibrary::sortarmor(armorsarray);
 					}
 					if (dt == 2) // same as weapon drop
 					{
-						helmet hd = equipment::createhelmet();
+						helmet hd = createhelmet();
 						cout << "You've found " << hd.hname << "!" << endl;
-						for (int i = 0; i < 5 - 1; i++)
-							for (int j = 0; j < 5 - i - 1; j++)
-								if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-									deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+						deadlibrary::sorthelmet(helmetsarray);
 						if (hd.htotalstat > helmetsarray[4].htotalstat)
 							helmetsarray[4] = hd;
-						for (int i = 0; i < 5 - 1; i++)
-							for (int j = 0; j < 5 - i - 1; j++)
-								if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-									deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+						deadlibrary::sorthelmet(helmetsarray);
 					}
 				}
 			}
@@ -926,54 +912,57 @@ static void viewchar(int pac)
 					ri = true;
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
-					if (mc2 == 1)
-						deadlibrary::swapweapon(c.we, weaponsarray[0]);
-					else if (mc2 == 2)
+					if (mc2 >= 1 && mc2 <= 5)
+						deadlibrary::swapweapon(c.we, weaponsarray[mc - 1]);
+					/*else if (mc2 == 2)
 						deadlibrary::swapweapon(c.we, weaponsarray[1]);
 					else if (mc2 == 3)
 						deadlibrary::swapweapon(c.we, weaponsarray[2]);
 					else if (mc2 == 4)
 						deadlibrary::swapweapon(c.we, weaponsarray[3]);
 					else if (mc2 == 5)
-						deadlibrary::swapweapon(c.we, weaponsarray[4]);
+						deadlibrary::swapweapon(c.we, weaponsarray[4]);*/
 					else
 						skip = true;
+					deadlibrary::sortweapon(weaponsarray);
 				}
 				else if (mc == 'b' || mc == 'B')
 				{
 					ri = true;
 					cout << "Enter the number of the armor you would like to equip." << endl;
 					cin >> mc2;
-					if (mc2 == 1)
-						deadlibrary::swaparmor(c.ae, armorsarray[0]);
-					else if (mc2 == 2)
+					if (mc2 >= 1 && mc2 <= 5)
+						deadlibrary::swaparmor(c.ae, armorsarray[mc2 - 1]);
+					/*else if (mc2 == 2)
 						deadlibrary::swaparmor(c.ae, armorsarray[1]);
 					else if (mc2 == 3)
 						deadlibrary::swaparmor(c.ae, armorsarray[2]);
 					else if (mc2 == 4)
 						deadlibrary::swaparmor(c.ae, armorsarray[3]);
 					else if (mc2 == 5)
-						deadlibrary::swaparmor(c.ae, armorsarray[4]);
+						deadlibrary::swaparmor(c.ae, armorsarray[4]);*/
 					else
 						skip = true;
+					deadlibrary::sortarmor(armorsarray);
 				}
 				else if (mc == 'c' || mc == 'C')
 				{
 					ri = true;
 					cout << "Enter the number of the helmet you would like to equip." << endl;
 					cin >> mc2;
-					if (mc2 == 1)
-						deadlibrary::swaphelmet(c.he, helmetsarray[0]);
-					else if (mc2 == 2)
+					if (mc2 >= 1 && mc2 <= 5)
+						deadlibrary::swaphelmet(c.he, helmetsarray[mc2 - 1]);
+					/*else if (mc2 == 2)
 						deadlibrary::swaphelmet(c.he, helmetsarray[1]);
 					else if (mc2 == 3)
 						deadlibrary::swaphelmet(c.he, helmetsarray[2]);
 					else if (mc2 == 4)
 						deadlibrary::swaphelmet(c.he, helmetsarray[3]);
 					else if (mc2 == 5)
-						deadlibrary::swaphelmet(c.he, helmetsarray[4]);
+						deadlibrary::swaphelmet(c.he, helmetsarray[4]);*/
 					else
 						skip = true;
+					deadlibrary::sorthelmet(helmetsarray);
 				}
 				else if (mc == 'd' || mc == 'D')
 				{
@@ -984,72 +973,63 @@ static void viewchar(int pac)
 					{
 						cout << "Enter the number of the weapon you would like to delete or enter 6 to unequip your current weapon." << endl;
 						cin >> mc5;
-						if (mc5 == 1)
-							weaponsarray[0] = emptyweapon;
-						else if (mc5 == 2)
+						if (mc5 >= 1 && mc5 <= 5)
+							weaponsarray[mc5 - 1] = emptyweapon;
+						/*else if (mc5 == 2)
 							weaponsarray[1] = emptyweapon;
 						else if (mc5 == 3)
 							weaponsarray[2] = emptyweapon;
 						else if (mc5 == 4)
 							weaponsarray[3] = emptyweapon;
 						else if (mc5 == 5)
-							weaponsarray[4] = emptyweapon;
+							weaponsarray[4] = emptyweapon;*/
 						else if (mc5 == 6)
 						{
 							weaponsarray[4] = c.we; // already sorted so worse item is in last slot
 							c.we = emptyweapon;
-							for (int i = 0; i < 5 - 1; i++) // sort again as theres a new item in inv
-								for (int j = 0; j < 5 - i - 1; j++)
-									if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-										deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+							deadlibrary::sortweapon(weaponsarray);
 						}
 					}
 					else if (mc4 == 'b' || mc == 'B')
 					{
 						cout << "Enter the number of the armor you would like to delete or enter 6 to unequip your current armor." << endl;
 						cin >> mc5;
-						if (mc5 == 1)
-							armorsarray[0] = emptyarmor;
-						else if (mc5 == 2)
+						if (mc5 >= 1 && mc5 <= 5)
+							armorsarray[mc5 - 1] = emptyarmor;
+						/*else if (mc5 == 2)
 							armorsarray[1] = emptyarmor;
 						else if (mc5 == 3)
 							armorsarray[2] = emptyarmor;
 						else if (mc5 == 4)
 							armorsarray[3] = emptyarmor;
 						else if (mc5 == 5)
-							armorsarray[4] = emptyarmor;
+							armorsarray[4] = emptyarmor;*/
 						else if (mc5 == 6)
 						{
 							armorsarray[4] = c.ae;
 							c.ae = emptyarmor;
-							for (int i = 0; i < 5 - 1; i++)
-								for (int j = 0; j < 5 - i - 1; j++)
-									if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-										deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
+							deadlibrary::sortarmor(armorsarray);
 						}
 					}
 					else if (mc4 == 'c' || mc == 'C')
 					{
 						cout << "Enter the number of the helmet you would like to delete or enter 6 to unequip your current helmet." << endl;
 						cin >> mc5;
-						if (mc5 == 1)
-							helmetsarray[0] = emptyhelmet;
-						else if (mc5 == 2)
+						if (mc5 >= 1 && mc5 <= 5)
+							helmetsarray[mc5 - 1] = emptyhelmet;
+						/*else if (mc5 == 2)
 							helmetsarray[1] = emptyhelmet;
 						else if (mc5 == 3)
 							helmetsarray[2] = emptyhelmet;
 						else if (mc5 == 4)
 							helmetsarray[3] = emptyhelmet;
 						else if (mc5 == 5)
-							helmetsarray[4] = emptyhelmet;
+							helmetsarray[4] = emptyhelmet;*/
 						else if (mc5 == 6)
 						{
 							helmetsarray[4] = c.he;
 							c.he = emptyhelmet;
-							for (int i = 0; i < 5 - 1; i++)
-								for (int j = 0; j < 5 - i - 1; j++)
-									if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-										deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+							deadlibrary::sorthelmet(helmetsarray);
 						}
 					}
 					else
@@ -1189,7 +1169,7 @@ static void loadchar()
 	system("CLS");
 }
 
-static void volumeupdate() //works in deadlib? make volup func that takes file name and num
+static void volumeupdate() //works in deadlib? pass mvolume and sfxvolume
 {
 	string vol;
 	vol = "setaudio em3 volume to ";
@@ -1570,6 +1550,8 @@ int main()
 		while (keepplaying == true) // starts when game is opened. main gameplay loop
 		{
 			cin.clear(); // to protect an invalid input from causing an infinite loop
+			if (c.cxp >= (int)xpcostscaler())
+				lvlrdy = true;
 			if (lvlrdy == true)
 			{
 				cout << "Your character has a pending level up\n0 - Level up screen" << endl;

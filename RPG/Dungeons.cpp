@@ -37,15 +37,21 @@ char fog[MAP_SIZE_X][MAP_SIZE_Y]; // ' ' is hidden, '.' is revealed
 int charx = 0;
 int chary = 0;
 char tileunderplayer = '@';
-int dungeondiff = 1; //stand in for character level in dungeon
-int charlevel = 0;
+int dungeondiff = 5; //stand in for character level in dungeon
+int charlevel = 0; //only needed for accuratly showing xp required for lvlup
+weapon wfound[10]; //for storing loot collected during dungeon
+int wfi = 0; //index for array
+armor afound[10];
+int afi = 0;
+helmet hfound[10];
+int hfi = 0;
+int xpfound;
 
 static const double aiattscaler() { return (.035 * pow(dungeondiff, 2)) + (.1 * (double)dungeondiff) + 1; }
 static const double aihpscaler() { return (.25 * pow(dungeondiff, 1.9)) + (2 * (double)dungeondiff) + 3; }
 static const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)dungeondiff / 2); }
 static const double xpcostscaler() { return ((.1 * (double)pow(charlevel, 2)) + (double)(5 * charlevel) + 5); }
 
-/*
 static weapon createweapon()
 {
 	string wname; // total name, part1, part2
@@ -53,7 +59,7 @@ static weapon createweapon()
 	string wname2;
 	int wnamei = (rand() % 4); //title selections
 	int wnamei2 = (rand() % 4);
-	int wcatt = ((rand() % 10) + 1); // weapon power
+	int wcatt = ((rand() % 2) + 1 + dungeondiff * .4); // weapon power
 	if (wcatt > 7) // change list titles are selected from based on power. better drops get better names
 	{
 		if (wnamei == 0)
@@ -66,13 +72,13 @@ static weapon createweapon()
 			wname1 = "Battle-Axe of ";
 
 		if (wnamei2 == 0)
-			wname2 = "Death";
+			wname2 = "Darkness";
 		else if (wnamei2 == 1)
-			wname2 = "Hades";
+			wname2 = "Nyx";
 		else if (wnamei2 == 2)
-			wname2 = "Chaos";
+			wname2 = "Blood";
 		else
-			wname2 = "Glory";
+			wname2 = "Void";
 		wname = wname1 + wname2;
 	}
 	else if (wcatt > 3)
@@ -99,11 +105,11 @@ static weapon createweapon()
 	else
 	{
 		if (wnamei == 0)
-			wname1 = "staff of ";
+			wname1 = "torch of ";
 		else if (wnamei == 1)
 			wname1 = "dagger of ";
 		else if (wnamei == 2)
-			wname1 = "Hammer of ";
+			wname1 = "cane of ";
 		else
 			wname1 = "knife of ";
 
@@ -127,7 +133,7 @@ static armor createarmor()
 	string aname1;
 	string aname2;
 	int aname1i = (rand() % 2);
-	int atotalstat = ((rand() % 10) + 1); // total power to be distributed between hp and regen
+	int atotalstat = ((rand() % 2) + 1 + dungeondiff * .4); // total power to be distributed between hp and regen
 	int bamchp = (rand() % (atotalstat + 1));
 	int baregen = (atotalstat - bamchp);
 	int amchp = bamchp * 5;
@@ -202,7 +208,7 @@ static helmet createhelmet()
 	string hname1;
 	string hname2;
 	int hname1i = (rand() % 2);
-	int htotalstat = ((rand() % 10) + 1); // total power to be distributed between hp and regen
+	int htotalstat = ((rand() % 2) + 1 + dungeondiff * .4); // total power to be distributed between hp and regen
 	int bhmchp = (rand() % (htotalstat + 1));
 	int bhregen = (htotalstat - bhmchp);
 	int hmchp = bhmchp * 5;
@@ -270,7 +276,7 @@ static helmet createhelmet()
 	helmet h = { hname ,hmchp, hregen, htotalstat };
 	return h;
 }
-*/
+
 static void init()
 {
     for (int y = 0; y < MAP_SIZE_X; y++) // create FOW
@@ -341,7 +347,8 @@ static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], h
     mciSendString(L"play itemdsfx", NULL, 0, NULL);
     if (dt == 0)
     {
-        weapon wd = equipment::createweapon();
+        weapon wd = createweapon();
+		wfound[wfi++] = wd;
         cout << "You've found " << wd.wname << "!" << endl;
         for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
             for (int j = 0; j < 5 - i - 1; j++)
@@ -356,7 +363,8 @@ static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], h
     }
     if (dt == 1)
     {
-        armor ad = equipment::createarmor();
+        armor ad = createarmor();
+		afound[afi++] = ad;
         cout << "You've found " << ad.aname << "!" << endl;
         for (int i = 0; i < 5 - 1; i++)
             for (int j = 0; j < 5 - i - 1; j++)
@@ -371,7 +379,8 @@ static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], h
     }
     if (dt == 2)
     {
-        helmet hd = equipment::createhelmet();
+        helmet hd = createhelmet();
+		hfound[hfi++] = hd;
         cout << "You've found " << hd.hname << "!" << endl;
         for (int i = 0; i < 5 - 1; i++)
             for (int j = 0; j < 5 - i - 1; j++)
@@ -384,11 +393,11 @@ static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], h
                 if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
                     deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
     }
-	system("pause");
+	//system("pause");
 	//audio here
 }
 
-static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[])
+static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[], bool boss)
 {
 	system("CLS");
 	cout << "When you see 'ATTACK #' hit the number then enter before times up" << endl;
@@ -493,42 +502,16 @@ static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helme
 			mciSendString(L"play vsfx", NULL, 0, NULL);
 
 			int xpgain = xpgainscaler();
+			if (boss == true)
+				xpgain = deadlibrary::intnormaldistribution(xpgainscaler(), xpgainscaler(), 1); //using rng as bounds makes it fairly random independant of precision already
 			c.cxp = c.cxp + xpgain;
 			cout << "victory! you gained " << xpgain << " xp.\nCurrent xp: " << c.cxp << "/" << (int)xpcostscaler() << endl;
 			cout << "\nhp remaining - " << c.chp << "/" << totalmaxhp << "\n" << endl;
 			c.score = c.score + xpgain;
+			xpfound += xpgain;
 
 			system("pause");
 			system("CLS");
-			/*
-			int sucheal = (rand() % 6); // same as attack but heals instead and won't wait quite as long
-			cout << "Rest and heal. current hp - " << c.chp << "/" << totalmaxhp << endl;
-			system("pause");
-			system("CLS");
-			cout << "HEAL: ";
-			Sleep(ct);
-			cout << sucheal << endl;
-			clock_t begin = clock();
-			cin >> numcheck;
-			clock_t end = clock();
-			double atttime = double(end - begin) / CLOCKS_PER_SEC;
-			system("CLS");
-			cout << "time for regen: " << atttime << endl;
-
-			if (sucheal == numcheck && atttime < 1)
-			{
-				int temp = c.chp;
-				c.chp = c.chp + (regenscaler() * (1 - atttime));
-				temp = c.chp - temp;
-				cout << temp << " hp gained." << endl;
-				if (c.chp > totalmaxhp)
-					c.chp = totalmaxhp;
-			}
-			else
-				cout << "Your actually throwing, that was too important to choke this hard." << endl;
-			system("pause");
-			system("CLS");
-			*/
 			break;
 		}
 
@@ -541,19 +524,32 @@ static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helme
 			keepatt = false;
 		system("CLS");
 	}
-	return 0;
+	return 4;
 }
 
 static void dungeonboss(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[])
 {
 	dungeondiff += 2; // boss fight is same but enemy is harder by 2 levels
-	battle(c, weaponsarray, armorsarry, helmetsarray);
+	battle(c, weaponsarray, armorsarry, helmetsarray, true);
 	dungeondiff -= 2;
 }
 
 static void exitdungeon()
 {
-	//commands before returnign to source.cpp
+	system("CLS");
+	cout << "Loot collected\n" << endl;
+	for (weapon item : wfound)
+		if (item.wname != "")
+			cout << item.wname << endl;
+	for (armor item : afound)
+		if (item.aname != "")
+			cout << item.aname << endl;
+	for (helmet item : hfound)
+		if (item.hname != "")
+			cout << item.hname << endl;
+	cout << xpfound << " xp gained" << endl;
+	system("pause");
+	system("CLS");
 }
 
 static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) // 0 - alive, 1 - dead, 2 - exit
@@ -562,11 +558,11 @@ static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[
     {
         itemdrop(c, weaponsarray, armorsarry, helmetsarray);
         map[charx][chary] = '#';
-        return 0;
+        return 3;
     }
     if (map[charx][chary] == ENEMY)
     {
-        int dead = battle(c, weaponsarray, armorsarry, helmetsarray); //return 1 if dead, 0 if alive
+        int dead = battle(c, weaponsarray, armorsarry, helmetsarray, false); //return 1 if dead, 4 if alive
         map[charx][chary] = '#';
         return dead;
     }
@@ -574,7 +570,7 @@ static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[
     {
         dungeonboss(c, weaponsarray, armorsarry, helmetsarray);
         map[charx][chary] = '#';
-        return 0;
+        return 4;
     }
     if (map[charx][chary] == EXIT)
     {
@@ -582,6 +578,7 @@ static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[
         map[charx][chary] = '#';
         return 2;
     }
+	return 4;
 }
 
 int dungeon(character &c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) //return 0 if dungeon was exited, return 1 if player died
@@ -596,7 +593,10 @@ int dungeon(character &c, weapon weaponsarray[], armor armorsarry[], helmet helm
 	cin >> dun;
 
 	if (dun == '0')
+	{
+		system("CLS");
 		return 0;
+	}
 
 	switch (dun)
 	{
@@ -645,7 +645,7 @@ int dungeon(character &c, weapon weaponsarray[], armor armorsarry[], helmet helm
     fog[charx][chary] = '.'; //only needed once so left out of repeated func
     printmap();
     int input = 0;
-	int exit = 0;
+	int collisionresult = 0;
     while (1) //main dungeon control loop. plays live independant of input
     {
         input = 0;
@@ -674,12 +674,13 @@ int dungeon(character &c, weapon weaponsarray[], armor armorsarry[], helmet helm
         printmap();
 		if (map[charx][chary] != '#') //don't run all the collision checks if there is no collision
 		{
-			exit = checkcollision(c, weaponsarray, armorsarry, helmetsarray); // 0 - alive, 1 - dead, 2 - exit
-			if (exit == 1)
+			collisionresult = checkcollision(c, weaponsarray, armorsarry, helmetsarray); // 0 - alive, 1 - dead, 2 - exit, 3 - item, 4 - boss/enemy
+			if (collisionresult == 1)
 				return 1;
-			else if (exit == 2)
+			if (collisionresult == 2)
 				return 0;
-			else { printmap(); } // gets here with return 0. map gets cleared furing encounters
+			if (collisionresult == 4)
+				printmap();
 		}
     }
 	return 0;

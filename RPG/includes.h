@@ -58,20 +58,20 @@ struct character
 //int pvp();
 int dungeon(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 
-namespace equipment
-{
-	weapon createweapon(); // found in Source.cpp
-	armor createarmor();
-	helmet createhelmet();
-}
-
 namespace deadlibrary
 {
+	void sortweapon(weapon arr[5]);
+	void sortarmor(armor arr[5]);
+	void sorthelmet(helmet arr[5]);
+
 	void swapweapon(weapon& i, weapon& j);
 	void swaparmor(armor& i, armor& j);
 	void swaphelmet(helmet& i, helmet& j);
+
 	void numswap(int *a, int *b);
 	void strswap(std::string *a, std::string *b);
+
+	int intnormaldistribution(int min, int max, double precision);
 }
 
 #pragma comment(lib, "Winmm.lib")

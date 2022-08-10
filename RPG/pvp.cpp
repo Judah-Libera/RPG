@@ -404,7 +404,8 @@ static character pvpnewchar()
 	system("CLS");
 	switch (temp) //character create, recopy
 	{
-	
+	default:
+		break;
 	}
 	return c;
 }
