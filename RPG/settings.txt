@@ -3,3 +3,4 @@ Start Difficulty 1
 Music Volume 0
 Effects Volume 1000
 Soundtrack 2
+Dungeon Generation 1

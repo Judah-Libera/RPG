@@ -2,9 +2,11 @@
 #include <conio.h> // for _getchar(). only used in this file
 
 //BUGS
-//make sure progress stays
 
 //FEATURES
+//limit access? like half of item lvl 9 or 10 drops are instead dungeon key. or given a dungeon key every x levels
+//gurentee there is exit or all boss within available pathing (don't like spawn exit next to player)
+//add soundtracks
 //have a 4th drop item of hp pot. can make it stay with chara after dungeon later
 
 #define KEY_UP 72
@@ -12,7 +14,7 @@
 #define KEY_LEFT 75
 #define KEY_RIGHT 77
 
-const int MAP_SIZE_X = 20;
+const int MAP_SIZE_X = 20; // needs to match manual maps for them to work.
 const int MAP_SIZE_Y = 20;
 const char PLAYER = 'C';
 const char BOSS = 'B';
@@ -22,13 +24,16 @@ const char ENEMY = 'M';
 
 using namespace std;
 
-static void init();
+static void makeshape(int y, int x, int n);
+static void findC();
+static void initfog();
 static void printmap();
 static void updatefog();
 static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[]);
 static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 static void dungeonboss(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 void exitdungeon();
+static int bosscount();
 static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 int dungeon(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 
@@ -47,10 +52,10 @@ helmet hfound[10];
 int hfi = 0;
 int xpfound;
 
-static const double aiattscaler() { return (.035 * pow(dungeondiff, 2)) + (.1 * (double)dungeondiff) + 1; }
+static const double aiattscaler() { return (.035 * pow(dungeondiff, 2.0)) + (.1 * (double)dungeondiff) + 1; }
 static const double aihpscaler() { return (.25 * pow(dungeondiff, 1.9)) + (2 * (double)dungeondiff) + 3; }
-static const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)dungeondiff / 2); }
-static const double xpcostscaler() { return ((.1 * (double)pow(charlevel, 2)) + (double)(5 * charlevel) + 5); }
+static const double xpgainscaler() { return ((double)((rand() % 3) + 2.0) * (1 + (double)dungeondiff / 2)); }
+static const double xpcostscaler() { return ((.1 * (double)pow(charlevel, 2.0)) + (5 * (double)charlevel) + 5); }
 
 static weapon createweapon()
 {
@@ -277,12 +282,157 @@ static helmet createhelmet()
 	return h;
 }
 
-static void init()
+static void makeshape(int y, int x, int n)
 {
-    for (int y = 0; y < MAP_SIZE_X; y++) // create FOW
-        for (int x = 0; x < MAP_SIZE_Y; x++)
-            fog[x][y] = ' ';
-    for (int y = 0; y < MAP_SIZE_X; y++) // fidn player start position
+	switch (n)
+	{
+	case 0: // J
+		map[x][y] = '@';
+		map[x][y - 1] = '@';
+		map[x][y + 1] = '@';
+		map[x + 1][y] = '@';
+		map[x + 2][y] = '@';
+		map[x + 2][y - 1] = '@';
+		break;
+	case 1: // +
+		map[x][y] = '@';
+		map[x + 1][y] = '@';
+		map[x - 1][y] = '@';
+		map[x][y + 1] = '@';
+		map[x][y - 1] = '@';
+		break;
+	case 2: // |
+		map[x][y] = '@';
+		map[x][y + 1] = '@';
+		map[x][y + 2] = '@';
+		map[x][y - 1] = '@';
+		break;
+	case 3: // -
+		map[x][y] = '@';
+		map[x + 1][y] = '@';
+		map[x + 2][y] = '@';
+		map[x - 1][y] = '@';
+		break;
+	case 4: // | |
+		map[x - 1][y + 1] = '@';
+		map[x - 1][y] = '@';
+		map[x - 1][y - 1] = '@';
+		map[x - 1][y - 2] = '@';
+		map[x + 1][y + 1] = '@';
+		map[x + 1][y] = '@';
+		map[x + 1][y - 1] = '@';
+		map[x + 1][y - 2] = '@';
+		break;
+	case 5: // =
+		map[x + 1][y - 1] = '@';
+		map[x][y - 1] = '@';
+		map[x - 1][y - 1] = '@';
+		map[x - 2][y - 1] = '@';
+		map[x + 1][y + 1] = '@';
+		map[x][y + 1] = '@';
+		map[x - 1][y + 1] = '@';
+		map[x - 2][y + 1];
+		break;
+	case 6: //L `|
+		map[x - 1][y] = '@';
+		map[x - 1][y - 1] = '@';
+		map[x - 1][y + 1] = '@';
+		map[x][y - 1] = '@';
+		map[x + 2][y] = '@';
+		map[x + 2][y + 1] = '@';
+		map[x + 2][y + 2] = '@';
+		map[x + 1][y + 2] = '@';
+		break;
+	default:
+		break;
+	}
+}
+
+static void makemap()
+{
+	for (int i = 0; i < MAP_SIZE_X; i++) //create map
+		for (int x = 0; x < MAP_SIZE_Y; x++)
+			map[x][i] = '#';
+
+	for (int i = 0; i < MAP_SIZE_X; i++) //create border
+	{
+		map[MAP_SIZE_Y - 1][i] = '@';
+		map[0][i] = '@';
+	}
+	for (int i = 1; i < MAP_SIZE_Y - 1; i++)
+	{
+		map[i][MAP_SIZE_X - 1] = '@';
+		map[i][0] = '@';
+	}
+
+	int a = 4; // shape spawn density. should keep as a multiple of mapzixe x y respectively
+	int b = 4;
+
+	for (int i = 0; i < (int)(MAP_SIZE_Y / b); i++)
+		for (int x = 0; x < (int)(MAP_SIZE_X / a); x++)
+			makeshape(deadlibrary::rng(x * a, (x + 1) * a), deadlibrary::rng(i * b, (i + 1) * b), deadlibrary::rng(0, 6)); //first slot is for mapsizex
+
+	int count = 0;
+	for (int i = 0; i < MAP_SIZE_X; i++)
+		for (int x = 0; x < MAP_SIZE_Y; x++)
+		{
+			if (map[x][i] == '#')
+			{
+				count = 0;
+				if (map[x + 1][i] == '@')
+					count++;
+				if (map[x - 1][i] == '@')
+					count++;
+				if (map[x][i + 1] == '@')
+					count++;
+				if (map[x][i - 1] == '@')
+					count++;
+
+				if (deadlibrary::rng(0, 9) == 0) //10% enemy spawn
+					map[x][i] = 'M';
+				if (count == 2 || count == 3) // 50% on 2 touching tiles for item
+					if (deadlibrary::rng(0, 2) == 0)
+						map[x][i] = 'T';
+				if (count == 3) // 50% any 3tile will exit, overriding item spawn
+					if (deadlibrary::rng(0, 1) == 0)
+						map[x][i] = 'O';
+				if (count == 4) //fill in inaccesible tiels
+					map[x][i] = '@';
+				//    2 sides are walls (choke)                          other adjacent tile is not enemy or boss       other adjacent tile on other side                for wall on other side
+				if (((map[x + 1][i] == '@' && map[x - 1][i] == '@') && (map[x][i + 1] != 'M' && map[x][i + 1] != 'B') && (map[x][i - 1] != 'M' && map[x][i - 1] != 'B')) || ((map[x][i + 1] == '@' && map[x][i - 1] == '@') && (map[x + 1][i] != 'M' && map[x + 1][i] != 'B') && (map[x - 1][i] != 'M' && map[x - 1][i] != 'B'))) //spawn enemy or boss at chokes. not if either of the two non wall are enemy or boss
+					if (deadlibrary::rng(0, 2) == 0)
+						map[x][i] = 'B';
+					else
+						map[x][i] = 'M';
+			}
+		}
+
+	do // keep spawning player till they are on playable tile
+	{
+		charx = deadlibrary::rng(1, MAP_SIZE_X);
+		chary = deadlibrary::rng(1, MAP_SIZE_Y);
+	} while (map[charx][chary] != '#');
+
+	/* // still possible to have no exit, but unlikely, and i'd like a better system. this allows for easy T grab and leave
+	switch (deadlibrary::rng(0, 3)) //guerentee available exit
+	{
+	case 0: map[charx + 1][chary] = 'O';
+		break;
+	case 1: map[charx - 1][chary] = 'O';
+		break;
+	case 2: map[charx][chary + 1] = 'O';
+		break;
+	case 3: map[charx][chary - 1] = 'O';
+		break;
+	default:
+		break;
+	}
+	*/
+}
+
+static void findC()
+{
+    for (int y = 0; y < MAP_SIZE_X; y++) // find player start position
         for (int x = 0; x < MAP_SIZE_Y; x++)
             if (map[x][y] == 'S')
             {
@@ -293,23 +443,30 @@ static void init()
             }
 }
 
+static void initfog()
+{
+	for (int y = 0; y < MAP_SIZE_X; y++) // create FOW
+		for (int x = 0; x < MAP_SIZE_Y; x++)
+			fog[x][y] = ' ';
+}
+
 static void printmap()
 {
     tileunderplayer = map[charx][chary];
     map[charx][chary] = 'c';
 	system("CLS");
-    for (int i = 0; i < MAP_SIZE_X; i++)
+    for (char i = 0; i < MAP_SIZE_X; i++)
     {
-        for (int x = 0; x < MAP_SIZE_Y; x++)
+        for (char x = 0; x < MAP_SIZE_Y; x++)
         {
-            if (fog[x][i] == ' ')
-                cout << ' ';
+			if (fog[x][i] == ' ')
+				printf(" ");
             else
             {
-                cout << map[x][i];
+                printf("%c", map[x][i]);
             }
         }
-        cout << endl;
+		printf("\n");
     }
     map[charx][chary] = tileunderplayer;
 }
@@ -353,13 +510,13 @@ static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], h
         for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
             for (int j = 0; j < 5 - i - 1; j++)
                 if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-                    deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+					rpglib::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
         if (wd.wcatt > weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
             weaponsarray[4] = wd;
         for (int i = 0; i < 5 - 1; i++) // sort inv by descending power again with new item
             for (int j = 0; j < 5 - i - 1; j++)
                 if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
-                    deadlibrary::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+					rpglib::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
     }
     if (dt == 1)
     {
@@ -369,13 +526,13 @@ static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], h
         for (int i = 0; i < 5 - 1; i++)
             for (int j = 0; j < 5 - i - 1; j++)
                 if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-                    deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
+					rpglib::swaparmor(armorsarray[j], armorsarray[j + 1]);
         if (ad.atotalstat > armorsarray[4].atotalstat)
             armorsarray[4] = ad;
         for (int i = 0; i < 5 - 1; i++)
             for (int j = 0; j < 5 - i - 1; j++)
                 if (armorsarray[j].atotalstat < armorsarray[j + 1].atotalstat)
-                    deadlibrary::swaparmor(armorsarray[j], armorsarray[j + 1]);
+					rpglib::swaparmor(armorsarray[j], armorsarray[j + 1]);
     }
     if (dt == 2)
     {
@@ -385,13 +542,13 @@ static void itemdrop(character& c, weapon weaponsarray[], armor armorsarray[], h
         for (int i = 0; i < 5 - 1; i++)
             for (int j = 0; j < 5 - i - 1; j++)
                 if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-                    deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+					rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
         if (hd.htotalstat > helmetsarray[4].htotalstat)
             helmetsarray[4] = hd;
         for (int i = 0; i < 5 - 1; i++)
             for (int j = 0; j < 5 - i - 1; j++)
                 if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-                    deadlibrary::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+					rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
     }
 	//system("pause");
 	//audio here
@@ -449,7 +606,7 @@ static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helme
 
 		if (sucat == numcheck && atttime < 1) // hit
 		{
-			double dmg = 3 * ((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt / 3) * ((double)(c.lvl - 1) * .5))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness. should hit for roughly what catt is on a mediocre hit.
+			double dmg = 3 * ((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt / 3) * (((double)c.lvl - 1) * .5))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness. should hit for roughly what catt is on a mediocre hit.
 			if (c.dif == 2)
 				dmg = dmg * .9; // -10% damage for hardcore
 			aihp = aihp - (int)dmg;
@@ -502,8 +659,8 @@ static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helme
 			mciSendString(L"play vsfx", NULL, 0, NULL);
 
 			int xpgain = xpgainscaler();
-			if (boss == true)
-				xpgain = deadlibrary::intnormaldistribution(xpgainscaler(), xpgainscaler(), 1); //using rng as bounds makes it fairly random independant of precision already
+			if (boss == true) // double boss xp. xp drop on normal dist curve
+				xpgain = deadlibrary::rngnd(xpgainscaler(), xpgainscaler(), 1) * 2; //using rng as bounds makes it fairly random independant of precision already
 			c.cxp = c.cxp + xpgain;
 			cout << "victory! you gained " << xpgain << " xp.\nCurrent xp: " << c.cxp << "/" << (int)xpcostscaler() << endl;
 			cout << "\nhp remaining - " << c.chp << "/" << totalmaxhp << "\n" << endl;
@@ -515,7 +672,7 @@ static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helme
 			break;
 		}
 
-		cout << "\n\nhp - " << c.chp << "/" << totalmaxhp << "\nattack - " << (int)((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt / 3) * ((double)(charlevel - 1) * .5))) << "\n\n" << endl;
+		cout << "\n\nhp - " << c.chp << "/" << totalmaxhp << "\nattack - " << (int)((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt / 3) * (((double)charlevel - 1) * .5))) << "\n\n" << endl;
 		cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n" << endl;
 		cout << "1 - continue attacking\n2 - retreat" << endl;
 		int temp3;
@@ -529,9 +686,7 @@ static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helme
 
 static void dungeonboss(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[])
 {
-	dungeondiff += 2; // boss fight is same but enemy is harder by 2 levels
-	battle(c, weaponsarray, armorsarry, helmetsarray, true);
-	dungeondiff -= 2;
+	//not enough to ake this worth using yet
 }
 
 static void exitdungeon()
@@ -552,6 +707,18 @@ static void exitdungeon()
 	system("CLS");
 }
 
+static int bosscount()
+{
+	int count = 0;
+	for (int y = 0; y < MAP_SIZE_X; y++) // find player start position
+		for (int x = 0; x < MAP_SIZE_Y; x++)
+			if (map[x][y] == 'B')
+			{
+				count++;
+			}
+	return count;
+}
+
 static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) // 0 - alive, 1 - dead, 2 - exit
 {
     if (map[charx][chary] == ITEM)
@@ -568,9 +735,15 @@ static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[
     }
     if (map[charx][chary] == BOSS)
     {
-        dungeonboss(c, weaponsarray, armorsarry, helmetsarray);
+		dungeondiff += 3; // boss fight is same but enemy is harder by 2 levels
+		int dead = battle(c, weaponsarray, armorsarry, helmetsarray, true);
+		dungeondiff -= 3;
+        //dungeonboss(c, weaponsarray, armorsarry, helmetsarray);
         map[charx][chary] = '#';
-        return 4;
+
+		if (bosscount() == 0) // spawn exit if all bosses are dead. extra precuation against getting stuck
+			map[charx][chary - 1] = 'O';
+        return dead;
     }
     if (map[charx][chary] == EXIT)
     {
@@ -581,7 +754,7 @@ static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[
 	return 4;
 }
 
-int dungeon(character &c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) //return 0 if dungeon was exited, return 1 if player died
+int dungeon(int dungeontype, character &c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) //return 0 if dungeon was exited, return 1 if player died
 {
 	charlevel = c.lvl;
 	char dun = 'A'; //select a dungeon and set difficulty and get file path for it
@@ -631,18 +804,26 @@ int dungeon(character &c, weapon weaponsarray[], armor armorsarry[], helmet helm
 		break;
 	}
 
-	int mapnumber = rand() % 3 + 1; //1-3 // rng pick map. first num is amount of maps available
+	initfog();
+	if (dungeontype == 0) // autogen off
+	{
+		int mapnumber = rand() % 3 + 1; //1-3 // rng pick map. first num is amount of maps available
+		string mapfile = "maps/map" + to_string(mapnumber) + ".txt";
+		string line; //read in map
+		ifstream is(mapfile);
+		for (int y = 0; y < MAP_SIZE_X; y++)
+			for (int x = 0; x < MAP_SIZE_Y; x++)
+				is >> map[x][y];
+		findC();
+	}
+	else // autogen on
+	{
 
-	string mapfile = "maps/map" + to_string(mapnumber) + ".txt";
-    string line; //read in map
-    ifstream is(mapfile);
-    for (int y = 0; y < MAP_SIZE_X; y++)
-        for (int x = 0; x < MAP_SIZE_Y; x++)
-            is >> map[x][y];
-
-    init();
+		makemap();
+	}
+    
     updatefog();
-    fog[charx][chary] = '.'; //only needed once so left out of repeated func
+    fog[charx][chary] = '.'; //only needed once so left out of repeated updatefog() func
     printmap();
     int input = 0;
 	int collisionresult = 0;

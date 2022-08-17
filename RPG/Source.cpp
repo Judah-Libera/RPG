@@ -1,12 +1,10 @@
-//     RPG V4.0.2				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V4.1.0				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//put itemdrop into deadlibrary
-//see if volumeupdate works in deadlibrary
+//see if volumeupdate works in deadlibrary // update source.cpp // mcisendstring at bottom broke???
 //lots of commented out code to remove if it works
-//add statics check over warnings
 //create another .cpp functions file for rpg functions (keep deadlib prtable)
-//highscore table looks broken
+//highscore table looks broken. would be in saving game
 //gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it). forces name that will work rn
 //hc overwrite untested
 
@@ -15,6 +13,7 @@
 //update pvp.cpp - sfx - char loads
 
 //FEATURES
+//add hlwknt st3
 //multiple save games. read folders in savedata folder, each character gets a folder with a number, user enters number to load filepath using that number. save game into folder with what ever number is entered.
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
 //colorize
@@ -35,7 +34,7 @@ static void killchar();
 static void viewchar(int pac);
 static void savegame();
 static void loadchar();
-static void volumeupdate();
+//static void volumeupdate();
 static void settings();
 static weapon createweapon();
 static armor createarmor();
@@ -49,6 +48,7 @@ int FullScreen = 1; // 1=fs, 0=windowed
 int mvolume = 1000; // = 0-10 * 100
 int sfxvolume = 1000; // ^^^
 int soundtracknum = 1;
+int dungeontype = 1; //0 - off. 1 - on
 
 character c = {};
 weapon weaponsarray[5]; //arrays for inv
@@ -59,8 +59,8 @@ static const double aiattscaler() { return (.035 * pow(c.lvl, 2)) + (.1 * (doubl
 static const double aihpscaler() { return (.25 * pow(c.lvl, 1.9)) + (2 * (double)c.lvl) + 3; }
 static const double cattscaler() { return (c.catt + (.6 * c.attlvlups)); } //NOT USED IN DAMAGE CALCULATION. influence the effect of lvlups on natural attack //(c.catt + (.12 * (double)pow(c.attlvlups, 1.5) + 1.2 * (double)c.attlvlups + 1.5)); }//old
 static const double mchpscaler() { return ((double)c.mchp * 1.08 + (((double)c.ae.amchp + (double)c.he.hmchp) * 1.04) + 5); }
-static const double xpgainscaler() { return ((double)((rand() % 3) + 2)) * (1 + (double)c.lvl / 2); }
-static const double xpcostscaler() { return ((.1 * (double)pow(c.lvl, 2)) + (double)(5 * c.lvl) + 5); }
+static const double xpgainscaler() { return (((double)(rand() % 3) + 2)) * (1 + (double)c.lvl / 2); }
+static const double xpcostscaler() { return ((.1 * (double)pow(c.lvl, 2)) + (5 * (double)c.lvl) + 5); }
 static const double regenscaler() { return (.8 * (double)(5 + c.regen + c.ae.aregen + c.he.hregen)) * ((double)c.mchp / 15); } // * (1 - atttime)
 
 static weapon createweapon()
@@ -340,18 +340,18 @@ static void viewhscores()
 	string n;
 	sdata.open("hscores.txt"); //just prints lines from hscores
 
+	if (c.name == "") //to be able to accuratly compare with line wwhen highlighting player
+		if (c.cclass == "Human")
+			n = "A Human of no renown";
+		else
+			n = "An " + c.cclass + " of no renown";
+	else
+		n = c.nametitle;
+
 	cout << "High Scores" << endl;
 	while (getline(sdata, line))
 	{
-		if (c.name == "") //to be able to accuratly compare with line
-			if (c.cclass == "Human")
-				n = "A Human of no renown";
-			else
-				n = "An " + c.cclass + " of no renown";
-		else
-			n = c.nametitle;
-
-		cout << (to_string(c.score) + "\t" + n) << endl;
+		//cout << (to_string(c.score) + "\t" + n) << endl; // for testing if comparison below is brokens
 		if (line == (to_string(c.score) + "\t" + n)) // if record matches this games then off color
 		{
 			SetConsoleTextAttribute(hConsole, 7);
@@ -627,7 +627,7 @@ static void play()
 		}
 		if (sucat == numcheck && atttime < 1) // hit
 		{
-			double dmg = 3 * ((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt / 3) * ((double)(c.lvl - 1) * .5))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness. should hit for roughly what catt is on a mediocre hit.
+			double dmg = 3 * ((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt / 3) * (((double)c.lvl - 1) * .5))) * (1 - atttime);		//damage to scale based off time to hit. influence of weapon increase a little with each level to preserve usefullness. should hit for roughly what catt is on a mediocre hit.
 			if (c.dif == 2)
 				dmg = dmg * .9; // -10% damage for hardcore
 			aihp = aihp - (int)dmg;
@@ -732,28 +732,28 @@ static void play()
 					{
 						weapon wd = createweapon();
 						cout << "You've found " << wd.wname << "!" << endl;
-						deadlibrary::sortweapon(weaponsarray);
+						rpglib::sortweapon(weaponsarray);
 						if (wd.wcatt > weaponsarray[4].wcatt) // if dropped item is better than worse inventory item
 							weaponsarray[4] = wd;
-						deadlibrary::sortweapon(weaponsarray);
+						rpglib::sortweapon(weaponsarray);
 					}
 					if (dt == 1) // same as weapon drop
 					{
 						armor ad = createarmor();
 						cout << "You've found " << ad.aname << "!" << endl;
-						deadlibrary::sortarmor(armorsarray);
+						rpglib::sortarmor(armorsarray);
 						if (ad.atotalstat > armorsarray[4].atotalstat)
 							armorsarray[4] = ad;
-						deadlibrary::sortarmor(armorsarray);
+						rpglib::sortarmor(armorsarray);
 					}
 					if (dt == 2) // same as weapon drop
 					{
 						helmet hd = createhelmet();
 						cout << "You've found " << hd.hname << "!" << endl;
-						deadlibrary::sorthelmet(helmetsarray);
+						rpglib::sorthelmet(helmetsarray);
 						if (hd.htotalstat > helmetsarray[4].htotalstat)
 							helmetsarray[4] = hd;
-						deadlibrary::sorthelmet(helmetsarray);
+						rpglib::sorthelmet(helmetsarray);
 					}
 				}
 			}
@@ -791,7 +791,7 @@ static void play()
 			break;
 		}
 
-		cout << "\n\nhp - " << c.chp << "/" << totalmaxhp << "\nattack - " << (int)((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt/3) * ((double)(c.lvl - 1) * .5))) << "\n\n" << endl;
+		cout << "\n\nhp - " << c.chp << "/" << totalmaxhp << "\nattack - " << (int)((double)c.catt + (c.we.wcatt + ((double)c.we.wcatt/3) * (((double)c.lvl - 1) * .5))) << "\n\n" << endl;
 		cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n" << endl;		
 		cout << "1 - continue attacking\n2 - retreat" << endl;
 		int temp3;
@@ -851,7 +851,7 @@ static void viewchar(int pac)
 		cout << c.nametitle << endl;
 	cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 	cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
-	cout << "attack - " << c.catt << " : weapon - " << (int)(c.we.wcatt + ((double)c.we.wcatt / 3) * ((double)(c.lvl - 1) * .5)) << endl;
+	cout << "attack - " << c.catt << " : weapon - " << (int)(c.we.wcatt + ((double)c.we.wcatt / 3) * (((double)c.lvl - 1) * .5)) << endl;
 	cout << "Expierience - " << c.cxp << "/" << (int)xpcostscaler() << endl;
 	cout << "Level - " << (int)c.lvl << "\n" << endl;
 	cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << "\n" << endl;
@@ -878,7 +878,7 @@ static void viewchar(int pac)
 			{
 				ri = false;
 				system("CLS");
-				cout << "\nCurrent Weapon: " << c.we.wname << " - " << c.we.wcatt << " att" << "\nCurrent Armor: " << c.ae.aname << " - " << c.ae.amchp << " hp - " << c.ae.aregen << "regen" << "\nCurrent Helmet: " << c.he.hname << " - " << c.he.hmchp << " hp - " << c.he.hregen << " regen" << endl;
+				cout << "\nCurrent Weapon: " << c.we.wname << " - " << c.we.wcatt << " att" << "\nCurrent Armor: " << c.ae.aname << " - " << c.ae.amchp << " hp - " << c.ae.aregen << " regen" << "\nCurrent Helmet: " << c.he.hname << " - " << c.he.hmchp << " hp - " << c.he.hregen << " regen" << endl;
 
 				cout << "\nA - Weapons in inventory." << endl;
 				for (int i = 0; i < 5; i++)
@@ -913,7 +913,7 @@ static void viewchar(int pac)
 					cout << "Enter the number of the weapon you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 >= 1 && mc2 <= 5)
-						deadlibrary::swapweapon(c.we, weaponsarray[mc - 1]);
+						rpglib::swapweapon(c.we, weaponsarray[mc2 - 1]);
 					/*else if (mc2 == 2)
 						deadlibrary::swapweapon(c.we, weaponsarray[1]);
 					else if (mc2 == 3)
@@ -924,7 +924,7 @@ static void viewchar(int pac)
 						deadlibrary::swapweapon(c.we, weaponsarray[4]);*/
 					else
 						skip = true;
-					deadlibrary::sortweapon(weaponsarray);
+					rpglib::sortweapon(weaponsarray);
 				}
 				else if (mc == 'b' || mc == 'B')
 				{
@@ -932,7 +932,7 @@ static void viewchar(int pac)
 					cout << "Enter the number of the armor you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 >= 1 && mc2 <= 5)
-						deadlibrary::swaparmor(c.ae, armorsarray[mc2 - 1]);
+						rpglib::swaparmor(c.ae, armorsarray[mc2 - 1]);
 					/*else if (mc2 == 2)
 						deadlibrary::swaparmor(c.ae, armorsarray[1]);
 					else if (mc2 == 3)
@@ -943,7 +943,7 @@ static void viewchar(int pac)
 						deadlibrary::swaparmor(c.ae, armorsarray[4]);*/
 					else
 						skip = true;
-					deadlibrary::sortarmor(armorsarray);
+					rpglib::sortarmor(armorsarray);
 				}
 				else if (mc == 'c' || mc == 'C')
 				{
@@ -951,7 +951,7 @@ static void viewchar(int pac)
 					cout << "Enter the number of the helmet you would like to equip." << endl;
 					cin >> mc2;
 					if (mc2 >= 1 && mc2 <= 5)
-						deadlibrary::swaphelmet(c.he, helmetsarray[mc2 - 1]);
+						rpglib::swaphelmet(c.he, helmetsarray[mc2 - 1]);
 					/*else if (mc2 == 2)
 						deadlibrary::swaphelmet(c.he, helmetsarray[1]);
 					else if (mc2 == 3)
@@ -962,7 +962,7 @@ static void viewchar(int pac)
 						deadlibrary::swaphelmet(c.he, helmetsarray[4]);*/
 					else
 						skip = true;
-					deadlibrary::sorthelmet(helmetsarray);
+					rpglib::sorthelmet(helmetsarray);
 				}
 				else if (mc == 'd' || mc == 'D')
 				{
@@ -987,7 +987,7 @@ static void viewchar(int pac)
 						{
 							weaponsarray[4] = c.we; // already sorted so worse item is in last slot
 							c.we = emptyweapon;
-							deadlibrary::sortweapon(weaponsarray);
+							rpglib::sortweapon(weaponsarray);
 						}
 					}
 					else if (mc4 == 'b' || mc == 'B')
@@ -1008,7 +1008,7 @@ static void viewchar(int pac)
 						{
 							armorsarray[4] = c.ae;
 							c.ae = emptyarmor;
-							deadlibrary::sortarmor(armorsarray);
+							rpglib::sortarmor(armorsarray);
 						}
 					}
 					else if (mc4 == 'c' || mc == 'C')
@@ -1029,7 +1029,7 @@ static void viewchar(int pac)
 						{
 							helmetsarray[4] = c.he;
 							c.he = emptyhelmet;
-							deadlibrary::sorthelmet(helmetsarray);
+							rpglib::sorthelmet(helmetsarray);
 						}
 					}
 					else
@@ -1052,7 +1052,7 @@ static void viewchar(int pac)
 				cout << c.nametitle << endl;
 			cout << "HP - " << c.chp << "/" << c.mchp + c.ae.amchp + c.he.hmchp << endl;
 			cout << "Regeneration - " << c.regen + c.ae.aregen + c.he.hregen << endl;
-			cout << "attack - " << c.catt << " : weapon - " << (int)(c.we.wcatt + ((double)c.we.wcatt / 3) * ((double)(c.lvl - 1) * .5)) << endl;
+			cout << "attack - " << c.catt << " : weapon - " << (int)(c.we.wcatt + ((double)c.we.wcatt / 3) * (((double)c.lvl - 1) * .5)) << endl;
 			cout << "Expierience - " << c.cxp << "/" << (int)xpcostscaler() << endl;
 			cout << "Level - " << c.lvl << "\n" << endl;
 			cout << "\nCurrent Weapon: " << c.we.wname << "\nCurrent Armor: " << c.ae.aname << "\nCurrent Helmet: " << c.he.hname << "\n" << endl;
@@ -1169,47 +1169,6 @@ static void loadchar()
 	system("CLS");
 }
 
-static void volumeupdate() //works in deadlib? pass mvolume and sfxvolume
-{
-	string vol;
-	vol = "setaudio em3 volume to ";
-	vol.append(to_string(mvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, 0);
-	vol = "setaudio fighttheme volume to ";
-	vol.append(to_string(mvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, 0);
-	vol = "setaudio fighttheme2 volume to ";
-	vol.append(to_string(mvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, 0);
-	vol = "setaudio maintheme volume to ";
-	vol.append(to_string(mvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, 0);
-	vol = "setaudio titletheme volume to ";
-	vol.append(to_string(mvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, 0);
-	vol = "setaudio practicetheme volume to ";
-	vol.append(to_string(mvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, 0);
-	vol = "setaudio critsfx volume to ";
-	vol.append(to_string(sfxvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, NULL);
-	vol = "setaudio itemdsfx volume to ";
-	vol.append(to_string(sfxvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, NULL);
-	vol = "setaudio elitesfx volume to ";
-	vol.append(to_string(sfxvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, NULL);
-	vol = "setaudio vssfx volume to ";
-	vol.append(to_string(sfxvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, NULL);
-	vol = "setaudio dssfx volume to ";
-	vol.append(to_string(sfxvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, NULL);
-	vol = "setaudio lvlupsfx volume to ";
-	vol.append(to_string(sfxvolume));
-	mciSendStringA(vol.c_str(), NULL, 0, NULL);
-}
-
 static void settings()
 {
 	mciSendString(L"open audio/sfx/elitesfx.mp3 type mpegvideo alias elitesfx", NULL, 0, NULL); // to hear sfx when selecting its vol
@@ -1221,7 +1180,7 @@ static void settings()
 	{
 		system("CLS");
 		cout << "Settings" << endl;
-		cout << "1 - New Character Difficulty\n2 - Toggle Full Screen launch\n3 - Music Volume\n4 - Sound Effects Volume\n5 - Change soundtrack (relaunch game).\n6 - exit" << endl;
+		cout << "1 - New Character Difficulty\n2 - Toggle Full Screen launch\n3 - Music Volume\n4 - Sound Effects Volume\n5 - Change soundtrack (relaunch game).\n6 - toggle dungeon generation\n7 - exit" << endl;
 
 		vi = false;
 		cin >> cs;
@@ -1279,7 +1238,11 @@ static void settings()
 		case 5: cout << "Judah - 1\nAlina - 2" << endl;
 			cin >> soundtracknum;
 			break;
-		case 6: vi = true;
+		case 6: cout << "On - 1\nOff - 0" << endl;
+			cin >> dungeontype;
+			if (dungeontype != 1 && dungeontype != 0)
+				dungeontype = 1;
+		case 7: vi = true;
 			break;
 		default: vi = false;
 			break;
@@ -1288,7 +1251,7 @@ static void settings()
 	system("CLS");
 
 	FILE* ofp = fopen("settings.txt", "w"); //update settings file
-	fprintf(ofp, "FullScreen %d\nStart Difficulty %d\nMusic Volume %d\nEffects Volume %d\nSoundtrack %d", FullScreen, difsel, mvolume, sfxvolume, soundtracknum);
+	fprintf(ofp, "FullScreen %d\nStart Difficulty %d\nMusic Volume %d\nEffects Volume %d\nSoundtrack %d\nDungeon Generation %d", FullScreen, difsel, mvolume, sfxvolume, soundtracknum, dungeontype);
 	fclose(ofp);
 	mciSendString(L"close elitesfx", NULL, 0, NULL);
 }
@@ -1301,7 +1264,8 @@ int main()
 	fscanf(ifp, "Start Difficulty %d\n", &difsel);
 	fscanf(ifp, "Music Volume %d\n", &mvolume);
 	fscanf(ifp, "Effects Volume %d\n", &sfxvolume);
-	fscanf(ifp, "Soundtrack %d", &soundtracknum);
+	fscanf(ifp, "Soundtrack %d\n", &soundtracknum);
+	fscanf(ifp, "Dungeon Generation %d", &dungeontype);
 	if (soundtracknum == 2)
 		st = "st2";
 	else
@@ -1334,7 +1298,7 @@ int main()
 	srand((unsigned)time(0));
 	int ts;
 	
-	volumeupdate();
+	rpglib::volumeupdate(mvolume, sfxvolume);
 
 	mciSendString(L"play titletheme repeat", NULL, 0, NULL);
 	int pvpfullexit = titlescreen(); // returns 1 if pvp() wants to close app //handles screensize
@@ -1593,7 +1557,7 @@ int main()
 				break;
 			case 4: keepplaying = false;
 				break;
-			case 5: dungeonresult = dungeon(c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died
+			case 5: dungeonresult = dungeon(dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died
 				if (dungeonresult == 1)
 					killchar();
 				break;

@@ -1,6 +1,6 @@
 4 2 5 Mask of Rejuvenation
 5 3 0 Mask of Rejuvenation
-2 0 5 Circlet of Balance
-2 1 0 Hood of Recovery
-1 0 5 Circlet of Health
-0 0 0   
+0 0 0 
+0 0 0 
+0 0 0 
+0 0 0 

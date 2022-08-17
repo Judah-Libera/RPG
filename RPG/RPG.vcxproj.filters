@@ -27,6 +27,9 @@
     <ClCompile Include="Dungeons.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="rpglib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h">

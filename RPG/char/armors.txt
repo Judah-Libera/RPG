@@ -1,6 +1,6 @@
 2 0 10 Robe of Health
-2 0 5 Tunic of Balance
-0 0 0   
+0 0 0 
 1 1 0 Tunic of Recovery
-1 0 5 Tunic of Health
-1 1 0 Tunic of Recovery
+0 0 0 
+0 0 0 
+0 0 0 

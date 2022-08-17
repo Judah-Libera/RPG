@@ -143,6 +143,7 @@
     <ClCompile Include="deadlibrary.cpp" />
     <ClCompile Include="Dungeons.cpp" />
     <ClCompile Include="pvp.cpp" />
+    <ClCompile Include="rpglib.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>

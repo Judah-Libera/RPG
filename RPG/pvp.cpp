@@ -1,5 +1,5 @@
 //unaltered since last backup
-
+/*
 #pragma warning(disable: 4996)
 
 #include "includes.h"
@@ -57,7 +57,7 @@ static void pvpplay()
 
 		clock_t end = clock();
 
-		atttime = double(end - begin) / CLOCKS_PER_SEC;
+		atttime = 0; // double(end - begin) / CLOCKS_PER_SEC;
 
 		system("CLS");
 
@@ -108,7 +108,7 @@ static void pvpplay()
 
 		end = clock();
 
-		atttime = double(end - begin) / CLOCKS_PER_SEC;
+		atttime = 0; // double(end - begin) / CLOCKS_PER_SEC;
 
 		system("CLS");
 
@@ -173,14 +173,14 @@ static character pvpheal(character c)
 	clock_t begin = clock();
 	cin >> numcheck;
 	clock_t end = clock();
-	double atttime = double(end - begin) / CLOCKS_PER_SEC;
+	double atttime = 0;// double(end - begin) / CLOCKS_PER_SEC;
 	system("CLS");
 	cout << "time for regen: " << atttime << endl;
 
 	if (sucheal == numcheck && atttime < 1)
 	{
 		int temp = c.chp;
-		c.chp = c.chp + (((double)(c.regen + c.ae.aregen + c.he.hregen) * ((double)(c.mchp + c.ae.amchp + c.he.hmchp) / 3)) * (1 - atttime));
+		//c.chp = c.chp + (((double)(c.regen + c.ae.aregen + c.he.hregen) * ((double)(c.mchp + c.ae.amchp + c.he.hmchp) / 3)) * (1 - atttime));
 		temp = c.chp - temp;
 		cout << temp << " hp gained." << endl;
 		if (c.chp > (c.mchp + c.ae.amchp + c.he.hmchp))
@@ -404,6 +404,8 @@ static character pvpnewchar()
 	system("CLS");
 	switch (temp) //character create, recopy
 	{
+	case 0: //don't warn me about no cases
+		break;
 	default:
 		break;
 	}
@@ -494,4 +496,4 @@ int pvp()
 	}
 	mciSendString(L"pause maintheme", NULL, 0, NULL);
 	return 0;
-}
+}*/

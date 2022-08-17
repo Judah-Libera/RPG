@@ -3,7 +3,8 @@
 #pragma once
 #pragma warning(disable: 4996) // VS has another function it likes more
 #pragma warning(disable: 6031) // don't check func return for failure
-#pragma warning(disable: 4244) // int = double
+#pragma warning(disable: 4244) // int set equal to double
+#pragma warning(disable: 4834) // ignored function returnvvalue
 #define NOMINMAX
 
 #include <iostream>
@@ -56,9 +57,18 @@ struct character
 };
 
 //int pvp();
-int dungeon(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
+int dungeon(int dungeontype, character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 
 namespace deadlibrary
+{
+	void numswap(int *a, int *b);
+	void strswap(std::string *a, std::string *b);
+
+	int rng(int min, int max);
+	int rngnd(int min, int max, double precision);
+}
+
+namespace rpglib
 {
 	void sortweapon(weapon arr[5]);
 	void sortarmor(armor arr[5]);
@@ -68,10 +78,7 @@ namespace deadlibrary
 	void swaparmor(armor& i, armor& j);
 	void swaphelmet(helmet& i, helmet& j);
 
-	void numswap(int *a, int *b);
-	void strswap(std::string *a, std::string *b);
-
-	int intnormaldistribution(int min, int max, double precision);
+	void volumeupdate(int mvolume, int sfxvolume);
 }
 
 #pragma comment(lib, "Winmm.lib")
