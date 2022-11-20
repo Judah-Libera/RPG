@@ -145,6 +145,7 @@
     <ClCompile Include="pvp.cpp" />
     <ClCompile Include="rpglib.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="TLE.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes.h" />

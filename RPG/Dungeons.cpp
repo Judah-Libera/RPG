@@ -1,18 +1,14 @@
 #include "includes.h"
-#include <conio.h> // for _getchar(). only used in this file
+#include <conio.h> // for _getchar().
 
 //BUGS
 
 //FEATURES
+//make enemies move around
 //limit access? like half of item lvl 9 or 10 drops are instead dungeon key. or given a dungeon key every x levels
 //gurentee there is exit or all boss within available pathing (don't like spawn exit next to player)
 //add soundtracks
 //have a 4th drop item of hp pot. can make it stay with chara after dungeon later
-
-#define KEY_UP 72
-#define KEY_DOWN 80
-#define KEY_LEFT 75
-#define KEY_RIGHT 77
 
 const int MAP_SIZE_X = 20; // needs to match manual maps for them to work.
 const int MAP_SIZE_Y = 20;
@@ -37,20 +33,20 @@ static int bosscount();
 static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 int dungeon(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
 
-char map[MAP_SIZE_X][MAP_SIZE_Y]; //x y // rows x columns // going down the matrix and going across the matrix
-char fog[MAP_SIZE_X][MAP_SIZE_Y]; // ' ' is hidden, '.' is revealed
-int charx = 0;
-int chary = 0;
-char tileunderplayer = '@';
-int dungeondiff = 5; //stand in for character level in dungeon
-int charlevel = 0; //only needed for accuratly showing xp required for lvlup
-weapon wfound[10]; //for storing loot collected during dungeon
-int wfi = 0; //index for array
-armor afound[10];
-int afi = 0;
-helmet hfound[10];
-int hfi = 0;
-int xpfound;
+static char map[MAP_SIZE_X][MAP_SIZE_Y]; //x y // rows x columns // going down the matrix and going across the matrix
+static char fog[MAP_SIZE_X][MAP_SIZE_Y]; // ' ' is hidden, '.' is revealed
+static int charx = 0;
+static int chary = 0;
+static char tileunderplayer = '@';
+static int dungeondiff = 5; //stand in for character level in dungeon
+static int charlevel = 0; //only needed for accuratly showing xp required for lvlup
+static weapon wfound[10]; //for storing loot collected during dungeon
+static int wfi = 0; //index for array
+static armor afound[10];
+static int afi = 0;
+static helmet hfound[10];
+static int hfi = 0;
+static int xpfound;
 
 static const double aiattscaler() { return (.035 * pow(dungeondiff, 2.0)) + (.1 * (double)dungeondiff) + 1; }
 static const double aihpscaler() { return (.25 * pow(dungeondiff, 1.9)) + (2 * (double)dungeondiff) + 3; }
@@ -797,9 +793,9 @@ int dungeon(int dungeontype, character &c, weapon weaponsarray[], armor armorsar
 	case 'H':
 		dungeondiff = 40;
 		break;
-	case '~': //temp cheat for testing
-		dungeondiff = 1;
-		break;
+	//case '~': //temp cheat for testing
+		//dungeondiff = 1;
+		//break;
 	default:
 		break;
 	}
@@ -818,7 +814,6 @@ int dungeon(int dungeontype, character &c, weapon weaponsarray[], armor armorsar
 	}
 	else // autogen on
 	{
-
 		makemap();
 	}
     
@@ -830,7 +825,7 @@ int dungeon(int dungeontype, character &c, weapon weaponsarray[], armor armorsar
     while (1) //main dungeon control loop. plays live independant of input
     {
         input = 0;
-        switch ((input = _getch())) // if an arrow key is down move in that direction, not if its into a wall
+        switch (input = _getch()) // if an arrow key is down move in that direction, not if its into a wall
         {
         case KEY_UP:
             if (map[charx][chary - 1] != '@')

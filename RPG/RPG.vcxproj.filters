@@ -28,6 +28,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="rpglib.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TLE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

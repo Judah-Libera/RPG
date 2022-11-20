@@ -1,6 +1,6 @@
-FullScreen 0
-Start Difficulty 1
-Music Volume 0
-Effects Volume 1000
+FullScreen 1
+Start Difficulty 2
+Music Volume 100
+Effects Volume 300
 Soundtrack 2
 Dungeon Generation 1

@@ -7,6 +7,11 @@
 #pragma warning(disable: 4834) // ignored function returnvvalue
 #define NOMINMAX
 
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -58,6 +63,7 @@ struct character
 
 //int pvp();
 int dungeon(int dungeontype, character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
+void TLE(int charlvl);
 
 namespace deadlibrary
 {

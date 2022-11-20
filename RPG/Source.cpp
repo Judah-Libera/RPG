@@ -1,12 +1,13 @@
 //     RPG V4.1.0				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //BUGS
-//see if volumeupdate works in deadlibrary // update source.cpp // mcisendstring at bottom broke???
-//lots of commented out code to remove if it works
-//create another .cpp functions file for rpg functions (keep deadlib prtable)
-//highscore table looks broken. would be in saving game
 //gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it). forces name that will work rn
-//hc overwrite untested
+
+//TESTING
+//won't load an empty save
+//audio
+//highscore table - if issue present its likely in saving
+//lots off commented code
 
 //EDITS
 //merge catt and catlvlups into same variable. //if it ain't broke dont fix it tho
@@ -672,7 +673,7 @@ static void play()
 
 			cout << "hp - 0\nYour garbage and don't deserve a second chance looser. Your score was " << c.score << ".\n\n" << endl;
 			cout << "ai hp - " << aihp << "\nai attack - " << aiatt << "\n\n" << endl;
-			/*
+			
 			if (c.dif != 0) // don't get score saved for easy
 				updatehscores();
 			if (c.dif == 2) // if hardcore, creates empty char to overwrite save data
@@ -681,14 +682,17 @@ static void play()
 				savegame();
 				system("CLS");
 			}
-			mciSendString(L"pause fighttheme", NULL, 0, NULL);
-			mciSendString(L"pause fighttheme2", NULL, 0, NULL);
-			mciSendString(L"seek maintheme to start", NULL, 0, NULL);
-			mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 			system("pause");
 			system("CLS");
 			viewhscores();
 			system("pause");
+			exit(0);
+
+			/*
+			mciSendString(L"pause fighttheme", NULL, 0, NULL);
+			mciSendString(L"pause fighttheme2", NULL, 0, NULL);
+			mciSendString(L"seek maintheme to start", NULL, 0, NULL);
+			mciSendString(L"play maintheme repeat", NULL, 0, NULL);
 			mciSendString(L"pause maintheme", NULL, 0, NULL); //close game
 			mciSendString(L"close maintheme", NULL, 0, NULL);
 			mciSendString(L"close em3", NULL, 0, NULL);
@@ -701,7 +705,7 @@ static void play()
 			mciSendString(L"close vsfx", NULL, 0, NULL);
 			mciSendString(L"close dsfx", NULL, 0, NULL);
 			mciSendString(L"close lvlupsfx", NULL, 0, NULL);
-			exit(0);*/
+			*/
 		}
 		if (aihp < 1) // enemy dead
 		{
@@ -1226,14 +1230,14 @@ static void settings()
 		case 3: cout << "Enter a music volume level 0 - 10" << endl;
 			cin >> mvolume;
 			mvolume *= 100;
-			volumeupdate();
+			rpglib::volumeupdate(mvolume, sfxvolume);
 			break;
 		case 4: mciSendString(L"seek elitesfx to start", NULL, 0, NULL);
 			mciSendStringA("play elitesfx", NULL, 0, NULL);
 			cout << "Enter a sound effects volume level 0 - 10" << endl;
 			cin >> sfxvolume;
 			sfxvolume *= 100;
-			volumeupdate();
+			rpglib::volumeupdate(mvolume, sfxvolume);
 			break;
 		case 5: cout << "Judah - 1\nAlina - 2" << endl;
 			cin >> soundtracknum;
@@ -1258,14 +1262,14 @@ static void settings()
 
 int main()
 {
-	string st;
-	FILE* ifp = fopen("settings.txt", "r"); //read in settigns
+	FILE* ifp = fopen("settings.txt", "r"); //read in settings
 	fscanf(ifp, "FullScreen %d\n", &FullScreen);
 	fscanf(ifp, "Start Difficulty %d\n", &difsel);
 	fscanf(ifp, "Music Volume %d\n", &mvolume);
 	fscanf(ifp, "Effects Volume %d\n", &sfxvolume);
 	fscanf(ifp, "Soundtrack %d\n", &soundtracknum);
 	fscanf(ifp, "Dungeon Generation %d", &dungeontype);
+	string st;
 	if (soundtracknum == 2)
 		st = "st2";
 	else
@@ -1332,6 +1336,10 @@ int main()
 		cout << "1 - Start a New Game\n2 - Load Game\n3 - Gameplay Mechanics\n4 - Combat Practice\n5 - High Scores\n6 - settings\n7 - Exit Game" << endl;
 		cin >> temp2;
 		system("CLS");
+
+		//temp tle access
+		if (temp2 == 0)
+			TLE(5);
 
 		if (temp2 == 1)
 		{
@@ -1405,7 +1413,10 @@ int main()
 		}
 		else if (temp2 == 2)
 		{
-			loadchar();
+			if (c.chp <= 0)
+				cout << "No game to load.";
+			else
+				loadchar();
 		}
 		else if (temp2 == 3)
 		{
