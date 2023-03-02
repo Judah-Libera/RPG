@@ -63,7 +63,7 @@ struct character
 
 //int pvp();
 int dungeon(int dungeontype, character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
-void TLE(int charlvl);
+int TLE(int charlvl);
 
 namespace deadlibrary
 {

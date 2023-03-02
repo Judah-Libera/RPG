@@ -1,13 +1,18 @@
 //     RPG V4.1.0				newcontent.alteredcontent/balancing.backendchanges/bugs
 
+//IP
+//dnugeons.cpp functionality changes whe naccessed from TLE. those changes are commented inside of dungeons.cpp where dungeontype is proccessed.
+
 //BUGS
 //gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it). forces name that will work rn
 
 //TESTING
+//dungeon selection moved to source.cpp
+//TLE access from game and dungeon/dialogue
 //won't load an empty save
 //audio
 //highscore table - if issue present its likely in saving
-//lots off commented code
+//lots of commented code
 
 //EDITS
 //merge catt and catlvlups into same variable. //if it ain't broke dont fix it tho
@@ -18,10 +23,7 @@
 //multiple save games. read folders in savedata folder, each character gets a folder with a number, user enters number to load filepath using that number. save game into folder with what ever number is entered.
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
 //colorize
-//dungeon feature. no heal/lvlup (make sure multple lvl in row can happen), boss at end (not elite), where bonus reward comes. extra drop/xp? set c.lvl to dung dif for scaling then set back. elite drop hp? forced to pplay normal for regen. useasciimap.cpp code
-//?story mode?
 //?map/travel? probably means reworkign drops to base off level. level scaling would need to be off location level. ascii map with letter for location. unlock through clevel? final dungeon for last title?
-//have someone else put in multiple character slots
 
 #include "includes.h"
 using namespace std;
@@ -35,7 +37,6 @@ static void killchar();
 static void viewchar(int pac);
 static void savegame();
 static void loadchar();
-//static void volumeupdate();
 static void settings();
 static weapon createweapon();
 static armor createarmor();
@@ -49,7 +50,7 @@ int FullScreen = 1; // 1=fs, 0=windowed
 int mvolume = 1000; // = 0-10 * 100
 int sfxvolume = 1000; // ^^^
 int soundtracknum = 1;
-int dungeontype = 1; //0 - off. 1 - on
+int dungeontype = 1; //0 - auto-gen off. 1 - on
 
 character c = {};
 weapon weaponsarray[5]; //arrays for inv
@@ -1568,7 +1569,54 @@ int main()
 				break;
 			case 4: keepplaying = false;
 				break;
-			case 5: dungeonresult = dungeon(dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died
+			case 5: system("CLS");
+				int dungeonresult = 0;
+				char dun = 'A'; //select a dungeon and set difficulty and get file path for it
+				string dungeonmaprow;
+				ifstream din("maps/dungeonsmap.txt");
+				while (getline(din, dungeonmaprow))
+					cout << dungeonmaprow << endl;
+				cout << "Choose a dungeon or exit by entering 0" << endl;
+				cin >> dun;
+
+				if (dun == '0')
+				{
+					system("CLS");
+					break;
+				}
+
+				switch (dun)
+				{
+				case 'A':
+					dungeonresult = dungeon(5, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died					
+					break;
+				case 'B':
+					dungeonresult = dungeon(10, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
+					break;
+				case 'C':
+					dungeonresult = dungeon(15, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
+					break;
+				case 'D':
+					dungeonresult = dungeon(20, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
+					break;
+				case 'E':
+					dungeonresult = dungeon(25, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
+					break;
+				case 'F':
+					dungeonresult = dungeon(30, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
+					break;
+				case 'G':
+					dungeonresult = dungeon(35, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died			
+					break;
+				case 'H':
+					dungeonresult = dungeon(40, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
+					break;
+				case 'T':
+					dungeonresult = TLE(c.clvl, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died
+					break;
+				default:
+					break;
+				}
 				if (dungeonresult == 1)
 					killchar();
 				break;
@@ -1582,7 +1630,6 @@ int main()
 		keepplaying = true;	
 	} while (resetmenu == true);
 	mciSendString(L"pause maintheme", NULL, 0, NULL);
-
 	mciSendString(L"close maintheme", NULL, 0, NULL);
 	mciSendString(L"close em3", NULL, 0, NULL);
 	mciSendString(L"close fighttheme", NULL, 0, NULL);

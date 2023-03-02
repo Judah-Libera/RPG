@@ -682,7 +682,7 @@ static int battle(character& c, weapon weaponsarray[], armor armorsarry[], helme
 
 static void dungeonboss(character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[])
 {
-	//not enough to ake this worth using yet
+	//not enough to make this worth using yet
 }
 
 static void exitdungeon()
@@ -750,61 +750,26 @@ static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[
 	return 4;
 }
 
-int dungeon(int dungeontype, character &c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) //return 0 if dungeon was exited, return 1 if player died
+int dungeon(int dungeondiff, int dungeontype, character &c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]) //return 0 if dungeon was exited, return 1 if player died
 {
 	charlevel = c.lvl;
-	char dun = 'A'; //select a dungeon and set difficulty and get file path for it
-	string dungeonmaprow;
-	ifstream din("maps/dungeonsmap.txt");
-	while (getline(din, dungeonmaprow))
-		cout << dungeonmaprow << endl;
-	cout << "Choose a dungeon or exit by entering 0" << endl;
-	cin >> dun;
-
-	if (dun == '0')
-	{
-		system("CLS");
-		return 0;
-	}
-
-	switch (dun)
-	{
-	case 'A':
-		dungeondiff = 5;
-		break;
-	case 'B':
-		dungeondiff = 10;
-		break;
-	case 'C':
-		dungeondiff = 15;
-		break;
-	case 'D':
-		dungeondiff = 20;
-		break;
-	case 'E':
-		dungeondiff = 25;
-		break;
-	case 'F':
-		dungeondiff = 30;
-		break;
-	case 'G':
-		dungeondiff = 35;
-		break;
-	case 'H':
-		dungeondiff = 40;
-		break;
-	//case '~': //temp cheat for testing
-		//dungeondiff = 1;
-		//break;
-	default:
-		break;
-	}
 
 	initfog();
 	if (dungeontype == 0) // autogen off
 	{
 		int mapnumber = rand() % 3 + 1; //1-3 // rng pick map. first num is amount of maps available
 		string mapfile = "maps/map" + to_string(mapnumber) + ".txt";
+		string line; //read in map
+		ifstream is(mapfile);
+		for (int y = 0; y < MAP_SIZE_X; y++)
+			for (int x = 0; x < MAP_SIZE_Y; x++)
+				is >> map[x][y];
+		findC();
+	}
+	else if (dungeontype == 2) // from TLE
+	{
+		//unhandled issues. adding cahracter interactions into the collision checks. when exiting need to go back to TLE
+		string mapfile = "twilightsedge/dungeonmap.txt";
 		string line; //read in map
 		ifstream is(mapfile);
 		for (int y = 0; y < MAP_SIZE_X; y++)

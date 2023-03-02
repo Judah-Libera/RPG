@@ -59,9 +59,9 @@ static void printmap()
 static void collisions(char tile)
 {
 	if (tile == mylayna)
-		cout << "MYLAYNA!!!";
+		mylaynainteract();
 	else if (tile == drayga)
-		cout << "DRAYGA!!!";
+		draygainteract();
 	else if (tile == grave)
 	{
 		if (draygadead == 1)
@@ -84,8 +84,7 @@ static void mylaynainteract()
 {
 	if (clvl < 10)
 	{
-		// talks about her love for drayga. and skill in alchemy (worries her tampering with forces better left alone would make fate hate her(curse)???).
-
+		cout << "dialogue expressing a liking of drayga. also is skilled in alchemy, and tends to loose herself in experimenting but knows some things are better left alone despite her not doing so. fate can be a cruel mistress." << endl;
 		mylaynaintroduction = 1;
 	}
 
@@ -93,11 +92,11 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0)
 		{
-			// just friendly greeting
+			cout << "sup" << endl;
 		}
 		else
 		{
-			// says drayga went chasing a lgened sayign it was the only that could be worthy enough of his intentions.
+			cout << "drayga sadi he had a surprise for me then just left. not really sure where he went or why, but i hope its worth the wait." << endl;
 		}
 		connection++;
 	}
@@ -106,11 +105,11 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0)
 		{
-			// happy greeting
+			cout << "sup *exitedly*" << endl;
 		}
 		else
 		{
-			// proposed gonna live the bestest life everythign is perfect
+			cout << "drayga proposed, wich ig is cool" << endl;
 		}
 		connection++;
 	}
@@ -119,11 +118,11 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0)
 		{
-			// ignores you focusing on her work
+			cout << "don't have time to talk rn" << endl;
 		}
 		else
 		{
-			// hes not feeling well but its ok i'll figure it out, i always do. he needs em to. i know its bad and gonna get worse, theres somethign hes not tellign me but i can help i know i can.
+			cout << "draygas feeling aweful and it's getting worse. He says he's find but i know he's lying. i don't know how to help him yet but i'll figure it out." << endl;
 		}
 		mylaynalater = 1;
 	}
@@ -132,11 +131,11 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0 || mylaynalater == 0 || draygalater == 0 || connection < 2)
 		{
-			// crying
+			cout << "*crying*" << endl;
 		}
 		else
-		{
-			// hes gone. he left. the potions didn't work and he left. don't know where but he mentioned a fate twister, somethign  that could break a curse. he promised he would be back soon but its been days, i can't loose him.
+		{ 
+			cout << "he left. nothign i tried worked and he gave up on me, as he should have. He mentioned knowing where i could find something to break the curse. He promised he'd be back soon but its been days. I can't loose him." << endl;
 		}
 		dungeonopen = 1;
 	}
@@ -145,11 +144,11 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0)
 		{
-			// empty gaze with a lifeless hello
+			cout << "her empty gaze is staring somewhere into the distance. her lifeless eyes barely turn to meet yours as she greets you with a fient \"hello\" you as if you were only part of a fading imagination." << endl;
 		}
 		else
 		{
-			// he must have run off to save me from whatever he feared the curse would do to him. hes gone now
+			cout << "whatever he thought was happening he must have been right. He left me. Left to save me from whatever the cursed had done to him. But i would have rathered he take me with him anyways. I don't know what to do anymore." << endl;
 		}
 		dungeonopen = 0;
 	}
@@ -159,7 +158,7 @@ static void draygainteract()
 {
 	if (clvl < 10)
 	{
-		//talks about his love for mylayna. and skill as blacksmith/adventurer (wants to do somethign worth while with it(gem)???).
+		cout << "character intro for drayga. like mylayna, is blacksmith, does a bit of legend chasing too." << endl;
 
 		draygaintroduction = 1;
 	}
@@ -168,11 +167,11 @@ static void draygainteract()
 	{
 		if (draygaintroduction == 0)
 		{
-			// friendly greeting
+			cout << "sup" << endl;
 		}
 		else
 		{
-			//needed that gem, didn't know if it was real but it was worth a shot, its perfect. proposed gonna live the bestest life everythign is perfect. feeling a bit odd though, probably jsut exhuasted from the way he had to fight with the gem.
+			cout << "got it. didn't even know if it was real but i had to take the chamce. it's perfecy, she loved it. it was exhausting but worth it. like really exhausting. im usually totally recovered y now but im still not feeling back to my usual self." << endl;
 		}
 		connection++;
 	}
@@ -181,17 +180,17 @@ static void draygainteract()
 	{
 		if (draygaintroduction == 0)
 		{
-			// worried and stressed greeting
+			cout << "sup *worried/stressed*" << endl;
 		}
 		else
 		{
-			// the gem must have been cursed. feeling worse, not loosing strength yet but can feel his mind slipping and dreams of aweful things (stalked by abeast bent on revenge)
+			cout << "I'm loosing myself. my strecnht is leaving, my mind spends half its time blank and my dreams have been getting worse and worse. Mylayna thinks im cursed and shes' prbably right. as skilled as she is though i don't think its something she'll be able to help with. don't tell her though, shes worried enough as is. figures it would end up like this, thigns were going too well." << endl;
 		}
 		draygalater = 1;
 	}
 }
 
-void TLE(int charlvl)
+int TLE(int charlvl, character c, weapon weaponsarray, armor armorsarray, helmet helmetsarray)
 {
 	ifstream data;
 	string line;
@@ -289,10 +288,14 @@ void TLE(int charlvl)
 			{
 				ofstream out("twilightsedge/qpd.txt");
 				out << mylaynaintroduction << " " << draygaintroduction << " " << mylaynalater << " " << draygalater << " " << dungeonopen << " " << queststarted << " " << dungeoncomplete << " " << draygadead << " " << dungeonresult << " " << connection << "\n";
-				return;
+				return 0;
 			}
 			else
-				questdungeon();
+			{
+				dungeonresult = dungeon(2, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died. int parameter 2 is dungeontype so it uses TEmap
+				if (dungeonresult == 1)
+					return 1; //return 1 if player died
+			}
 		}
 		cout << charx;
 		cout << chary;
