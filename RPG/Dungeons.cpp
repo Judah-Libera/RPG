@@ -17,6 +17,7 @@ const char BOSS = 'B';
 const char ITEM = 'T';
 const char EXIT = 'O';
 const char ENEMY = 'M';
+const char DRAYGA = 'D';
 
 using namespace std;
 
@@ -741,6 +742,10 @@ static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[
 			map[charx][chary - 1] = 'O';
         return dead;
     }
+    if (map[charx][chary] == DRAYGA)
+    {
+	cout << "am drayga, am deadening" << endl;
+    }
     if (map[charx][chary] == EXIT)
     {
         exitdungeon();
@@ -768,7 +773,6 @@ int dungeon(int dungeondiff, int dungeontype, character &c, weapon weaponsarray[
 	}
 	else if (dungeontype == 2) // from TLE
 	{
-		//unhandled issues. adding cahracter interactions into the collision checks. when exiting need to go back to TLE
 		string mapfile = "twilightsedge/dungeonmap.txt";
 		string line; //read in map
 		ifstream is(mapfile);

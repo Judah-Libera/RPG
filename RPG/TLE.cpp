@@ -20,7 +20,7 @@ static int mylaynaintroduction = 0;
 static int draygaintroduction = 0;
 static int mylaynalater = 0;
 static int draygalater = 0;
-static int dungeonopen = 0;
+static int dungeonopen = 1; // should be 0. is 1 for testing is dungeon call from tle works.
 static int queststarted = 0;
 static int dungeoncomplete = 0;
 static int draygadead = 0;
@@ -197,7 +197,7 @@ int TLE(int charlvl, character c, weapon weaponsarray, armor armorsarray, helmet
 	data.open("twilightsedge/qpd.txt");
 	getline(data, line);
 	istringstream in(line);
-	//in >> mylaynaintroduction >> draygaintroduction >> mylaynalater >> draygalater >> dungeonopen >> queststarted >> dungeoncomplete >> draygadead >> dungeonresult >> connection;
+	in >> mylaynaintroduction >> draygaintroduction >> mylaynalater >> draygalater >> dungeonopen >> queststarted >> dungeoncomplete >> draygadead >> dungeonresult >> connection;
 
 	cout << mylaynaintroduction << draygaintroduction;
 	system("pause");
@@ -292,7 +292,7 @@ int TLE(int charlvl, character c, weapon weaponsarray, armor armorsarray, helmet
 			}
 			else
 			{
-				dungeonresult = dungeon(2, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died. int parameter 2 is dungeontype so it uses TEmap
+				dungeonresult = dungeon(2, c, weaponsarray, armorsarray, helmetsarray); //return 0 if dungeon was exited, return 1 if player died. int parameter 2 is dungeontype so it uses TEmap
 				if (dungeonresult == 1)
 					return 1; //return 1 if player died
 			}
