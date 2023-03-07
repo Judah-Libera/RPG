@@ -1338,10 +1338,6 @@ int main()
 		cin >> temp2;
 		system("CLS");
 
-		//temp tle access
-		if (temp2 == 0)
-			TLE(5);
-
 		if (temp2 == 1)
 		{
 			cout << "What type of character you would like to make?\n1 - Orc - high health but low damage. Makes for a forgving combat experience.\n2 - Human - medium health and medium damage. A good balance in required combat ability. \n3 - Elf - low health but high damage. Requires the ability to consistently win rounds." << endl;
@@ -1572,12 +1568,15 @@ int main()
 			case 5: system("CLS");
 				int dungeonresult = 0;
 				char dun = 'A'; //select a dungeon and set difficulty and get file path for it
+
+				{ //switch control didn't like these variable declarations, so processing at a different scope
 				string dungeonmaprow;
 				ifstream din("maps/dungeonsmap.txt");
 				while (getline(din, dungeonmaprow))
 					cout << dungeonmaprow << endl;
 				cout << "Choose a dungeon or exit by entering 0" << endl;
 				cin >> dun;
+				}
 
 				if (dun == '0')
 				{
@@ -1612,7 +1611,7 @@ int main()
 					dungeonresult = dungeon(40, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
 					break;
 				case 'T':
-					dungeonresult = TLE(c.clvl, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died
+					dungeonresult = TLE(c.lvl, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died
 					break;
 				default:
 					break;

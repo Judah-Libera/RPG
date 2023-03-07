@@ -62,8 +62,8 @@ struct character
 };
 
 //int pvp();
-int dungeon(int dungeontype, character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
-int TLE(int charlvl);
+int dungeon(int dungeondiff, int dungeontype, character& c, weapon weaponsarray[], armor armorsarry[], helmet helmetsarray[]);
+int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[]);
 
 namespace deadlibrary
 {

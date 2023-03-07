@@ -190,7 +190,7 @@ static void draygainteract()
 	}
 }
 
-int TLE(int charlvl, character c, weapon weaponsarray, armor armorsarray, helmet helmetsarray)
+int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], helmet helmetsarray[])
 {
 	ifstream data;
 	string line;
@@ -292,7 +292,7 @@ int TLE(int charlvl, character c, weapon weaponsarray, armor armorsarray, helmet
 			}
 			else
 			{
-				dungeonresult = dungeon(2, c, weaponsarray, armorsarray, helmetsarray); //return 0 if dungeon was exited, return 1 if player died. int parameter 2 is dungeontype so it uses TEmap
+				dungeonresult = dungeon(c.lvl, 2, c, weaponsarray, armorsarray, helmetsarray); //return 0 if dungeon was exited, return 1 if player died. int parameter 2 is dungeontype so it uses TEmap
 				if (dungeonresult == 1)
 					return 1; //return 1 if player died
 			}
