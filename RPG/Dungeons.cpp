@@ -48,6 +48,7 @@ static int afi = 0;
 static helmet hfound[10];
 static int hfi = 0;
 static int xpfound;
+static int turncounter = 0;
 
 static const double aiattscaler() { return (.035 * pow(dungeondiff, 2.0)) + (.1 * (double)dungeondiff) + 1; }
 static const double aihpscaler() { return (.25 * pow(dungeondiff, 1.9)) + (2 * (double)dungeondiff) + 3; }
@@ -744,7 +745,50 @@ static int checkcollision(character& c, weapon weaponsarray[], armor armorsarry[
     }
     if (map[charx][chary] == DRAYGA)
     {
-	cout << "am drayga, am deadening" << endl;
+	if (turncounter < 40)
+	{
+		cout << "Draygs form appears from the drakness as you draw closer. He's collapsed on the floor, inches from death. only when you get close does he acknowledge your presence. 'you came... thank you... I'm sorry... I'm sorry I coudln't find anything. again. she'll never forgive me. My time is coming, I know it is. I know what i'll become. Leave before it's too late. And here, the best of my life's work. May it bring you to better fortune than I. Tell Mylayna that I'm sorry for... *Drayga's eyes roll back and and he's clearly lost consiousness. But he's still breathing, just barely.*\n" << endl;
+		cout << "(0) - I should go before what ever it is takes over him" << endl;
+		cout << "(1) - I'm sure whatever fate awaits him is worse than death. At least i could provide a merciful end. *you draw your sword and run it through is heart. He lets out a final breath. He's dead.*" << endl;
+		cout << "(3) - Mylayna deserves the chance for a proper burial at least. *you sling him over your back and head back to Twighlights Edge.*" << endl;
+		int mc = 0;
+		cin >> mc;
+
+		weapon wd = {"Drayga's Blade", 20};
+        for (int i = 0; i < 5 - 1; i++) // sort inv by descending power
+            for (int j = 0; j < 5 - i - 1; j++)
+                if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
+					rpglib::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+            weaponsarray[4] = wd;
+        for (int i = 0; i < 5 - 1; i++) // sort inv by descending power again with new item
+            for (int j = 0; j < 5 - i - 1; j++)
+                if (weaponsarray[j].wcatt < weaponsarray[j + 1].wcatt)
+					rpglib::swapweapon(weaponsarray[j], weaponsarray[j + 1]);
+		
+		if (mc == 3)
+			return 3;
+		else
+			return 2;
+		
+	}
+	else
+	{
+		cout << "out of the gloom a fidure looms towards you. as it enters the light of your torch, you see the growling form of a beast. it's eyes are red, and it's teeth are bared. as it starts charging you don't you realize with a sinking feeling how similair it looks to drayga... you were too late." << endl;
+		dungeondiff += 5; //drayga is big boss fight, so up 5 levels
+		int dead = battle(c, weaponsarray, armorsarry, helmetsarray, true);
+		dungeondiff -= 5;
+		if (dead == 1) // cut interaction short and return dead if drayga kills player
+			return 1;
+		cout << "as the beast dies it slowly reverts to it's human form, still a bloddy mess. the look of regret etched now forever on his face.\n" << endl;
+		cout << "(0) - I should spare Mylayna the trama of seeing her love mangled like this." << endl;
+		cout << "(1) - I should bring him back. Mylayna would want him returned regardless of how it affects her." << endl;
+		int mc = 0;
+		cin >> mc;
+		if (mc == 1)
+			return 5;
+		else
+			return 4;
+	}
     }
     if (map[charx][chary] == EXIT)
     {
@@ -799,22 +843,26 @@ int dungeon(int dungeondiff, int dungeontype, character &c, weapon weaponsarray[
         case KEY_UP:
             if (map[charx][chary - 1] != '@')
                 chary--;
+		turncounter++;
             break;
         case KEY_DOWN:
             if (map[charx][chary + 1] != '@')
                 chary++;
+		turncounter++;
             break;
         case KEY_LEFT:
             if (map[charx - 1][chary] != '@')
                 charx--;
+		turncounter++;
             break;
         case KEY_RIGHT:
             if (map[charx + 1][chary] != '@')
                 charx++;
+		turncounter++;
             break;
         default:
             break;
-        }      
+        }
         updatefog();//update FOW then clear and reprint then do any collision actions
         printmap();
 		if (map[charx][chary] != '#') //don't run all the collision checks if there is no collision

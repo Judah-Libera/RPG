@@ -21,11 +21,12 @@ static int draygaintroduction = 0;
 static int mylaynalater = 0;
 static int draygalater = 0;
 static int dungeonopen = 1; // should be 0. is 1 for testing is dungeon call from tle works.
-static int queststarted = 0;
+//static int queststarted = 0;
 static int dungeoncomplete = 0;
 static int draygadead = 0;
 static int dungeonresult = 0; //1 - no drayga returned. 2 - drayga mangled returned. 3 - drayga alive returned.
 static int connection = 0; //goes up to 3
+static int dropnecklace = 0; // one time use for drayga giving necklace
 
 using namespace std;
 
@@ -82,6 +83,21 @@ static void questdungeon()
 
 static void mylaynainteract()
 {
+	if (dungeoncomplete == 1)
+	{
+		if (draygadead == 1 && dungeoncomplete == 1)
+		{
+			cout << "you found him? dying... no it can't be. told you to leave him? thats rediculous clearly he wasn't in his right mind. i could have done something! i figured out how t osave him! it's too late now though. figures he'd rather stay there, he knows what lengths i'd go to. and no i don't want the sword, keept it." << endl;
+		}
+		else if (draygadead == 0 && dungeoncomplete == 1)
+		{
+			cout << "you found him? alive? i don't believe it. i thought he was dead. i thought i lost him. i thought i lost everything. let me have him. i can fix this, i figured out what needs to be done." << endl;
+			//update valeus so next vilalge load mylayna is dead and drayga gives you necklace
+		}
+		else{}
+		return;
+	}
+
 	if (clvl < 10)
 	{
 		cout << "dialogue expressing a liking of drayga. also is skilled in alchemy, and tends to loose herself in experimenting but knows some things are better left alone despite her not doing so. fate can be a cruel mistress." << endl;
@@ -127,7 +143,7 @@ static void mylaynainteract()
 		mylaynalater = 1;
 	}
 
-	if (clvl >= 25 || clvl < 30)
+	if (clvl >= 25)
 	{
 		if (mylaynaintroduction == 0 || mylaynalater == 0 || draygalater == 0 || connection < 2)
 		{
@@ -136,26 +152,21 @@ static void mylaynainteract()
 		else
 		{ 
 			cout << "he left. nothign i tried worked and he gave up on me, as he should have. He mentioned knowing where i could find something to break the curse. He promised he'd be back soon but its been days. I can't loose him." << endl;
+			if (dungeoncomplete == 0)
+				dungeonopen = 1;
 		}
-		dungeonopen = 1;
-	}
-
-	if (clvl > 30)
-	{
-		if (mylaynaintroduction == 0)
-		{
-			cout << "her empty gaze is staring somewhere into the distance. her lifeless eyes barely turn to meet yours as she greets you with a fient \"hello\" you as if you were only part of a fading imagination." << endl;
-		}
-		else
-		{
-			cout << "whatever he thought was happening he must have been right. He left me. Left to save me from whatever the cursed had done to him. But i would have rathered he take me with him anyways. I don't know what to do anymore." << endl;
-		}
-		dungeonopen = 0;
 	}
 }
 
 static void draygainteract()
 {
+	if (dungeoncomplete == 1 && draygadead == 0)
+	{
+		cout << "of course she did, she never did know when was too far. she traded lives with me, thought i could do more with mine, thought i could be more ok without her. I never should have taken the risk for her gem all that time ago. I hate it, nothing would have ever made it worth the trouble its cuase. i don't want it. here, get rid of it for me." << endl;
+		dropnecklace = 1;
+		return;
+	}
+
 	if (clvl < 10)
 	{
 		cout << "character intro for drayga. like mylayna, is blacksmith, does a bit of legend chasing too." << endl;
@@ -171,7 +182,7 @@ static void draygainteract()
 		}
 		else
 		{
-			cout << "got it. didn't even know if it was real but i had to take the chamce. it's perfecy, she loved it. it was exhausting but worth it. like really exhausting. im usually totally recovered y now but im still not feeling back to my usual self." << endl;
+			cout << "got it. didn't even know if it was real but i had to take the chance. it's perfect, she loved it. it was exhausting but worth it. like really exhausting. im usually totally recovered y now but im still not feeling back to my usual self." << endl;
 		}
 		connection++;
 	}
@@ -184,7 +195,7 @@ static void draygainteract()
 		}
 		else
 		{
-			cout << "I'm loosing myself. my strecnht is leaving, my mind spends half its time blank and my dreams have been getting worse and worse. Mylayna thinks im cursed and shes' prbably right. as skilled as she is though i don't think its something she'll be able to help with. don't tell her though, shes worried enough as is. figures it would end up like this, thigns were going too well." << endl;
+			cout << "I'm loosing myself. my strenght is leaving, my mind spends half its time blank and my dreams have been getting worse and worse. Mylayna thinks im cursed and shes' prbably right. as skilled as she is though i don't think its something she'll be able to help with. don't tell her though, shes worried enough as is. figures it would end up like this, thigns were going too well." << endl;
 		}
 		draygalater = 1;
 	}
@@ -197,15 +208,16 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 	data.open("twilightsedge/qpd.txt");
 	getline(data, line);
 	istringstream in(line);
-	in >> mylaynaintroduction >> draygaintroduction >> mylaynalater >> draygalater >> dungeonopen >> queststarted >> dungeoncomplete >> draygadead >> dungeonresult >> connection;
+	in >> mylaynaintroduction >> draygaintroduction >> mylaynalater >> draygalater >> dungeonopen >> dungeoncomplete >> draygadead >> dungeonresult >> connection;
+	//in >> mylaynaintroduction >> draygaintroduction >> mylaynalater >> draygalater >> dungeonopen >> queststarted >> dungeoncomplete >> draygadead >> dungeonresult >> connection;
 
-	cout << mylaynaintroduction << draygaintroduction;
+	cout << mylaynaintroduction << draygaintroduction << mylaynalater << draygalater << dungeonopen << dungeoncomplete << draygadead << dungeonresult << connection << endl;
 	system("pause");
 
 	clvl = charlvl;
 
-	if (draygaintroduction == 1 && mylaynaintroduction == 1)
-		queststarted = 1;
+	//if (draygaintroduction == 1 && mylaynaintroduction == 1)
+		//queststarted = 1;
 
 
 	ifstream is("twilightsedge/map.txt");
@@ -237,19 +249,40 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 
 	if (dungeoncomplete == 1)
 	{
-		map[1][13] = 'n';
-		if (dungeonresult == 1)
+		//map[1][13] = 'n';
+		if (dungeonresult == 3)
 		{
-			draygadead = 1;
+			//mylayna grave and drayga alive
+			map[1][13] = 'n';
+			map[13][15] = 'D';
 		}
-		else if (dungeonresult == 2)
+		else if (dungeonresult == 4)
 		{
-			draygadead = 1;
+			//drayga grave
+			map[18][16] = 'n';
 		}
 		else
 		{
 			map[2][12] = 'M';
 		}
+	}
+
+	if (dropnecklace == 1)
+	{
+		if (c.he.hname != "Mylayna's Pendant" && helmetsarray[0].hname != "Mylayna's Pendant" && helmetsarray[1].hname != "Mylayna's Pendant" && helmetsarray[2].hname != "Mylayna's Pendant" && helmetsarray[3].hname != "Mylayna's Pendant" && helmetsarray[4].hname != "Mylayna's Pendant") //only drop if player doesn't have it already.
+		{
+			helmet hd = { "Mylayna's Pendant", 40, 8, 20 };
+       		for (int i = 0; i < 5 - 1; i++) //sort helmets by total stat
+            		for (int j = 0; j < 5 - i - 1; j++)
+                			if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
+						rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+            	helmetsarray[4] = hd; // give armor
+			for (int i = 0; i < 5 - 1; i++) //re-sort
+            		for (int j = 0; j < 5 - i - 1; j++)
+                			if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
+						rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+		}
+		dropnecklace = 0;
 	}
 	
 	printmap();
@@ -287,14 +320,38 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 			if (chary < 0)
 			{
 				ofstream out("twilightsedge/qpd.txt");
-				out << mylaynaintroduction << " " << draygaintroduction << " " << mylaynalater << " " << draygalater << " " << dungeonopen << " " << queststarted << " " << dungeoncomplete << " " << draygadead << " " << dungeonresult << " " << connection << "\n";
+				out << mylaynaintroduction << " " << draygaintroduction << " " << mylaynalater << " " << draygalater << " " << dungeonopen << " " << dungeoncomplete << " " << draygadead << " " << dungeonresult << " " << connection << "\n";
 				return 0;
 			}
 			else
 			{
+				dungeoncomplete = 1;
 				dungeonresult = dungeon(c.lvl, 2, c, weaponsarray, armorsarray, helmetsarray); //return 0 if dungeon was exited, return 1 if player died. int parameter 2 is dungeontype so it uses TEmap
-				if (dungeonresult == 1)
-					return 1; //return 1 if player died
+				if (dungeonresult == 0) //player left dungeon before finding drayga
+				{
+					dungeoncomplete = 0;
+					dungeonopen = 0;
+				}
+				if (dungeonresult == 1) // died
+					return 1;
+				if (dungeonresult == 2) //drayga was left.
+				{
+					draygadead = 1;
+				}
+				if (dungeonresult == 3) // drayga taken back to mylayna
+				{
+					draygadead = 0;
+				}
+				if (dungeonresult == 4) // drayga was boss and body bruoght back
+				{
+					//drayga was killed and body back. needs t oget grave
+					draygadead = 1;
+				}
+				if (dungeonresult == 5) // drayga was boss and left
+				{
+					//drayga was killed and left.
+					dungeoncomplete = 0;
+				}
 			}
 		}
 		cout << charx;

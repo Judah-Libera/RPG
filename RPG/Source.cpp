@@ -888,7 +888,7 @@ static void viewchar(int pac)
 				cout << "\nA - Weapons in inventory." << endl;
 				for (int i = 0; i < 5; i++)
 				{
-					if (weaponsarray[i].wname == "" || weaponsarray[i].wname == " ") //empty naems should be blank but just in case its a space it checks that too
+					if (weaponsarray[i].wname == "" || weaponsarray[i].wname == " ") //empty names should be blank but just in case its a space it checks that too
 						cout << i + 1 << " - " << "empty" << endl;
 					else
 						cout << i + 1 << " - " << weaponsarray[i].wname << " - " << weaponsarray[i].wcatt << " att" << endl;
