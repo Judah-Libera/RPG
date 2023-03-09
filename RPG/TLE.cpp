@@ -26,7 +26,9 @@ static int dungeoncomplete = 0;
 static int draygadead = 0;
 static int dungeonresult = 0; //1 - no drayga returned. 2 - drayga mangled returned. 3 - drayga alive returned.
 static int connection = 0; //goes up to 3
+
 static int dropnecklace = 0; // one time use for drayga giving necklace
+static string charname = "default";
 
 using namespace std;
 
@@ -92,7 +94,6 @@ static void mylaynainteract()
 		else if (draygadead == 0 && dungeoncomplete == 1)
 		{
 			cout << "you found him? alive? i don't believe it. i thought he was dead. i thought i lost him. i thought i lost everything. let me have him. i can fix this, i figured out what needs to be done." << endl;
-			//update valeus so next vilalge load mylayna is dead and drayga gives you necklace
 		}
 		else{}
 		return;
@@ -100,7 +101,7 @@ static void mylaynainteract()
 
 	if (clvl < 10)
 	{
-		cout << "dialogue expressing a liking of drayga. also is skilled in alchemy, and tends to loose herself in experimenting but knows some things are better left alone despite her not doing so. fate can be a cruel mistress." << endl;
+		cout << "Hey! You must be new around here. I guess your probably exploring then and must be wondering who i am. I'm Mylayna, experimental alchemist and wife of Drayga! well... not yet, but i'll make him like me soon enough. I'd work on creating a love potion but the experience with all of my other rather questionable expirements tells me Drayga's probably a lot better off if a take a more... let's go with \"tradtional\" approach. I'm sure the fates would prefere that approach anyways. but there i go rambling about him again, i'll let you go." << endl;
 		mylaynaintroduction = 1;
 	}
 
@@ -108,11 +109,12 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0)
 		{
-			cout << "sup" << endl;
+			cout << "Oh, Hey. I've seen you around before but havn't gotten the chance to Introduce myself. I'm Mylayna, alchemist, and day dreamer. Or at least Drayga says so. Says i'm \"not very grounded\", to which my favorite response is the sky contains all the most wonderful things. I wish i could be a bird, or shine like the sky's, i'd never need a lamp again, think of all the money that would save me. sorry, you probably don't care, thats ok. You havn't seen Drayga have you? he kinda just left, said he wanted to get me something. I things were going pretty well with us, at least i'm pretty sure they were. For me at least. Anyways, if you see him let him know i miss him." << endl;
+			mylaynaintroduction = 1;
 		}
 		else
 		{
-			cout << "drayga sadi he had a surprise for me then just left. not really sure where he went or why, but i hope its worth the wait." << endl;
+			cout << "Hey " + charname + ", you know how i told you Drayga would be mine? well i was right, guess i'm irrisistable... or just persistent i guess. Calls me his moonlit star, cuase i'me a daydreams with my head in the clouds. But hey, i'll take it. anyways, you havn't seen him around anywhere have you? He left tow na couple days ago, said he wanted to get me something as special as i am. I'm worried what he'll come back with honestly. But hatever it is hopefully its soon." << endl;
 		}
 		connection++;
 	}
@@ -121,11 +123,11 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0)
 		{
-			cout << "sup *exitedly*" << endl;
+			cout << "Oh, hey there. about time you come said hi, you've been around long enough. I'm Mylyna, alchemist and now fiance of Drayga, can you beleive it? better bet it took me a lot of work, but it's soooo worth it, he's prefect." << endl;
 		}
 		else
 		{
-			cout << "drayga proposed, wich ig is cool" << endl;
+			cout << charname << "! It's so good to see you again. Guess what? after all my long hours and hard work it finally happened, he proposed. thats waht the long trip was for, went chasing a legend again, but this time for me. He found the most beautiful gem i've ever seen. Fashoned it into a pendant for me and proposed that night, under the full moon. Asked me to brighten his life forever, it was sooo romantic. It'll forever be my favorite day." << endl;
 		}
 		connection++;
 	}
@@ -134,7 +136,7 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0)
 		{
-			cout << "don't have time to talk rn" << endl;
+			cout << "Hi, don't mean to be rude but i'm really busy at the moment." << endl;
 		}
 		else
 		{
@@ -147,7 +149,7 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0 || mylaynalater == 0 || draygalater == 0 || connection < 2)
 		{
-			cout << "*crying*" << endl;
+			cout << "*You approach to say hello, but she doens't acknowledge you, she's clearly too distruaght to to talk.*" << endl;
 		}
 		else
 		{ 
@@ -210,6 +212,7 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 	istringstream in(line);
 	in >> mylaynaintroduction >> draygaintroduction >> mylaynalater >> draygalater >> dungeonopen >> dungeoncomplete >> draygadead >> dungeonresult >> connection;
 	//in >> mylaynaintroduction >> draygaintroduction >> mylaynalater >> draygalater >> dungeonopen >> queststarted >> dungeoncomplete >> draygadead >> dungeonresult >> connection;
+	charname = c.name;
 
 	cout << mylaynaintroduction << draygaintroduction << mylaynalater << draygalater << dungeonopen << dungeoncomplete << draygadead << dungeonresult << connection << endl;
 	system("pause");
@@ -266,25 +269,6 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 			map[2][12] = 'M';
 		}
 	}
-
-	if (dropnecklace == 1)
-	{
-		if (c.he.hname != "Mylayna's Pendant" && helmetsarray[0].hname != "Mylayna's Pendant" && helmetsarray[1].hname != "Mylayna's Pendant" && helmetsarray[2].hname != "Mylayna's Pendant" && helmetsarray[3].hname != "Mylayna's Pendant" && helmetsarray[4].hname != "Mylayna's Pendant") //only drop if player doesn't have it already.
-		{
-			helmet hd = { "Mylayna's Pendant", 40, 8, 20 };
-       		for (int i = 0; i < 5 - 1; i++) //sort helmets by total stat
-            		for (int j = 0; j < 5 - i - 1; j++)
-                			if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-						rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
-            	helmetsarray[4] = hd; // give armor
-			for (int i = 0; i < 5 - 1; i++) //re-sort
-            		for (int j = 0; j < 5 - i - 1; j++)
-                			if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
-						rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
-		}
-		dropnecklace = 0;
-	}
-	
 	printmap();
 	int input = 0;
 	while (1)
@@ -314,6 +298,25 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 		printmap();
 		if (chary >= 0 && charx < MAP_SIZE_Y - 1)
 			collisions(map[charx][chary]);
+
+		if (dropnecklace == 1)
+		{
+			if (c.he.hname != "Mylayna's Pendant" && helmetsarray[0].hname != "Mylayna's Pendant" && helmetsarray[1].hname != "Mylayna's Pendant" && helmetsarray[2].hname != "Mylayna's Pendant" && helmetsarray[3].hname != "Mylayna's Pendant" && helmetsarray[4].hname != "Mylayna's Pendant") //only drop if player doesn't have it already.
+			{
+				helmet hd = { "Mylayna's Pendant", 40, 8, 20 };
+       			for (int i = 0; i < 5 - 1; i++) //sort helmets by total stat
+            			for (int j = 0; j < 5 - i - 1; j++)
+                				if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
+							rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+            		helmetsarray[4] = hd; // give armor
+				for (int i = 0; i < 5 - 1; i++) //re-sort
+            			for (int j = 0; j < 5 - i - 1; j++)
+                				if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
+							rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
+			}
+			dropnecklace = 0;
+		}
+
 		else
 		{
 			system("CLS");

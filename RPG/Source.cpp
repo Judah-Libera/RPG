@@ -1622,6 +1622,8 @@ int main()
 			case 6: keepplaying = false; // quite just gameplay loop
 				resetmenu = false; // quite main menu loop
 				break;
+			case 7: lvlrdy = true; //temp for test. instant lvl to go through stages of tle.
+				break;
 			default:
 				break;
 			}
