@@ -149,11 +149,11 @@ static void mylaynainteract()
 	{
 		if (mylaynaintroduction == 0 || mylaynalater == 0 || draygalater == 0 || connection < 2)
 		{
-			cout << "*You approach to say hello, but she doens't acknowledge you, she's clearly too distruaght to to talk.*" << endl;
+			cout << "*You approach to say hello, but she doens't acknowledge you, she's clearly too distraught to to talk.*" << endl;
 		}
 		else
 		{ 
-			cout << "he left. nothign i tried worked and he gave up on me, as he should have. He mentioned knowing where i could find something to break the curse. He promised he'd be back soon but its been days. I can't loose him." << endl;
+			cout << "he left. nothing i tried worked and he gave up on me, as he should have. He mentioned knowing where i could find something to break the curse. He promised he'd be back soon but its been days. I can't loose him." << endl;
 			if (dungeoncomplete == 0)
 				dungeonopen = 1;
 		}
@@ -171,7 +171,7 @@ static void draygainteract()
 
 	if (clvl < 10)
 	{
-		cout << "character intro for drayga. like mylayna, is blacksmith, does a bit of legend chasing too." << endl;
+		cout << "Hey there! Come to talk metal forging? or i practice with my weapons too if thats more your market... Or just an introduction i suppose. I'm Drayga, a metal smith with most of time but always up for something exiting." << endl;
 
 		draygaintroduction = 1;
 	}
@@ -180,7 +180,7 @@ static void draygainteract()
 	{
 		if (draygaintroduction == 0)
 		{
-			cout << "sup" << endl;
+			cout << "Hey, think i've seen you before, finally need something from my shop? oh, just finally saying hi? well I'm Drayga, towns best blacksmith. not that theres much competition." << endl;
 		}
 		else
 		{
@@ -193,7 +193,7 @@ static void draygainteract()
 	{
 		if (draygaintroduction == 0)
 		{
-			cout << "sup *worried/stressed*" << endl;
+			cout << "Hey, i've seen you around before. I'm Drayga. You cuaght me at a bad time though, i've been feeling pretty aweul as of late." << endl;
 		}
 		else
 		{
