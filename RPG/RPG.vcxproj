@@ -150,6 +150,24 @@
   <ItemGroup>
     <ClInclude Include="includes.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="asciiart.txt" />
+    <Text Include="char\armors.txt" />
+    <Text Include="char\chardata.txt" />
+    <Text Include="char\helmets.txt" />
+    <Text Include="char\weapons.txt" />
+    <Text Include="game backups\how to use.txt" />
+    <Text Include="hscores.txt" />
+    <Text Include="maps\blankmap20x20.txt" />
+    <Text Include="maps\DungeonsMap.txt" />
+    <Text Include="maps\map1.txt" />
+    <Text Include="maps\map2.txt" />
+    <Text Include="maps\map3.txt" />
+    <Text Include="settings.txt" />
+    <Text Include="twilightsedge\dungeonmap.txt" />
+    <Text Include="twilightsedge\map.txt" />
+    <Text Include="twilightsedge\qpd.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

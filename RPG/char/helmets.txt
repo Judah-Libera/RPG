@@ -1,6 +1,6 @@
 0 0 0 
-4 1 10 Viel of Equilibrium
-4 0 20 Viel of Life
-4 2 0 Viel of Rejuvenation
-4 2 0 Viel of Rejuvenation
-3 0 15 Hood of Health
+0 0 0 
+0 0 0 
+0 0 0 
+0 0 0 
+0 0 0 

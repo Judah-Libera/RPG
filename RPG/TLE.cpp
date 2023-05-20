@@ -4,6 +4,13 @@
 #include "includes.h"
 #include <conio.h> // for _getch()
 
+static void findC();
+static void printmap();
+static void collisions(char tile);
+static void questdungeon();
+static void mylaynainteract();
+static void draygainteract();
+
 const char mylayna = 'L';
 const char drayga = 'D';
 const char grave = 'n';
@@ -28,7 +35,7 @@ static int dungeonresult = 0; //1 - no drayga returned. 2 - drayga mangled retur
 static int connection = 0; //goes up to 3
 
 static int dropnecklace = 0; // one time use for drayga giving necklace
-static string charname = "default";
+static std::string charname = "default";
 
 using namespace std;
 
@@ -62,15 +69,28 @@ static void printmap()
 static void collisions(char tile)
 {
 	if (tile == mylayna)
+	{
+		system("CLS");
 		mylaynainteract();
+		system("pause");
+		system("CLS");
+	}
 	else if (tile == drayga)
+	{
+		system("CLS");
 		draygainteract();
+		system("pause");
+		system("CLS");
+	}
 	else if (tile == grave)
 	{
+		system("CLS");
 		if (draygadead == 1)
 			cout << "rip drayga";
 		else
 			cout << "rip mylayna";
+		system("pause");
+		system("CLS");
 	}
 }
 
@@ -105,7 +125,7 @@ static void mylaynainteract()
 		mylaynaintroduction = 1;
 	}
 
-	if (clvl >= 10 || clvl < 15)
+	if (clvl >= 10 && clvl < 15)
 	{
 		if (mylaynaintroduction == 0)
 		{
@@ -119,7 +139,7 @@ static void mylaynainteract()
 		connection++;
 	}
 
-	if (clvl >= 15 || clvl < 20)
+	if (clvl >= 15 && clvl < 20)
 	{
 		if (mylaynaintroduction == 0)
 		{
@@ -132,7 +152,7 @@ static void mylaynainteract()
 		connection++;
 	}
 
-	if (clvl >= 20 || clvl < 25)
+	if (clvl >= 20 && clvl < 25)
 	{
 		if (mylaynaintroduction == 0)
 		{
@@ -176,7 +196,7 @@ static void draygainteract()
 		draygaintroduction = 1;
 	}
 
-	if (clvl >= 15 || clvl < 20)
+	if (clvl >= 15 && clvl < 20)
 	{
 		if (draygaintroduction == 0)
 		{
@@ -189,7 +209,7 @@ static void draygainteract()
 		connection++;
 	}
 
-	if (clvl >= 20 || clvl < 25)
+	if (clvl >= 20 && clvl < 25)
 	{
 		if (draygaintroduction == 0)
 		{
@@ -296,27 +316,27 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 			break;
 		}
 		printmap();
-		if (chary >= 0 && charx < MAP_SIZE_Y - 1)
-			collisions(map[charx][chary]);
 
 		if (dropnecklace == 1)
 		{
 			if (c.he.hname != "Mylayna's Pendant" && helmetsarray[0].hname != "Mylayna's Pendant" && helmetsarray[1].hname != "Mylayna's Pendant" && helmetsarray[2].hname != "Mylayna's Pendant" && helmetsarray[3].hname != "Mylayna's Pendant" && helmetsarray[4].hname != "Mylayna's Pendant") //only drop if player doesn't have it already.
 			{
 				helmet hd = { "Mylayna's Pendant", 40, 8, 20 };
-       			for (int i = 0; i < 5 - 1; i++) //sort helmets by total stat
-            			for (int j = 0; j < 5 - i - 1; j++)
-                				if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
+				for (int i = 0; i < 5 - 1; i++) //sort helmets by total stat
+					for (int j = 0; j < 5 - i - 1; j++)
+						if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
 							rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
-            		helmetsarray[4] = hd; // give armor
+				helmetsarray[4] = hd; // give armor
 				for (int i = 0; i < 5 - 1; i++) //re-sort
-            			for (int j = 0; j < 5 - i - 1; j++)
-                				if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
+					for (int j = 0; j < 5 - i - 1; j++)
+						if (helmetsarray[j].htotalstat < helmetsarray[j + 1].htotalstat)
 							rpglib::swaphelmet(helmetsarray[j], helmetsarray[j + 1]);
 			}
 			dropnecklace = 0;
 		}
 
+		if (chary >= 0 && charx < MAP_SIZE_Y - 1)
+			collisions(map[charx][chary]);
 		else
 		{
 			system("CLS");

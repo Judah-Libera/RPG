@@ -1,7 +1,6 @@
-//     RPG V4.1.0				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V4.1.1				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //IP
-//dnugeons.cpp functionality changes whe naccessed from TLE. those changes are commented inside of dungeons.cpp where dungeontype is proccessed.
 
 //BUGS
 //gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it). forces name that will work rn
@@ -13,12 +12,15 @@
 //audio
 //highscore table - if issue present its likely in saving
 //lots of commented code
+//failing to load empty save. not sure if c.cclass == ""
 
 //EDITS
 //merge catt and catlvlups into same variable. //if it ain't broke dont fix it tho
 //update pvp.cpp - sfx - char loads
 
 //FEATURES
+//add tle st
+//add dungeon st
 //add hlwknt st3
 //multiple save games. read folders in savedata folder, each character gets a folder with a number, user enters number to load filepath using that number. save game into folder with what ever number is entered.
 //boss theme(?dissonent theme? tremelo bass, e,f#,g. melody around a#. dim5th tritone)
@@ -1106,6 +1108,12 @@ static void loadchar()
 	istringstream data(textline);
 	data >> c.cclass >> c.chp >> c.mchp >> c.catt >> c.attlvlups >> c.regen >> c.cxp >> c.lvl >> c.score >> c.dif;
 
+	if (c.cclass == "")
+	{
+		c.cclass = "NULL";
+		return;
+	}
+
 	for (int i = 0; i < 5; i++)
 	{
 		weaponsarray[i] = { "", 0 };
@@ -1264,6 +1272,10 @@ static void settings()
 int main()
 {
 	FILE* ifp = fopen("settings.txt", "r"); //read in settings
+
+	if (ifp == NULL)
+		cout << "file failed to open";
+
 	fscanf(ifp, "FullScreen %d\n", &FullScreen);
 	fscanf(ifp, "Start Difficulty %d\n", &difsel);
 	fscanf(ifp, "Music Volume %d\n", &mvolume);
@@ -1410,8 +1422,13 @@ int main()
 		}
 		else if (temp2 == 2)
 		{
-			if (c.chp <= 0)
-				cout << "No game to load.";
+			if (c.cclass == "NULL")
+			{
+				cout << "No game to load." << endl;
+				keepplaying = false;
+				system("pause");
+				system("CLS");
+			}
 			else
 				loadchar();
 		}
@@ -1565,18 +1582,18 @@ int main()
 				break;
 			case 4: keepplaying = false;
 				break;
-			case 5: system("CLS");
+			case 5:
+			{
+				system("CLS");
 				int dungeonresult = 0;
 				char dun = 'A'; //select a dungeon and set difficulty and get file path for it
 
-				{ //switch control didn't like these variable declarations, so processing at a different scope
 				string dungeonmaprow;
 				ifstream din("maps/dungeonsmap.txt");
 				while (getline(din, dungeonmaprow))
 					cout << dungeonmaprow << endl;
 				cout << "Choose a dungeon or exit by entering 0" << endl;
 				cin >> dun;
-				}
 
 				if (dun == '0')
 				{
@@ -1586,30 +1603,39 @@ int main()
 
 				switch (dun)
 				{
+				case 'a':
 				case 'A':
 					dungeonresult = dungeon(5, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died					
 					break;
+				case 'b':
 				case 'B':
 					dungeonresult = dungeon(10, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
 					break;
+				case 'c':
 				case 'C':
 					dungeonresult = dungeon(15, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
 					break;
+				case 'd':
 				case 'D':
 					dungeonresult = dungeon(20, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
 					break;
+				case 'e':
 				case 'E':
 					dungeonresult = dungeon(25, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
 					break;
+				case 'f':
 				case 'F':
 					dungeonresult = dungeon(30, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
 					break;
+				case 'g':
 				case 'G':
 					dungeonresult = dungeon(35, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died			
 					break;
+				case 'h':
 				case 'H':
 					dungeonresult = dungeon(40, dungeontype, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died				
 					break;
+				case 't':
 				case 'T':
 					dungeonresult = TLE(c.lvl, c, weaponsarray, armorsarray, helmetsarray);//return 0 if dungeon was exited, return 1 if player died
 					break;
@@ -1619,6 +1645,7 @@ int main()
 				if (dungeonresult == 1)
 					killchar();
 				break;
+			}
 			case 6: keepplaying = false; // quite just gameplay loop
 				resetmenu = false; // quite main menu loop
 				break;
