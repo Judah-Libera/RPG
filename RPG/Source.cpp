@@ -1,9 +1,16 @@
-//     RPG V4.1.1				newcontent.alteredcontent/balancing.backendchanges/bugs
+//     RPG V4.1.2				newcontent.alteredcontent/balancing.backendchanges/bugs
 
 //IP
+//TLE map start position undefined in array, make it an actual character after S is found
+//check tle txt file for uneven number of chars in all rows, looks like rows ~5-10 were a character short
+
+//QOL
+//show curretn volume in change menu
+//cancel for al lsettings options
 
 //BUGS
 //gameplay loop stuck infinite looping after entering name as more that one word. (idk if it breaks just setting it or also on gameload or other uses of it). forces name that will work rn
+//TLE map currupts and stepping on a currupted tile crashes. sometimes jus crashes too, odds high as you move around more. maybe somethign about tileunderplayer swapping around?
 
 //TESTING
 //dungeon selection moved to source.cpp
@@ -1250,6 +1257,8 @@ static void settings()
 			break;
 		case 5: cout << "Judah - 1\nAlina - 2" << endl;
 			cin >> soundtracknum;
+			if (soundtracknum != 1 && soundtracknum != 2)
+				soundtracknum = 1;
 			break;
 		case 6: cout << "On - 1\nOff - 0" << endl;
 			cin >> dungeontype;

@@ -54,16 +54,21 @@ static void findC()
 
 static void printmap()
 {
-	tileunderplayer = map[charx][chary];
-	map[charx][chary] = 'c';
+	//tileunderplayer = map[charx][chary];
+	//map[charx][chary] = 'c';
 	system("CLS");
 	for (char i = 0; i < MAP_SIZE_X; i++)
 	{
 		for (char x = 0; x < MAP_SIZE_Y; x++)
-			printf("%c", map[x][i]);
+		{
+			if (x == charx && i == chary)
+				printf("c");
+			else
+				printf("%c", map[x][i]);
+		}
 		printf("\n");
 	}
-	map[charx][chary] = tileunderplayer;
+	//map[charx][chary] = tileunderplayer;
 }
 
 static void collisions(char tile)
@@ -234,7 +239,7 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 	//in >> mylaynaintroduction >> draygaintroduction >> mylaynalater >> draygalater >> dungeonopen >> queststarted >> dungeoncomplete >> draygadead >> dungeonresult >> connection;
 	charname = c.name;
 
-	cout << mylaynaintroduction << draygaintroduction << mylaynalater << draygalater << dungeonopen << dungeoncomplete << draygadead << dungeonresult << connection << endl;
+	cout << mylaynaintroduction << " " << draygaintroduction << " " << mylaynalater << " " << draygalater << " " << dungeonopen << " " << dungeoncomplete << " " << draygadead << " " << dungeonresult << " " << connection << endl;
 	system("pause");
 
 	clvl = charlvl;
@@ -290,32 +295,37 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 		}
 	}
 	printmap();
-	int input = 0;
+	unsigned char input = 0;
 	while (1)
 	{
-		input = 0;
-		switch (input = _getch())
+		input = _getch();
+		if (input == 224) //224 is catch code for special character i.e. arrow keys
 		{
-		case KEY_UP:
-			if (map[charx][chary - 1] != '@' && map[charx][chary - 1] != ' ')
-				chary--;
-			break;
-		case KEY_DOWN:
-			if (map[charx][chary + 1] != '@' && map[charx][chary + 1] != ' ')
-				chary++;
-			break;
-		case KEY_LEFT:
-			if (map[charx - 1][chary] != '@' && map[charx - 1][chary] != ' ')
-				charx--;
-			break;
-		case KEY_RIGHT:
-			if (map[charx + 1][chary] != '@' && map[charx + 1][chary] != ' ' && map[charx + 1][chary] != ']')
-				charx++;
-			break;
-		default:
-			break;
+			unsigned char arrowkey = _getch();
+			switch (arrowkey)
+			{
+			case KEY_UP:
+				if (map[charx][chary - 1] != '@' && map[charx][chary - 1] != ' ')
+					chary--;
+				break;
+			case KEY_DOWN:
+				if (map[charx][chary + 1] != '@' && map[charx][chary + 1] != ' ')
+					chary++;
+				break;
+			case KEY_LEFT:
+				if (map[charx - 1][chary] != '@' && map[charx - 1][chary] != ' ')
+					charx--;
+				break;
+			case KEY_RIGHT:
+				if (map[charx + 1][chary] != '@' && map[charx + 1][chary] != ' ' && map[charx + 1][chary] != ']')
+					charx++;
+				break;
+			default:
+				break;
+			}
 		}
 		printmap();
+		cout << "(" << charx << "," << chary << ")" << endl; //debugging position
 
 		if (dropnecklace == 1)
 		{
@@ -377,7 +387,5 @@ int TLE(int charlvl, character& c, weapon weaponsarray[], armor armorsarray[], h
 				}
 			}
 		}
-		cout << charx;
-		cout << chary;
 	}
 }
